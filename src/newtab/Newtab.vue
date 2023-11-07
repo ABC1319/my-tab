@@ -21,5 +21,4 @@ import Home from './components/layout/Home.vue'
       </div>
     </div>
   </Suspense>
-  <NaiveProvider />
 </template>

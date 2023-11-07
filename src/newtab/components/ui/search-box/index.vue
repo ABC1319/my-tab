@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core'
 import { reactive, ref } from 'vue'
+import GlassModal from '../glass-modal/index.vue'
 import { searchEngine } from './engine'
 import EngineList from './EngineList.vue'
 

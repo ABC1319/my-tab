@@ -95,7 +95,7 @@ defineExpose({
   backdrop-filter: blur(5px);
   box-shadow: 0 0 1px 1px #ffffff, 0 1px 5px 0px #ffffff;
   padding: 12px;
-  z-index: 99;
+  z-index: 9999;
 }
 .glass-modal{
   min-height: 300px;
