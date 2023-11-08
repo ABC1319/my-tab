@@ -97,12 +97,14 @@ const DEFAULT_SITES = [
 
 ]
 
+const { width } = useWindowSize()
+
 const options = ref({
   containerClassName: 'drag-container',
   elementsClassName: 'my-website-item',
   size: { width: 144, height: 88 },
   gap: 20,
-  maximumInLine: 6,
+  maximumInLine: Math.min(Math.floor(width.value / (144 + 20)), 6),
   duration: 300,
 })
 
@@ -114,15 +116,15 @@ const containerSize = computed(() => {
 
 const { resetLayout } = createDragInHorizontal(options.value)
 
-const { width } = useWindowSize()
-
-watch(width, (val) => {
+watch(width, () => {
   const max = Math.min(Math.floor(width.value / (options.value.size.width + options.value.gap)), 6)
 
   if (max !== options.value.maximumInLine) {
     options.value.maximumInLine = max
     resetLayout(undefined, undefined, max)
   }
+}, {
+  immediate: true,
 })
 </script>
 

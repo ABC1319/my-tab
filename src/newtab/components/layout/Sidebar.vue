@@ -1,27 +1,45 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+const shrinkBtnRef = ref<HTMLElement | null>(null)
 const isShrink = ref(false)
-const sidebarRef = ref<HTMLElement | null>(null)
-function toggle() {
-  isShrink.value = !isShrink.value
+const isHideBtn = ref(false) // 这个变量纯纯的是为了让按钮隐藏的时候延迟几秒
+function toggleShrink() {
+  if (!shrinkBtnRef.value)
+    return
+
+  const rotate = ['rotate(0)', 'rotate(180deg)']
+  const animation = shrinkBtnRef.value.animate(
+    { transform: isShrink.value ? [...rotate].reverse() : rotate },
+    { duration: 300, fill: 'forwards' },
+  )
+  animation.onfinish = () => {
+    isShrink.value = !isShrink.value
+
+    if (isShrink.value) {
+      setTimeout(() => {
+        isHideBtn.value = !isHideBtn.value
+      }, 1000 * 1)
+    }
+    else {
+      isHideBtn.value = !isHideBtn.value
+    }
+  }
 }
 </script>
 
 <template>
   <div
-    ref="sidebarRef"
-    class="w-58px h-full p-5px text-white transition-all duration-300 ease-in-out"
+    :style="{
+      width: isShrink ? '0px' : '48px',
+      marginLeft: isShrink ? '0px' : '5px',
+      marginRight: isShrink ? '0px' : '5px',
+      transform: isShrink ? 'translateX(-24px)' : 'unset',
+      transitionProperty: 'transform,width',
+    }"
+    class="h-[calc(100vh_-_10px)] my-auto text-white duration-300 ease-in-out relative"
   >
-    <div class=" w-full h-full bg-[#252835] rounded-10px py-10px flex flex-col gap-10px flex-shrink-0">
-      <div class="w-full h-fit flex flex-col justify-start items-center gap-10px">
-        <div class="w-32px h-32px bg-[#5021FF] rounded-6px grid place-items-center cursor-pointer [&>svg:hover]:scale-120" @click="toggle">
-          <svg class="transition-transform ease-in-out" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24">
-            <path fill="currentColor" d="m11 18l-6-6l6-6l1.4 1.4L7.825 12l4.575 4.6L11 18Zm6.6 0l-6-6l6-6L19 7.4L14.425 12L19 16.6L17.6 18Z" />
-          </svg>
-        </div>
-      </div>
-
+    <div class="w-full h-full bg-[#252835] rounded-10px py-10px flex flex-col gap-10px flex-shrink-0">
       <div class="w-full flex-1 flex flex-col justify-start items-center gap-10px">
         <div class="w-32px h-32px bg-[#484E64] rounded-6px grid place-items-center cursor-pointer [&>svg:hover]:scale-120">
           <svg class="transition-transform ease-in-out" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48">
@@ -42,6 +60,27 @@ function toggle() {
         <div class="w-32px h-32px hover:bg-[#484E64] rounded-6px grid place-items-center cursor-pointer [&>svg:hover]:scale-120">
           <svg class=" transition-transform ease-in-out" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
             <path fill="currentColor" d="M12.5 8H11v6l4.75 2.85l.75-1.23l-4-2.37zm4.837-6.19l4.607 3.845l-1.28 1.535l-4.61-3.843zm-10.674 0l1.282 1.536L3.337 7.19l-1.28-1.536zM12 4a9 9 0 1 0 .001 18.001A9 9 0 0 0 12 4zm0 16c-3.86 0-7-3.14-7-7s3.14-7 7-7s7 3.14 7 7s-3.14 7-7 7z" />
+          </svg>
+        </div>
+      </div>
+
+      <div
+        ref="shrinkBtnRef"
+        class="
+          w-fit h-fit mx-auto
+          flex flex-col justify-start items-center gap-10px
+          origin-[100%_50%]
+          ease-linear transition-opacity duration-300
+        "
+        :class="
+          isHideBtn
+            ? 'opacity-0 hover:opacity-100'
+            : 'opacity-100'
+        "
+      >
+        <div class="w-32px h-32px bg-[#5021FF] rounded-6px grid place-items-center cursor-pointer [&>svg:hover]:scale-120" @click="toggleShrink">
+          <svg class="transition-transform ease-in-out" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24">
+            <path fill="currentColor" d="m11 18l-6-6l6-6l1.4 1.4L7.825 12l4.575 4.6L11 18Zm6.6 0l-6-6l6-6L19 7.4L14.425 12L19 16.6L17.6 18Z" />
           </svg>
         </div>
       </div>
