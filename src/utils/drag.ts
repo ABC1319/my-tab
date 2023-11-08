@@ -105,20 +105,21 @@ export function createDragInHorizontal(options: DragInHorizonProps) {
     })
 
     // 3. 创建 placeholderBox 占位元素
-    const ele = elementsBox.value![0].ele as Element
-    const phElement = document.createElement('div')
-    phElement.id = `placeholderBox${generateUuid()}`
-    phElement.style.position = 'absolute'
-    phElement.style.width = '0px'
-    phElement.style.height = '0px'
-    phElement.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
-    phElement.style.backdropFilter = 'blur(80px)'
-    phElement.style.zIndex = '997'
-    const computedStyle = getComputedStyle(ele)
-    phElement.style.borderRadius = computedStyle.borderRadius
-    phElement.style.clipPath = computedStyle.clipPath
-    placeholderBox.value.ele = phElement
-    containerDOM.value.appendChild(placeholderBox.value.ele as Node)
+    const ele = elementsBox.value![0].ele
+    const p_prime = ele!.cloneNode(true) as HTMLElement
+    p_prime.id = `placeholderBox${generateUuid()}`
+    p_prime.style.backgroundColor = 'rgba(255, 255, 255, 0.0)'
+    p_prime.style.zIndex = '997'
+
+    while (p_prime.firstChild) {
+      // 移除子元素
+      p_prime.removeChild(p_prime.firstChild)
+    }
+
+    p_prime.style.content = 'none' // 隐藏伪元素内容
+
+    placeholderBox.value.ele = p_prime
+    containerDOM.value.appendChild(p_prime)
   }
 
   /**

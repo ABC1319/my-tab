@@ -140,7 +140,7 @@ watch(width, (val) => {
         :class="options.elementsClassName"
         class="
           w-144px h-88px
-          flex flex-col justify-center items-center  gap-5px flex-shrink-0 flex-grow-0
+          flex flex-col justify-center items-center gap-5px flex-shrink-0 flex-grow-0
           cursor-pointer
           overflow-hidden
           rounded-10px
