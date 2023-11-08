@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { useWindowSize } from '@vueuse/core'
+import { watch } from 'vue'
 import { createDragInHorizontal } from '~/utils/drag'
 
 const DEFAULT_SITES = [
@@ -96,42 +97,59 @@ const DEFAULT_SITES = [
 
 ]
 
-const box = ref<HTMLElement | null>(null)
-const item = ref<HTMLElement[] | null>(null)
+const options = ref({
+  containerClassName: 'drag-container',
+  elementsClassName: 'my-website-item',
+  size: { width: 144, height: 88 },
+  gap: 20,
+  maximumInLine: 6,
+  duration: 300,
+})
 
-onMounted(async () => {
-  const { isDragged } = createDragInHorizontal(
-    box.value!,
-    item.value!,
-    'my-website-item',
-    { width: 144, height: 88 },
-    20,
-    6,
-    300,
-  )
-  watch(isDragged, (val) => {
-    // eslint-disable-next-line no-console
-    console.log(val, 'isDragged')
-    // isDraggedWebSitesList = true
-  })
+const containerSize = computed(() => {
+  const w = (options.value.size.width + options.value.gap) * options.value.maximumInLine - options.value.gap
+  const h = (options.value.size.width + options.value.gap) * Math.floor(DEFAULT_SITES.length / options.value.maximumInLine) - options.value.gap
+  return { width: w, height: h }
+})
+
+const { resetLayout } = createDragInHorizontal(options.value)
+
+const { width } = useWindowSize()
+
+watch(width, (val) => {
+  const max = Math.min(Math.floor(width.value / (options.value.size.width + options.value.gap)), 6)
+
+  if (max !== options.value.maximumInLine) {
+    options.value.maximumInLine = max
+    resetLayout(undefined, undefined, max)
+  }
 })
 </script>
 
 <template>
-  <div ref="box" class="w-965px h-500px -mt-10px">
+  <div class="w-full h-full flex justify-center items-center">
     <div
-      v-for="item in DEFAULT_SITES" ref="item" :key="item.webName" class="
-        my-website-item
-        w-144px h-88px
-        flex flex-col justify-center items-center  gap-5px flex-shrink-0 flex-grow-0
-        cursor-pointer
-        overflow-hidden
-        rounded-10px
-        text-center
-      "
+      :class="options.containerClassName"
+      :style="{ width: `${containerSize.width}px` }"
+      style="will-change: width;"
+      class="h-500px"
     >
-      <div w-144px h-88px>
-        {{ item.webName }}
+      <div
+        v-for="(item, index) in DEFAULT_SITES"
+        :key="item.webName"
+        :class="options.elementsClassName"
+        class="
+          w-144px h-88px
+          flex flex-col justify-center items-center  gap-5px flex-shrink-0 flex-grow-0
+          cursor-pointer
+          overflow-hidden
+          rounded-10px
+          text-center
+        "
+      >
+        <div w-144px h-88px>
+          {{ item.webName + index }}
+        </div>
       </div>
     </div>
   </div>

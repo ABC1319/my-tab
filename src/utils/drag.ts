@@ -1,3 +1,5 @@
+import { tryOnMounted } from '@vueuse/core'
+
 function generateUuid(a = ''): string {
   return a
     ? ((Number(a) ^ (Math.random() * 16)) >> (Number(a) / 4)).toString(16)
@@ -13,51 +15,72 @@ interface ElemensBoxType {
   ele?: HTMLElement
 }
 
-export function createDragInHorizontal(
-  containerElement: HTMLElement,
-  elements: HTMLElement[],
-  elementsClassName: string,
-  size: { width: number; height: number },
-  gap: number,
-  maximumInLine: number,
-  duration = 200,
-) {
-  let isDragging = false // 拖拽状态
-  const isDragged = ref(false) // 是否已经拖拽过
+interface DragInHorizonProps {
+  containerClassName: string
+  elementsClassName: string
+  size: { width: number; height: number }
+  gap: number
+  maximumInLine: number
+  duration?: number
+}
+
+/**
+ * 创建水平方向的可拖拽的容器
+ * @param containerClassName 盒子容器的 className
+ * @param elementsClassName 容器中可拖拽 item 的 className
+ * @param size 盒子尺寸
+ * @param gap item 间隔
+ * @param maximumInLine 每行最大个数
+ * @param duration 动画过渡时间
+ * @returns  isDragged : 是否拖拽
+ */
+export function createDragInHorizontal(options: DragInHorizonProps) {
+  const {
+    containerClassName,
+    elementsClassName,
+    size,
+    gap,
+    maximumInLine,
+    duration = 200,
+  } = options
+
+  // 拖拽状态
+  let isDragging = false
+  // 是否已经拖拽过
+  const isDragged = ref(false)
+
   let mouseFrom = { x: 0, y: 0 }
   let mouseTo = { x: 0, y: 0 }
 
+  // DOM
+  const containerDOM = computed<HTMLElement | null>(() => document?.querySelector(`.${containerClassName}`))
+  const itemsDOM = computed<NodeListOf<HTMLElement> | null>(() => document?.querySelectorAll(`.${elementsClassName}`))
+
+  // 全部的元素对象 itemsDOM -> elementsBox
+  const elementsBox = ref<ElemensBoxType[]>([])
   // 当前选中的元素对象
   const currentClickedBox = ref<ElemensBoxType>({ id: '', x: 0, y: 0, width: size.width, height: size.height })
-  // 全部的元素对象
-  const elementsBox = ref<ElemensBoxType[]>([])
-
   // 占位的元素对象
-  const placeholderElement = document.createElement('div')
-  placeholderElement.style.position = 'absolute'
-  placeholderElement.style.width = '0px'
-  placeholderElement.style.height = '0px'
-  const computedStyle = getComputedStyle(elements[0] as HTMLElement)
-  placeholderElement.style.borderRadius = computedStyle.borderRadius
-  placeholderElement.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
-  placeholderElement.style.backdropFilter = 'blur(80px)'
-  placeholderElement.style.zIndex = '997'
-  placeholderElement.style.clipPath = 'path("M 0 44 C 0 0.9849735503722608 0.9849735503722608 0 44 0 L 100 0 C 143.01502644962773 0 144 0.9849735503722608 144 44 L 144 44 C 144 87.01502644962774 143.01502644962773 88 100 88 L 44 88 C 0.9849735503722608 88 0 87.01502644962774 0 44 z")'
+  const placeholderBox = ref({ id: '', x: 0, y: 0, width: 0, height: 0, ele: undefined } as ElemensBoxType)
 
-  const placeholderBox = ref({ id: '', x: 0, y: 0, width: 0, height: 0, ele: placeholderElement })
-
-  main()
-
-  function main() {
+  tryOnMounted(() => {
     initLayout()
     bindEventListener()
-  }
+  })
 
   function initLayout() {
-    // 1. 设置 containerElement 的样式
-    containerElement.style.position = 'relative'
+    if (!containerDOM.value)
+      return
+    if (!itemsDOM.value)
+      return
+
+    if (itemsDOM.value.length <= 0)
+      return
+
+    containerDOM.value.style.position = 'relative'
+
     // 2. 设置 elements 的样式
-    elements.forEach((element, index) => {
+    itemsDOM.value.forEach((element, index) => {
       element.id = `elements${generateUuid()}`
       const row = Math.floor(index / maximumInLine)
       const column = index % maximumInLine
@@ -82,14 +105,67 @@ export function createDragInHorizontal(
     })
 
     // 3. 创建 placeholderBox 占位元素
-    containerElement.appendChild(placeholderElement)
+    const ele = elementsBox.value![0].ele as Element
+    const phElement = document.createElement('div')
+    phElement.id = `placeholderBox${generateUuid()}`
+    phElement.style.position = 'absolute'
+    phElement.style.width = '0px'
+    phElement.style.height = '0px'
+    phElement.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
+    phElement.style.backdropFilter = 'blur(80px)'
+    phElement.style.zIndex = '997'
+    const computedStyle = getComputedStyle(ele)
+    phElement.style.borderRadius = computedStyle.borderRadius
+    phElement.style.clipPath = computedStyle.clipPath
+    placeholderBox.value.ele = phElement
+    containerDOM.value.appendChild(placeholderBox.value.ele as Node)
+  }
+
+  /**
+   * 重新设置布局
+   * demo: resetLayout(undefined, 30, 6, 200)
+   * @param newSize item 尺寸
+   * @param newGap 间隔
+   * @param newMaximumInLine 每行最大个数
+   * @param newDuration 动画过渡
+   * @returns void
+   */
+  function resetLayout(
+    newSize: { width: number; height: number } = size,
+    newGap: number = gap,
+    newMaximumInLine: number = maximumInLine,
+    newDuration: number = duration,
+  ) {
+    if (!elementsBox.value)
+      return
+
+    elementsBox.value.forEach((element, index) => {
+      const row = Math.floor(index / newMaximumInLine)
+      const column = index % newMaximumInLine
+
+      if (element.ele) {
+        element.ele.style.width = `${newSize.width}px`
+        element.ele.style.height = `${newSize.height}px`
+        element.ele.style.transition = `transform ${newDuration}ms ease 0s`
+      }
+
+      const box = elementsBox.value.find(item => item.id === element.id)
+      if (box) {
+        box.x = column * (newSize.width + newGap)
+        box.y = row * (newSize.height + newGap)
+        box.width = newSize.width
+        box.height = newSize.height
+      }
+    })
   }
 
   // 1. 监听占位元素的位置
   watch(placeholderBox, () => {
-    placeholderBox.value.ele.style.width = `${placeholderBox.value.width}px`
-    placeholderBox.value.ele.style.height = `${placeholderBox.value.height}px`
-    placeholderBox.value.ele.style.transform = `translate3d(${placeholderBox.value.x}px, ${placeholderBox.value.y}px, 0)`
+    if (placeholderBox.value.ele) {
+      placeholderBox.value.ele.style.width = `${placeholderBox.value.width}px`
+      placeholderBox.value.ele.style.height = `${placeholderBox.value.height}px`
+      placeholderBox.value.ele.style.transform = `translate3d(${placeholderBox.value.x}px, ${placeholderBox.value.y}px, 0)`
+    }
   }, { deep: true })
 
   // 2. 监听设置所有元素的位置
@@ -129,7 +205,6 @@ export function createDragInHorizontal(
     // 3. 设置当前点击元素的位置。并且将当前点击元素的顺序放在最后
     const index = elementsBox.value.findIndex(item => item.id === clickedItem?.id)
     if (index !== -1) {
-      // currentClickedBox.value = elementsBox.value.splice(index, 1)[0]
       currentClickedBox.value = elementsBox.value[index]
       currentClickedBox.value.ele!.style.zIndex = '999'
       currentClickedBox.value.ele!.style.transition = 'unset'
@@ -194,14 +269,13 @@ export function createDragInHorizontal(
     currentClickedBox.value.y = placeholderBox.value.y
     currentClickedBox.value = { id: '', x: 0, y: 0, width: size.width, height: size.height }
 
-    placeholderBox.value = { id: '', x: 0, y: 0, width: 0, height: 0, ele: placeholderElement }
+    placeholderBox.value = { id: '', x: 0, y: 0, width: 0, height: 0, ele: placeholderBox.value.ele }
     placeholderBox.value.ele!.style.transition = 'unset'
 
     mouseFrom = { x: 0, y: 0 }
     mouseTo = { x: 0, y: 0 }
   }
 
-  // 检测碰撞
   function hitAllEle(node: ElemensBoxType, allNodes: ElemensBoxType[]) {
     const hittedNodes: any = []
 
@@ -289,6 +363,7 @@ export function createDragInHorizontal(
 
   return {
     isDragged,
+    resetLayout,
     bindEventListener,
     unbindEventListener,
   }
