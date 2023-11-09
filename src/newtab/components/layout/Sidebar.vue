@@ -37,7 +37,7 @@ function toggleShrink() {
       transform: isShrink ? 'translateX(-24px)' : 'unset',
       transitionProperty: 'transform,width',
     }"
-    class="h-[calc(100vh_-_10px)] my-auto text-white duration-300 ease-in-out relative"
+    class="h-[calc(100vh_-_10px)] my-auto text-white duration-300 ease-in-out relative flex-shrink-0"
   >
     <div class="w-full h-full bg-[#252835] rounded-10px py-10px flex flex-col gap-10px flex-shrink-0">
       <div class="w-full flex-1 flex flex-col justify-start items-center gap-10px">

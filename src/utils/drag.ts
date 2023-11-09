@@ -35,7 +35,7 @@ interface DragInHorizonProps {
  * @returns  isDragged : 是否拖拽
  */
 export function createDragInHorizontal(options: DragInHorizonProps) {
-  const {
+  let {
     containerClassName,
     elementsClassName,
     size,
@@ -139,6 +139,11 @@ export function createDragInHorizontal(options: DragInHorizonProps) {
   ) {
     if (!elementsBox.value)
       return
+
+    size = newSize
+    gap = newGap
+    maximumInLine = newMaximumInLine
+    duration = newDuration
 
     elementsBox.value.forEach((element, index) => {
       const row = Math.floor(index / newMaximumInLine)

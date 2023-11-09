@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useWindowSize } from '@vueuse/core'
+import { useElementSize, useWindowSize } from '@vueuse/core'
 import { watch } from 'vue'
 import { createDragInHorizontal } from '~/utils/drag'
 
@@ -97,44 +97,50 @@ const DEFAULT_SITES = [
 
 ]
 
-const { width } = useWindowSize()
+// 这里使用两个变量的原因是：要获取 main DOM 的 width 来确定每行几个
+// 但是在初始化的时候，main DOM 还没有渲染出来
+// 等 onMounted 的时候再确定，会每次都有排列动画，效果不好
+// 所以初始的时候，要么确定 main DOM 的宽度(100vw - 48)，要么就直接给个默认值(使用 window.innerWidth )
+// 这里使用 window.innerWidth 去确定个数
+
+const outerContainerRef = ref(null)
+const { width: windowWidth } = useWindowSize()
+const { width } = useElementSize(outerContainerRef)
 
 const options = ref({
   containerClassName: 'drag-container',
   elementsClassName: 'my-website-item',
   size: { width: 144, height: 88 },
   gap: 20,
-  maximumInLine: Math.min(Math.floor(width.value / (144 + 20)), 6),
+  maximumInLine: Math.min(Math.floor((windowWidth.value - 100 - 58) / (144 + 20)), 6), // 58 是 sidebar 的 width
   duration: 300,
 })
 
-const containerSize = computed(() => {
+const containerWidth = computed(() => {
   const w = (options.value.size.width + options.value.gap) * options.value.maximumInLine - options.value.gap
-  const h = (options.value.size.width + options.value.gap) * Math.floor(DEFAULT_SITES.length / options.value.maximumInLine) - options.value.gap
-  return { width: w, height: h }
+  return `${w}px`
+})
+const containerHeight = computed(() => {
+  const h = (options.value.size.width + options.value.gap) * Math.ceil(DEFAULT_SITES.length / options.value.maximumInLine) - options.value.gap
+  return `${h}px`
 })
 
 const { resetLayout } = createDragInHorizontal(options.value)
-
-watch(width, () => {
-  const max = Math.min(Math.floor(width.value / (options.value.size.width + options.value.gap)), 6)
+watch(width, (val) => {
+  const max = Math.min(Math.floor((val - 100) / (options.value.size.width + options.value.gap)), 6)
 
   if (max !== options.value.maximumInLine) {
     options.value.maximumInLine = max
     resetLayout(undefined, undefined, max)
   }
-}, {
-  immediate: true,
 })
 </script>
 
 <template>
-  <div class="w-full h-full flex justify-center items-center">
+  <div ref="outerContainerRef" class="w-full flex justify-center items-center">
     <div
       :class="options.containerClassName"
-      :style="{ width: `${containerSize.width}px` }"
-      style="will-change: width;"
-      class="h-500px"
+      class="my-website-box"
     >
       <div
         v-for="(item, index) in DEFAULT_SITES"
@@ -149,7 +155,11 @@ watch(width, () => {
           text-center
         "
       >
-        <div w-144px h-88px>
+        <div class="w-10 h-10 grid place-items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M16 30a14 14 0 1 1 14-14a14.016 14.016 0 0 1-14 14zm0-26a12 12 0 1 0 12 12A12.014 12.014 0 0 0 16 4z" fill="currentColor" /><path d="M15 7h2v7h-2z" fill="currentColor" /><path d="M7 15h7v2H7z" fill="currentColor" /><path d="M15 18h2v7h-2z" fill="currentColor" /><path d="M18 15h7v2h-7z" fill="currentColor" /></svg>
+        </div>
+
+        <div class="w-full">
           {{ item.webName + index }}
         </div>
       </div>
@@ -158,6 +168,14 @@ watch(width, () => {
 </template>
 
 <style scoped>
+.my-website-box{
+  will-change: width,height;
+  transition-property: width,height;
+  transition-duration: 300ms;
+  transition-timing-function: linear;
+  width: v-bind(containerWidth);
+  height: v-bind(containerHeight);
+}
 .my-website-item {
   background-color: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(40px);

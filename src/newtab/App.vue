@@ -6,18 +6,24 @@ import Home from './components/layout/Home.vue'
 <template>
   <Suspense>
     <!-- 背景 -->
-    <div class="main-container w-screen h-screen bg-black overflow-hidden">
-      <div
-        class="w-full h-full flex flex-row"
-        style="
-            transition: ALl .3s cubic-bezier(0.4, 0, 0.2, 1);
-            background-image: url(/assets/main_resource.png);
-            background-size: cover;
-          "
-      >
-        <Sidebar class="flex-shrink-0" />
-        <Home />
-      </div>
+    <div
+      class="
+        main-container
+        w-screen h-screen overflow-hidden
+        bg-black
+        flex flex-row
+      "
+    >
+      <Sidebar />
+      <Home />
     </div>
   </Suspense>
 </template>
+
+<style scoped>
+.main-container{
+  background-image: url(/assets/main_resource.png);
+  background-size: cover;
+  background-position: center;
+}
+</style>

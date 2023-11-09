@@ -41,12 +41,16 @@ function handleSelectedSearchEngine(item: typeof searchConfig.value[0]) {
   }
 }
 
+const selectionRef = ref<HTMLElement | null>(null)
+const searchRef = ref<HTMLElement | null>(null)
 function isOpenSearchEngineList() {
+  if (!searchRef.value || !selectionRef.value)
+    return
+
   isShowSearchEngine.value = !isShowSearchEngine.value
 }
 
-const target = ref(null)
-onClickOutside(target, (event: PointerEvent) => {
+onClickOutside(selectionRef, (event: PointerEvent) => {
   // 1. 如果是点击 icon ，不对其进行操作
   if ((event.target as HTMLElement).id === 'search-icon')
     return
@@ -77,16 +81,18 @@ function handleSaveEngineModal() {
 </script>
 
 <template>
-  <div class=" w-full flex flex-col justify-center items-center pointer-events-none top-[12vh]">
+  <div class="flex-shrink-0 mt-88px mb-48px w-full h-[56px] flex flex-col justify-center items-center pointer-events-none relative">
     <section
-      class="w-[676px] max-w-[86vw] pointer-events-auto" style="
+      ref="searchRef"
+      class="w-[676px] max-w-[66vw] pointer-events-auto h-full"
+      style="
         transition-property: top;
         transition-duration: 200ms;
         border-radius: 12px;
-        "
+      "
     >
       <div
-        class="search-box overflow-hidden w-full h-[48px] flex items-center rounded-[30px] text-[var(--primary-text-color)] bg-opacity-60 transition-colors duration-100 focus-within:bg-opacity-80 dark:focus-within:bg-opacity-70 "
+        class="search-box overflow-hidden w-full h-full flex items-center rounded-[30px] transition-colors duration-100 focus-within:bg-opacity-80 dark:focus-within:bg-opacity-70 "
       >
         <!-- icon -->
         <div
@@ -107,12 +113,17 @@ function handleSaveEngineModal() {
         <!-- 输入框 -->
         <input
           v-model="searchText"
-          class=" text-gray-700 outline-none h-full grow bg-[transparent] py-[12px] pl-[4px] pr-[42px] placeholder:text-gray-500"
+          class="
+            h-full text-16px
+            text-gray-900 placeholder:text-gray-400 bg-[transparent]
+            py-[12px] pl-1 pr-[42px]
+            outline-none grow
+          "
           placeholder="输入搜索内容" autocomplete="off" @keydown.enter="handleSearch"
         >
 
         <!-- 清除 icon -->
-        <div class="absolute top-0 right-0 flex h-full w-[48px] items-center justify-center">
+        <div class="absolute top-0 right-0 flex h-full w-[48px] items-center justify-center text-[#252835]">
           <button v-show="searchText" tabindex="-1" type="button" class="h-[32px] w-[32px]" @click="clearSearchText">
             <div i-ooui:clear />
           </button>
@@ -122,20 +133,21 @@ function handleSaveEngineModal() {
 
     <!-- 搜索引擎 ，最多 9 个 -->
     <section
-      ref="target"
+      ref="selectionRef"
       :style="{
         height: isShowSearchEngine ? '90px' : '0px',
         padding: isShowSearchEngine ? '1rem 1.4rem' : '0 1.4rem',
       }"
       class="
         search-engine
-        w-[676px] max-w-[86vw] overflow-hidden z-9999
+        w-[676px] max-w-[66vw] overflow-hidden z-9999
         pointer-events-auto
         rounded-[12px]
-        mt-10px p-4
+        p-4 mt-10px
         select-none
         flex flex-row justify-start items-center
         transition-all ease-in duration-200
+        absolute top-full
       "
     >
       <EngineList @handleSelectedSearchEngine="handleSelectedSearchEngine" />
@@ -202,7 +214,7 @@ function handleSaveEngineModal() {
 
 <style scoped>
 .search-box {
-  background-color: rgba(255, 255, 255, 0.4);
+  background-color: #F5F7F8;
   backdrop-filter: blur(40px);
   border: 1px solid #ffffff1a;
   box-shadow: 0 4px 16px 0 #0000001a;
