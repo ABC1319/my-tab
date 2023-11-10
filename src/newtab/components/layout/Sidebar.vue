@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { isShrinkSidebar } from '~/logic/storage'
+
+const isShrink = ref(isShrinkSidebar.value === 'true')
+watch(isShrink, (v) => {
+  isShrinkSidebar.value = `${v}`
+})
 
 const shrinkBtnRef = ref<HTMLElement | null>(null)
-const isShrink = ref(false)
-const isHideBtn = ref(false) // 这个变量纯纯的是为了让按钮隐藏的时候延迟几秒
+const isHideBtn = ref(true) // 这个变量纯纯的是为了让按钮隐藏的时候延迟几秒
+
 function toggleShrink() {
   if (!shrinkBtnRef.value)
     return
@@ -18,11 +24,11 @@ function toggleShrink() {
 
     if (isShrink.value) {
       setTimeout(() => {
-        isHideBtn.value = !isHideBtn.value
+        isHideBtn.value = true
       }, 1000 * 1)
     }
     else {
-      isHideBtn.value = !isHideBtn.value
+      isHideBtn.value = false
     }
   }
 }
@@ -72,9 +78,14 @@ function toggleShrink() {
           origin-[100%_50%]
           ease-linear transition-opacity duration-300
         "
+        :style="{
+          transform: isShrink ? 'rotate(180deg)' : 'rotate(0deg)',
+        }"
         :class="
-          isHideBtn
-            ? 'opacity-0 hover:opacity-100'
+          isShrink
+            ? isHideBtn
+              ? 'opacity-0 hover:opacity-100'
+              : 'opacity-100'
             : 'opacity-100'
         "
       >
