@@ -17,6 +17,7 @@ specifiers:
   chokidar: ^3.5.3
   cross-env: ^7.0.3
   crx: ^5.0.1
+  dexie: ^3.2.4
   eslint: ^8.40.0
   esno: ^0.16.3
   fs-extra: ^11.1.1
@@ -56,6 +57,7 @@ devDependencies:
   chokidar: 3.5.3
   cross-env: 7.0.3
   crx: 5.0.1
+  dexie: 3.2.4
   eslint: 8.53.0
   esno: 0.16.3
   fs-extra: 11.1.1
@@ -2420,6 +2422,11 @@ packages:
 
   /destr/2.0.2:
     resolution: {integrity: sha512-65AlobnZMiCET00KaFFjUefxDX0khFA/E4myqZ7a6Sq1yZtR8+FVIvilVX66vF2uobSumxooYZChiRPCKNqhmg==}
+    dev: true
+
+  /dexie/3.2.4:
+    resolution: {integrity: sha512-VKoTQRSv7+RnffpOJ3Dh6ozknBqzWw/F3iqMdsZg958R0AS8AnY9x9d1lbwENr0gzeGJHXKcGhAMRaqys6SxqA==}
+    engines: {node: '>=6.0'}
     dev: true
 
   /dir-glob/3.0.1:
