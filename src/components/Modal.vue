@@ -1,16 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-const props = defineProps({
-  title: {
-    type: String,
-    default: 'Title',
-    required: false,
-  },
-})
-
 const visible = ref(false)
-function close() {
+async function close() {
   const animateDom = document.querySelectorAll('.modal-mask')[0] as HTMLElement
   animateDom.classList.add('fade-out')
 
@@ -18,11 +10,9 @@ function close() {
   animateOutDom1.classList.remove('scale-up-center')
   animateOutDom1.classList.add('scale-down-center')
 
-  setTimeout(() => {
-    visible.value = false
-  }, 300)
-
-  // visible.value = false
+  const ANIMATIONS = animateOutDom1.getAnimations()
+  await Promise.all(ANIMATIONS.map(animation => animation.finished))
+  visible.value = false
 }
 
 function open() {
@@ -37,27 +27,26 @@ defineExpose({
 </script>
 
 <template>
-  <Teleport to="body">
-    <div v-if="visible" class="modal-mask">
-      <div class="modal scale-up-center">
-        <div class="modal-box">
-          <div class="modal-header">
-            <span class="font-medium">
-              {{ props.title }}
-            </span>
-            <div
-              class="
-                cursor-pointer
-               text-blue-600 hover:bg-blue-400 hover:text-white
-                rounded-full
-               "
-            >
-              <div i-carbon-close @click="close" />
-            </div>
-          </div>
-          <div class="modal-content">
-            <slot />
-          </div>
+  <Teleport to="body" @click.stop>
+    <div
+      v-if="visible"
+      class="modal-mask"
+      @click="close"
+    >
+      <div class="modal scale-up-center" @click.stop>
+        <div class="modal-content">
+          <slot />
+        </div>
+        <div
+          class="
+            absolute right-10px top-10px
+            cursor-pointer
+            text-white hover:bg-white hover:text-[#252835]
+            rounded-full
+            w-6 h-6
+          "
+        >
+          <div class="w-full h-full" i-carbon-close @click="close" />
         </div>
       </div>
     </div>
@@ -72,7 +61,7 @@ defineExpose({
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(5px);
   box-shadow: 0 0 1px 1px #ffffff, 0 1px 5px 0px #ffffff;
   padding: 12px;
@@ -83,17 +72,17 @@ defineExpose({
   width: 500px;
   height: auto;
   border-radius: 20px;
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: #252836;
   backdrop-filter: blur(40px);
-  /* box-shadow: 0 0 1px 1px #ffffff, 0 1px 5px 0px #ffffff; */
   padding: 12px;
   z-index: 100;
+  color: white;
+  position: relative;
 }
 .modal-box{
   width: 100%;
   height: 100%;
   border-radius: 15px;
-  background-color: rgba(255, 255, 255, 1);
   backdrop-filter: blur(2px);
   z-index: 100;
   padding-top: 10px;
@@ -107,7 +96,6 @@ defineExpose({
 }
 .modal-content{
   height: calc(100% - 40px);
-  padding: 20px;
 }
 
 .scale-up-center{

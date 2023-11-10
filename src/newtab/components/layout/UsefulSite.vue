@@ -87,7 +87,7 @@ function handleAddWebSite() {
     </div>
   </div>
 
-  <Modal ref="modalRef" title="测试">
+  <Modal ref="modalRef">
     测试
   </Modal>
 </template>
