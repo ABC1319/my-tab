@@ -105,21 +105,41 @@ export function createDragInHorizontal(options: DragInHorizonProps) {
     })
 
     // 3. 创建 placeholderBox 占位元素
+    // const ele = elementsBox.value![0].ele
+    // const p_prime = ele!.cloneNode(true) as HTMLElement
+    // p_prime.id = `placeholderBox${generateUuid()}`
+    // p_prime.style.backgroundColor = 'rgba(255, 255, 255, 0.0)'
+    // p_prime.style.zIndex = '997'
+
+    // while (p_prime.firstChild) {
+    //   // 移除子元素
+    //   p_prime.removeChild(p_prime.firstChild)
+    // }
+    // p_prime.style.content = 'none' // 隐藏伪元素内容
+    // placeholderBox.value.ele = p_prime
+    // containerDOM.value.appendChild(p_prime)
+
+    if (
+      !elementsBox.value[0]
+      || !elementsBox.value[0]?.ele
+    )
+      return
+
     const ele = elementsBox.value![0].ele
-    const p_prime = ele!.cloneNode(true) as HTMLElement
-    p_prime.id = `placeholderBox${generateUuid()}`
-    p_prime.style.backgroundColor = 'rgba(255, 255, 255, 0.0)'
-    p_prime.style.zIndex = '997'
 
-    while (p_prime.firstChild) {
-      // 移除子元素
-      p_prime.removeChild(p_prime.firstChild)
+    const phElement = document.createElement('div')
+    const computedStyles = getComputedStyle(ele as HTMLElement)
+    for (let i = 0; i < computedStyles.length; i++) {
+      const property = computedStyles[i]
+      const value = computedStyles.getPropertyValue(property)
+      phElement.style.setProperty(property, value)
     }
-
-    p_prime.style.content = 'none' // 隐藏伪元素内容
-
-    placeholderBox.value.ele = p_prime
-    containerDOM.value.appendChild(p_prime)
+    phElement.id = `placeholderBox${generateUuid()}`
+    phElement.className = 'placeholderBox'
+    phElement.style.background = '#ffffff21 !important'
+    phElement.style.zIndex = '997'
+    placeholderBox.value.ele = phElement
+    containerDOM.value.appendChild(phElement)
   }
 
   /**
@@ -144,6 +164,39 @@ export function createDragInHorizontal(options: DragInHorizonProps) {
     gap = newGap
     maximumInLine = newMaximumInLine
     duration = newDuration
+
+    // -----------------------这里是判断数量是否发生改变 start-------------------------- //
+    const currentDoms = document?.querySelectorAll(`.${elementsClassName}`)
+
+    // 1. 判断是否减少
+    const names = Array.from(currentDoms).map(dom => dom.id)
+    elementsBox.value.forEach((item, index) => {
+      if (!names.includes(item.id))
+        elementsBox.value.splice(index, 1)
+    })
+    // 2. 判断是否增加
+    const addedItems = Array.from(currentDoms).filter(dom => !dom.id) as HTMLElement[]
+    addedItems.forEach((element, index) => {
+      element.id = `elements${generateUuid()}`
+      const row = Math.floor(index / maximumInLine)
+      const column = index % maximumInLine
+      element.style.position = 'absolute'
+      element.style.width = `${size.width}px`
+      element.style.height = `${size.height}px`
+      element.style.userSelect = 'none'
+      element.style.willChange = 'transform'
+      element.style.zIndex = '998'
+      element.style.transition = `transform ${duration}ms ease 0s`
+      elementsBox.value.push({
+        id: element.id,
+        x: column * (size.width + gap),
+        y: row * (size.height + gap),
+        width: size.width,
+        height: size.height,
+        ele: element,
+      })
+    })
+    // -----------------------这里是判断数量是否发生改变 end-------------------------- //
 
     elementsBox.value.forEach((element, index) => {
       const row = Math.floor(index / newMaximumInLine)

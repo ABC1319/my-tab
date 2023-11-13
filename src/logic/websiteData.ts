@@ -1,14 +1,6 @@
 import { storageWebsiteDB } from '.'
+import type { WebsiteParams } from '~/typings/website'
 
-export interface WebsiteParams {
-  id?: number
-  url: string
-  type: number
-  webName: string
-  icon: string
-  index: number
-  property: { color: string }
-}
 export async function getPinedWebsite() {
   const queryResult = await storageWebsiteDB.getItemBySQL(
     { key: 'where', value: 'type' },
