@@ -88,7 +88,93 @@ function handleAddWebSite() {
   </div>
 
   <Modal ref="modalRef">
-    测试
+    <div class="flex flex-row justify-around items-center my-8 w-560px max-w-66vw min-w-350px">
+      <div class="mt-34px">
+        <div
+          class="w-220px h-130px grid place-items-center bg-white rounded-10px"
+        >
+          <div class="mix-blend-difference">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M11 13v3q0 .425.288.713T12 17q.425 0 .713-.288T13 16v-3h3q.425 0 .713-.288T17 12q0-.425-.288-.713T16 11h-3V8q0-.425-.288-.713T12 7q-.425 0-.713.288T11 8v3H8q-.425 0-.713.288T7 12q0 .425.288.713T8 13h3Zm1 9q-2.075 0-3.9-.788t-3.175-2.137q-1.35-1.35-2.137-3.175T2 12q0-2.075.788-3.9t2.137-3.175q1.35-1.35 3.175-2.137T12 2q2.075 0 3.9.788t3.175 2.137q1.35 1.35 2.138 3.175T22 12q0 2.075-.788 3.9t-2.137 3.175q-1.35 1.35-3.175 2.138T12 22Z" /></svg>
+          </div>
+        </div>
+
+        <div class="w-58px h-24px mt-14px bg-[#404459] rounded-md text-[#fafafa] ml-auto flex flex-row cursor-pointer overflow-hidden ">
+          <div class="w-24px h-full grid place-items-center flex-1 hover:bg-[#2528366b]">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M3 21h3.75L17.81 9.94l-3.75-3.75L3 17.25V21zm2-2.92l9.06-9.06l.92.92L5.92 19H5v-.92zM18.37 3.29a.996.996 0 0 0-1.41 0l-1.83 1.83l3.75 3.75l1.83-1.83a.996.996 0 0 0 0-1.41l-2.34-2.34z" /></svg>
+          </div>
+          <div class="h-full w-1px bg-[#00000036]" />
+          <div class="w-24px h-full grid place-items-center flex-1 hover:bg-[#2528366b]">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" /></svg>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="flex flex-col justify-start items-start">
+          <label
+            for="name-input"
+            class="my-2 text-14px"
+          >
+            名称
+          </label>
+          <input
+            id="name-input"
+            :maxlength="128"
+            type="text"
+            class="
+            w-225px h-8 text-14px
+            rounded-6px
+          bg-[#404459] text-[#fafafa]
+            box-border px-16px py-8px
+            outline-none
+          "
+          >
+
+          <label
+            for="url-input"
+            class="my-2 text-14px"
+          >
+            地址
+          </label>
+          <input
+            id="url-input"
+            :maxlength="128" type="text"
+            class="
+            w-225px h-8 text-14px
+            rounded-6px
+          bg-[#404459] text-[#fafafa]
+            box-border px-16px py-8px
+            outline-none
+          "
+          >
+        </div>
+
+        <div class="flex flex-row gap-2 mt-32px">
+          <button
+            class="
+            ok-btn
+            w-108px h-32px text-14px
+            rounded-6px
+            bg-[#404459] text-[#fafafa]
+            hover:bg-[#4044596b]
+          "
+          >
+            确定
+          </button>
+          <button
+            class="
+            cancel-btn
+            w-108px h-32px text-14px
+            rounded-6px
+            bg-[#40445990] text-[#fafafa]
+            hover:bg-[#4044596b]
+          "
+          >
+            取消
+          </button>
+        </div>
+      </div>
+    </div>
   </Modal>
 </template>
 
@@ -121,5 +207,10 @@ function handleAddWebSite() {
   box-shadow: inset 0 0 0 200px rgb(255, 255, 255, 0.2);
   filter: blur(16px);
   pointer-events: none;
+}
+
+.ok-btn,
+.cancel-btn {
+  clip-path: path(M 0 16 C 0 0.358172 0.358172 0 16 0 L 92 0 C 107.642 0 108 0.358172 108 16 L 108 16 C 108 31.6418 107.642 32 92 32 L 16 32 C 0.358172 32 0 31.6418 0 16 Z);
 }
 </style>

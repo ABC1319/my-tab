@@ -43,6 +43,7 @@ defineExpose({
             cursor-pointer
             text-white hover:bg-white hover:text-[#252835]
             rounded-full
+            transition-all duration-300 ease-in-out
             w-6 h-6
           "
         >
@@ -69,7 +70,7 @@ defineExpose({
 }
 .modal{
   min-height: 300px;
-  width: 500px;
+  width: fit-content;
   height: auto;
   border-radius: 20px;
   background-color: #252836;
