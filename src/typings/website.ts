@@ -4,5 +4,5 @@ export interface WebsiteParams {
   url: string
   icon: string
   type: number
-  remark?: string
+  remark?: Record<string, any>
 }

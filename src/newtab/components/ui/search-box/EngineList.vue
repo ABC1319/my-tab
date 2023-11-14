@@ -12,6 +12,7 @@ let isDraggedEngineList = false
 const options = {
   containerClassName: 'search-engine-container',
   elementsClassName: 'search-engine-item',
+  defaultPinedClassName: '自定义',
   size: { width: 70, height: 70 },
   gap: 0,
   maximumInLine: 9,
@@ -38,7 +39,7 @@ function handleSelectedSearchEngine(item: typeof searchConfig.value[0]) {
     <div
       v-for="item in searchConfig.slice(0, 9)"
       :key="item.label"
-      :class="options.elementsClassName"
+      :class="`${options.elementsClassName} search-${item.label}`"
       class="w-70px h-64px flex flex-col justify-center items-center cursor-pointer gap-5px flex-shrink-0 flex-grow-0"
       @click="handleSelectedSearchEngine(item)"
     >

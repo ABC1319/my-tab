@@ -18,6 +18,7 @@ interface ElemensBoxType {
 interface DragInHorizonProps {
   containerClassName: string
   elementsClassName: string
+  defaultPinedClassName: string
   size: { width: number; height: number }
   gap: number
   maximumInLine: number
@@ -38,6 +39,7 @@ export function createDragInHorizontal(options: DragInHorizonProps) {
   let {
     containerClassName,
     elementsClassName,
+    defaultPinedClassName,
     size,
     gap,
     maximumInLine,
@@ -176,26 +178,48 @@ export function createDragInHorizontal(options: DragInHorizonProps) {
     })
     // 2. 判断是否增加
     const addedItems = Array.from(currentDoms).filter(dom => !dom.id) as HTMLElement[]
-    addedItems.forEach((element, index) => {
-      element.id = `elements${generateUuid()}`
-      const row = Math.floor(index / maximumInLine)
-      const column = index % maximumInLine
-      element.style.position = 'absolute'
-      element.style.width = `${size.width}px`
-      element.style.height = `${size.height}px`
-      element.style.userSelect = 'none'
-      element.style.willChange = 'transform'
-      element.style.zIndex = '998'
-      element.style.transition = `transform ${duration}ms ease 0s`
-      elementsBox.value.push({
-        id: element.id,
-        x: column * (size.width + gap),
-        y: row * (size.height + gap),
-        width: size.width,
-        height: size.height,
-        ele: element,
+
+    if (addedItems.length > 0) {
+      // 3. 将 add 筛出来，放到最后一个
+      let defaultAddElementBox = null
+      elementsBox.value = elementsBox.value.filter((item) => {
+        if (item.ele) {
+          if (item.ele.className.includes(defaultPinedClassName))
+            defaultAddElementBox = item
+
+          return !item.ele.className.includes(defaultPinedClassName)
+        }
+        else {
+          return null
+        }
+      }).filter(item => item !== null)
+
+      addedItems.forEach((element, index) => {
+        element.id = `elements${generateUuid()}`
+        const row = Math.floor(index / maximumInLine)
+        const column = index % maximumInLine
+        element.style.position = 'absolute'
+        element.style.width = `${size.width}px`
+        element.style.height = `${size.height}px`
+        element.style.userSelect = 'none'
+        element.style.willChange = 'transform'
+        element.style.zIndex = '998'
+        element.style.transition = `transform ${duration}ms ease 0s`
+
+        elementsBox.value.push({
+          id: element.id,
+          x: column * (size.width + gap),
+          y: row * (size.height + gap),
+          width: size.width,
+          height: size.height,
+          ele: element,
+        })
       })
-    })
+
+      if (defaultAddElementBox)
+        elementsBox.value.push(defaultAddElementBox)
+    }
+
     // -----------------------这里是判断数量是否发生改变 end-------------------------- //
 
     elementsBox.value.forEach((element, index) => {
@@ -239,6 +263,10 @@ export function createDragInHorizontal(options: DragInHorizonProps) {
   }, { deep: true, immediate: true })
 
   function handlePointerdown(e: PointerEvent) {
+    // 鼠标左键
+    if (e.button !== 0)
+      return
+
     // 1. 判断点击的元素是否是 item
     if (!e.target)
       return
@@ -316,6 +344,10 @@ export function createDragInHorizontal(options: DragInHorizonProps) {
 
     // 赋值给鼠标初始位置
     mouseFrom = { x: e.clientX, y: e.clientY }
+
+    // if (currentClickedBox.value.ele.className.includes(defaultPinedClassName)) {
+
+    // }
   }
   function handlePointerup(e: PointerEvent) {
     isDragging = false
