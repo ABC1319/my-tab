@@ -3,10 +3,10 @@ import { ref } from 'vue'
 
 const visible = ref(false)
 async function close() {
-  const animateDom = document.querySelectorAll('.modal-mask')[0] as HTMLElement
+  const animateDom = document.querySelectorAll('.custom-modal-mask')[0] as HTMLElement
   animateDom.classList.add('fade-out')
 
-  const animateOutDom1 = document.querySelectorAll('.modal')[0] as HTMLElement
+  const animateOutDom1 = document.querySelectorAll('.custom-modal')[0] as HTMLElement
   animateOutDom1.classList.remove('scale-up-center')
   animateOutDom1.classList.add('scale-down-center')
 
@@ -30,11 +30,11 @@ defineExpose({
   <Teleport to="body" @click.stop>
     <div
       v-if="visible"
-      class="modal-mask"
+      class="custom-modal-mask"
       @click="close"
     >
-      <div class="modal scale-up-center" @click.stop>
-        <div class="modal-content">
+      <div class="custom-modal scale-up-center" @click.stop>
+        <div class="custom-modal-content">
           <slot />
         </div>
         <div
@@ -55,7 +55,7 @@ defineExpose({
 </template>
 
 <style scoped>
-.modal-mask{
+.custom-modal-mask{
   @apply flex justify-center items-center;
   position: fixed;
   top: 0;
@@ -68,7 +68,7 @@ defineExpose({
   padding: 12px;
   z-index: 9999;
 }
-.modal{
+.custom-modal{
   min-height: 300px;
   width: fit-content;
   height: auto;
@@ -80,7 +80,7 @@ defineExpose({
   color: white;
   position: relative;
 }
-.modal-box{
+.custom-modal-box{
   width: 100%;
   height: 100%;
   border-radius: 15px;
@@ -88,14 +88,14 @@ defineExpose({
   z-index: 100;
   padding-top: 10px;
 }
-.modal-header{
+.custom-modal-header{
   @apply flex flex-row justify-between items-center;
   height: 40px;
   border-bottom: 1px solid #f4f4f4;
   padding: 0 20px;
   font-size: 20px;
 }
-.modal-content{
+.custom-modal-content{
   height: calc(100% - 40px);
 }
 

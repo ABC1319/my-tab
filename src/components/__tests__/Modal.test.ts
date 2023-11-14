@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
-import Modal from '../Modal.vue'
+import CustomModal from '../CustomModal.vue'
 
 describe('Card Component', () => {
   it('should render', () => {
-    const wrapper = mount(Modal)
+    const wrapper = mount(CustomModal)
 
     expect(wrapper.html()).toBeTruthy()
   })

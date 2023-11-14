@@ -20,7 +20,7 @@ const websites = ref<WebsiteParams[]>([
   ...DEFAULT_SITES,
 ])
 
-const modalRef = ref<typeof import('~/components/Modal.vue').default | null>(null)
+const modalRef = ref<typeof import('~/components/CustomModal.vue').default | null>(null)
 
 // 这里使用两个变量的原因是：要获取 main DOM 的 width 来确定每行几个
 // 但是在初始化的时候，main DOM 还没有渲染出来
@@ -171,7 +171,7 @@ function addWebsite() {
     </div>
   </div>
 
-  <Modal ref="modalRef">
+  <CustomModal ref="modalRef">
     <div class="modal-content-container flex flex-row justify-around items-center my-8 w-560px max-w-66vw min-w-350px">
       <div class="mt-34px">
         <div
@@ -263,7 +263,7 @@ function addWebsite() {
         </div>
       </div>
     </div>
-  </Modal>
+  </CustomModal>
 </template>
 
 <style scoped>
