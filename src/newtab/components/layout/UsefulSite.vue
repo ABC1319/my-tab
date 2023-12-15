@@ -14,6 +14,7 @@ const DEFAULT_SITES: WebsiteParams = {
   url: 'https://mmeme.me/',
   icon: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M11 13v3q0 .425.288.713T12 17q.425 0 .713-.288T13 16v-3h3q.425 0 .713-.288T17 12q0-.425-.288-.713T16 11h-3V8q0-.425-.288-.713T12 7q-.425 0-.713.288T11 8v3H8q-.425 0-.713.288T7 12q0 .425.288.713T8 13h3Zm1 9q-2.075 0-3.9-.788t-3.175-2.137q-1.35-1.35-2.137-3.175T2 12q0-2.075.788-3.9t2.137-3.175q1.35-1.35 3.175-2.137T12 2q2.075 0 3.9.788t3.175 2.137q1.35 1.35 2.138 3.175T22 12q0 2.075-.788 3.9t-2.137 3.175q-1.35 1.35-3.175 2.138T12 22Z"/></svg>',
   type: 0,
+  index: 0,
 }
 
 const websites = ref<WebsiteParams[]>([
@@ -56,6 +57,7 @@ const currentSiteCfg = ref<WebsiteParams>({
   url: '',
   icon: '',
   type: 0,
+  index: -1,
   remark: {
     color: getColorFromPalettes(),
   },
@@ -71,12 +73,58 @@ const defaultIcon = computed(() => {
 
 await getList()
 async function getList() {
-  websites.value = [...(await getPinedWebsite()), DEFAULT_SITES]
+  const webs = await getPinedWebsite()
+
+  webs.filter((item: { webName: string }) => {
+    return item.webName !== 'default-add'
+  })
+
+  webs.sort((a: any, b: any) => {
+    return Number(a.index) - Number(b.index)
+  })
+
+  websites.value = [...webs, DEFAULT_SITES]
 }
 
 let isDraggedSite = false
-const { isDragged, resetLayout } = createDragInHorizontal(options.value)
-watch(isDragged, () => {
+const { isDragged, elementsBox, resetLayout } = createDragInHorizontal(options.value)
+watch(isDragged, async (val) => {
+  if (!val) {
+    // 1.将数据的位置跟实际位置的顺序同步
+
+    const sorts = elementsBox.value.map((item) => {
+      return item.ele?.className.match(/webName-(\d+)/)?.[1]
+    }).filter(item => item)
+
+    websites.value.forEach((item) => {
+      const index = sorts.indexOf(item.webName)
+      item.index = index + 1
+    })
+
+    // websites.value.sort((a, b) => {
+    //   return sorts.indexOf(a.webName) - sorts.indexOf(b.webName)
+    // })
+
+    websites.value.forEach((item) => {
+      if (item.webName !== 'default-add') {
+        editPinedWebsite({
+          id: item.id,
+          url: item.url,
+          webName: item.webName,
+          index: item.index,
+          icon: item.icon,
+          type: item.type,
+          remark: {
+            defaultIcon: '',
+            color: item?.remark?.color,
+          },
+        })
+      }
+    })
+
+    // 2.说明拖拽结束，通知一下同步
+    noticeSynchronize()
+  }
   isDraggedSite = true
 })
 watch(width, (val) => {
@@ -92,8 +140,8 @@ onMounted(() => {
 })
 
 function handleSynchronize() {
-  broadcast.onmessage(async (event: MessageEvent<any>) => {
-    if (JSON.parse(event.data).cmd === 'SynchronizeWebsites') {
+  broadcast.syncWebsites.listen(async (event: MessageEvent<any>) => {
+    if (JSON.parse(event.data).cmd === 'SyncWebsites') {
       await getList()
       resetLayout()
     }
@@ -101,7 +149,7 @@ function handleSynchronize() {
 }
 
 function noticeSynchronize() {
-  broadcast.synchronizeWebsites()
+  broadcast.syncWebsites.call()
 }
 
 function openSiteModal(item: WebsiteParams) {
@@ -115,6 +163,7 @@ function openSiteModal(item: WebsiteParams) {
         url: '',
         icon: '',
         type: 0,
+        index: websites.value.length,
         remark: {
           color: getColorFromPalettes(),
         },
@@ -133,6 +182,7 @@ function closeSiteModal() {
     webName: '',
     url: '',
     icon: '',
+    index: -1,
     type: 0,
   }
 }
@@ -142,12 +192,13 @@ function addWebsite() {
     alert('请先输入网站地址')
   }
   else {
-    const { id, webName, url, remark } = currentSiteCfg.value
+    const { id, webName, url, remark, index } = currentSiteCfg.value
 
     editPinedWebsite({
       id,
       url,
       webName,
+      index,
       icon: '',
       type: 0,
       remark: {
@@ -227,13 +278,17 @@ function handleSelectContextMenu(e: typeof contextMenuOptions[number]) {
 <template>
   <div ref="outerContainerRef" class="w-full flex justify-center items-center min-w-[320px]">
     <div
-      :class="options.containerClassName" class="my-website-box" :style="{
+      :class="options.containerClassName"
+      class="my-website-box"
+      :style="{
         width: containerWidth,
         height: containerHeight,
       }"
     >
       <div
-        v-for="item in websites" :key="item.webName" :class="`${options.elementsClassName} webName-${item.webName}`"
+        v-for="item in websites"
+        :key="item.webName"
+        :class="`${options.elementsClassName} webName-${item.webName}`"
         class="
           w-144px h-88px
           flex flex-col justify-center items-center gap-5px flex-shrink-0 flex-grow-0
@@ -299,26 +354,34 @@ function handleSelectContextMenu(e: typeof contextMenuOptions[number]) {
             名称
           </label>
           <input
-            id="name-input" v-model="currentSiteCfg.webName" :maxlength="128" type="text" class="
-            w-225px h-8 text-14px
-            rounded-6px
-          bg-[#404459] text-[#fafafa]
-            box-border px-16px py-8px
-            outline-none
-          "
+            id="name-input"
+            v-model="currentSiteCfg.webName"
+            :maxlength="128"
+            type="text"
+            class="
+              w-225px h-8 text-14px
+              rounded-6px
+            bg-[#404459] text-[#fafafa]
+              box-border px-16px py-8px
+              outline-none
+            "
           >
 
           <label for="url-input" class="my-2 text-14px">
             地址
           </label>
           <input
-            id="url-input" v-model="currentSiteCfg.url" :maxlength="128" type="text" class="
-            w-225px h-8 text-14px
-            rounded-6px
-          bg-[#404459] text-[#fafafa]
-            box-border px-16px py-8px
-            outline-none
-          "
+            id="url-input"
+            v-model="currentSiteCfg.url"
+            :maxlength="128"
+            type="text"
+            class="
+              w-225px h-8 text-14px
+              rounded-6px
+            bg-[#404459] text-[#fafafa]
+              box-border px-16px py-8px
+              outline-none
+            "
           >
         </div>
 

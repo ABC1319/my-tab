@@ -168,7 +168,7 @@ export function createDragInHorizontal(options: DragInHorizonProps) {
     duration = newDuration
 
     // -----------------------这里是判断数量是否发生改变 start-------------------------- //
-    const currentDoms = document?.querySelectorAll(`.${elementsClassName}`)
+    const currentDoms = document?.querySelectorAll(`.${elementsClassName}`) as NodeListOf<HTMLElement>
 
     // 1. 判断是否减少
     const names = Array.from(currentDoms).map(dom => dom.id)
@@ -220,8 +220,13 @@ export function createDragInHorizontal(options: DragInHorizonProps) {
         elementsBox.value.push(defaultAddElementBox)
     }
 
-    // -----------------------这里是判断数量是否发生改变 end-------------------------- //
+    // 将 elementBox 按照实际 DOM 的顺序进行排列
+    const domIdArr = Array.from(currentDoms).map(item => item.id)
+    elementsBox.value.sort((a: any, b: any) => {
+      return domIdArr.indexOf(a.id) - domIdArr.indexOf(b.id)
+    })
 
+    // -----------------------这里是判断数量是否发生改变 end-------------------------- //
     elementsBox.value.forEach((element, index) => {
       const row = Math.floor(index / newMaximumInLine)
       const column = index % newMaximumInLine
@@ -290,7 +295,9 @@ export function createDragInHorizontal(options: DragInHorizonProps) {
     mouseFrom = { x: e.clientX, y: e.clientY }
 
     // 3. 设置当前点击元素的位置。并且将当前点击元素的顺序放在最后
-    const index = elementsBox.value.findIndex(item => item.id === clickedItem?.id)
+    const index = elementsBox.value.length > 0
+      ? elementsBox.value.findIndex(item => item.id === clickedItem?.id)
+      : -1
     if (index !== -1) {
       currentClickedBox.value = elementsBox.value[index]
       currentClickedBox.value.ele!.style.zIndex = '999'
@@ -325,6 +332,8 @@ export function createDragInHorizontal(options: DragInHorizonProps) {
     currentClickedBox.value.x += disX
     currentClickedBox.value.y += disY
 
+    // const currentWebName = currentClickedBox.value.ele?.className.match(/webName-(\S+)/)?.[1]
+
     placeholderBox.value.ele!.style.transition = 'all 500ms ease 0s'
     placeholderBox.value!.x = Math.round(currentClickedBox.value.x / (size.width + gap)) * (size.width + gap)
     placeholderBox.value!.y = Math.round(currentClickedBox.value.y / (size.height + gap)) * (size.height + gap)
@@ -344,10 +353,6 @@ export function createDragInHorizontal(options: DragInHorizonProps) {
 
     // 赋值给鼠标初始位置
     mouseFrom = { x: e.clientX, y: e.clientY }
-
-    // if (currentClickedBox.value.ele.className.includes(defaultPinedClassName)) {
-
-    // }
   }
   function handlePointerup(e: PointerEvent) {
     isDragging = false
@@ -408,7 +413,7 @@ export function createDragInHorizontal(options: DragInHorizonProps) {
     if (
       (
         placeholderBox.value.x > column * (size.width + gap)
-      && placeholderBox.value.y === row * (size.height + gap)
+        && placeholderBox.value.y === row * (size.height + gap)
       )
       || (
         placeholderBox.value.y > row * (size.height + gap)
@@ -454,6 +459,7 @@ export function createDragInHorizontal(options: DragInHorizonProps) {
 
   return {
     isDragged,
+    elementsBox,
     resetLayout,
     bindEventListener,
     unbindEventListener,

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { isShrinkSidebar } from '~/logic/storage'
+import { broadcast, isShrinkSidebar } from '~/logic/storage'
 
 const isShrink = ref(isShrinkSidebar.value === 'true')
 watch(isShrink, (v) => {
@@ -31,6 +31,21 @@ function toggleShrink() {
       isHideBtn.value = false
     }
   }
+}
+
+onMounted(() => {
+  handleSynchronize()
+})
+function handleSynchronize() {
+  broadcast.syncSidebar.listen(async (event: MessageEvent<any>) => {
+    if (JSON.parse(event.data).cmd === 'syncSidebar') {
+      // 同步
+      toggleShrink()
+    }
+  })
+}
+function noticeSynchronize() {
+  broadcast.syncSidebar.call()
 }
 </script>
 
@@ -89,7 +104,13 @@ function toggleShrink() {
             : 'opacity-100'
         "
       >
-        <div class="w-32px h-32px bg-[#5021FF] rounded-6px grid place-items-center cursor-pointer [&>svg:hover]:scale-120" @click="toggleShrink">
+        <div
+          class="w-32px h-32px bg-[#5021FF] rounded-6px grid place-items-center cursor-pointer [&>svg:hover]:scale-120"
+          @click="
+            toggleShrink();
+            noticeSynchronize()
+          "
+        >
           <svg class="transition-transform ease-in-out" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24">
             <path fill="currentColor" d="m11 18l-6-6l6-6l1.4 1.4L7.825 12l4.575 4.6L11 18Zm6.6 0l-6-6l6-6L19 7.4L14.425 12L19 16.6L17.6 18Z" />
           </svg>

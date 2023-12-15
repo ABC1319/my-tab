@@ -1,47 +1,68 @@
 /**
  * 窗口通信
+ * 1. sidebar
+ * 2. usefulSite
  * @returns {
  *  data: BroadcastChannel
- *  onmessage: () => void
  *  synchronizeWebsites: () => void
  *  synchronizeSidebar: () => void
  * }
  *
- * // 调用
- * broadcast.synchronizeWebsites()
- * // 监听
- * broadcast.onmessage((event: MessageEvent<any>) => {
- *  console.log(event, 'broadcast')
- * })
+ * @demo
+ * function handleSynchronize() {
+ *   broadcast.syncWebsites.listen(async (event: MessageEvent<any>) => {
+ *     if (JSON.parse(event.data).cmd === 'SyncWebsites') {
+ *       await getList()
+ *       resetLayout()
+ *     }
+ *   })
+ * }
+ * function noticeSynchronize() {
+ *   broadcast.syncWebsites.call()
+ * }
  */
 export function useBroadcast() {
   const broadcastChannel = new BroadcastChannel('broadcast')
+  const messageCallbacks: ((event: MessageEvent<any>) => void)[] = []
 
   const broadcast = {
 
     data: broadcastChannel,
 
-    onmessage(callback: (event: MessageEvent<any>) => void) {
-      broadcastChannel.onmessage = callback
+    syncWebsites: {
+      call(value?: any) {
+        broadcastChannel.postMessage(
+          JSON.stringify({
+            cmd: 'SyncWebsites',
+            data: value,
+          }),
+        )
+      },
+      listen(callback: (event: MessageEvent<any>) => void) {
+        messageCallbacks.push(callback)
+      },
     },
 
-    synchronizeWebsites(value?: any) {
-      broadcastChannel.postMessage(
-        JSON.stringify({
-          cmd: 'SynchronizeWebsites',
-          data: null,
-        }),
-      )
+    syncSidebar: {
+      call(value?: any) {
+        broadcastChannel.postMessage(
+          JSON.stringify({
+            cmd: 'syncSidebar',
+            data: value,
+          }),
+        )
+      },
+      listen(callback: (event: MessageEvent<any>) => void) {
+        messageCallbacks.push(callback)
+      },
     },
 
-    synchronizeSidebar(value?: any) {
-      broadcastChannel.postMessage(
-        JSON.stringify({
-          cmd: 'synchronizeSidebar',
-          data: null,
-        }),
-      )
-    },
+  }
+
+  broadcastChannel.onmessage = (event) => {
+    messageCallbacks.forEach((callback) => {
+      callback(event)
+    })
   }
 
   return broadcast
