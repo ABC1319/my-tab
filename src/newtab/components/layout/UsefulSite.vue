@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useElementSize, useWindowSize } from '@vueuse/core'
 import { watch } from 'vue'
+import { broadcast } from '~/logic'
 import { deletePinedWebsite, editPinedWebsite, getPinedWebsite } from '~/logic/websiteData'
 import type { WebsiteParams } from '~/typings/website'
 import { createDragInHorizontal } from '~/utils/drag'
@@ -86,6 +87,23 @@ watch(width, (val) => {
   }
 })
 
+onMounted(() => {
+  handleSynchronize()
+})
+
+function handleSynchronize() {
+  broadcast.onmessage(async (event: MessageEvent<any>) => {
+    if (JSON.parse(event.data).cmd === 'SynchronizeWebsites') {
+      await getList()
+      resetLayout()
+    }
+  })
+}
+
+function noticeSynchronize() {
+  broadcast.synchronizeWebsites()
+}
+
 function openSiteModal(item: WebsiteParams) {
   if (isDraggedSite) {
     isDraggedSite = false
@@ -142,6 +160,7 @@ function addWebsite() {
       closeSiteModal()
       nextTick(() => {
         resetLayout()
+        noticeSynchronize()
       })
     })
   }
@@ -191,6 +210,7 @@ function handleSelectContextMenu(e: typeof contextMenuOptions[number]) {
           await getList()
           nextTick(() => {
             resetLayout()
+            noticeSynchronize()
           })
 
           contextMenuRef.value?.close()
@@ -207,17 +227,13 @@ function handleSelectContextMenu(e: typeof contextMenuOptions[number]) {
 <template>
   <div ref="outerContainerRef" class="w-full flex justify-center items-center min-w-[320px]">
     <div
-      :class="options.containerClassName"
-      class="my-website-box"
-      :style="{
+      :class="options.containerClassName" class="my-website-box" :style="{
         width: containerWidth,
         height: containerHeight,
       }"
     >
       <div
-        v-for="item in websites"
-        :key="item.webName"
-        :class="`${options.elementsClassName} webName-${item.webName}`"
+        v-for="item in websites" :key="item.webName" :class="`${options.elementsClassName} webName-${item.webName}`"
         class="
           w-144px h-88px
           flex flex-col justify-center items-center gap-5px flex-shrink-0 flex-grow-0
@@ -225,14 +241,11 @@ function handleSelectContextMenu(e: typeof contextMenuOptions[number]) {
           overflow-hidden
           rounded-10px
           text-center
-        "
-        @click="openSiteModal(item)"
-        @contextmenu="e => openContextmenu(item, e)"
+        " @click="openSiteModal(item)" @contextmenu="e => openContextmenu(item, e)"
       >
         <div v-if="item.icon" class="w-10 h-10 grid place-items-center" v-html="item.icon" />
         <div
-          v-else
-          class="alpha-icon w-10 h-10 grid place-items-center text-18px"
+          v-else class="alpha-icon w-10 h-10 grid place-items-center text-18px"
           :style="{ background: item?.remark?.color || 'green' }"
         >
           {{ item?.remark && item?.remark?.defaultIcon }}
@@ -248,9 +261,7 @@ function handleSelectContextMenu(e: typeof contextMenuOptions[number]) {
   <CustomModal ref="modalRef">
     <div class="modal-content-container flex flex-row justify-around items-center my-8 w-560px max-w-66vw min-w-350px">
       <div class="mt-34px">
-        <div
-          class="w-220px h-130px grid place-items-center bg-white rounded-10px"
-        >
+        <div class="w-220px h-130px grid place-items-center bg-white rounded-10px">
           <div
             class="alpha-icon w-10 h-10 grid place-items-center text-18px"
             :style="{ background: currentSiteCfg.remark?.color || 'green' }"
@@ -259,31 +270,36 @@ function handleSelectContextMenu(e: typeof contextMenuOptions[number]) {
           </div>
         </div>
 
-        <div class="w-58px h-24px mt-14px bg-[#404459] rounded-md text-[#fafafa] ml-auto flex flex-row cursor-pointer overflow-hidden ">
+        <div
+          class="w-58px h-24px mt-14px bg-[#404459] rounded-md text-[#fafafa] ml-auto flex flex-row cursor-pointer overflow-hidden "
+        >
           <div class="w-24px h-full grid place-items-center flex-1 hover:bg-[#2528366b]">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M3 21h3.75L17.81 9.94l-3.75-3.75L3 17.25V21zm2-2.92l9.06-9.06l.92.92L5.92 19H5v-.92zM18.37 3.29a.996.996 0 0 0-1.41 0l-1.83 1.83l3.75 3.75l1.83-1.83a.996.996 0 0 0 0-1.41l-2.34-2.34z" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M3 21h3.75L17.81 9.94l-3.75-3.75L3 17.25V21zm2-2.92l9.06-9.06l.92.92L5.92 19H5v-.92zM18.37 3.29a.996.996 0 0 0-1.41 0l-1.83 1.83l3.75 3.75l1.83-1.83a.996.996 0 0 0 0-1.41l-2.34-2.34z"
+              />
+            </svg>
           </div>
           <div class="h-full w-1px bg-[#00000036]" />
           <div class="w-24px h-full grid place-items-center flex-1 hover:bg-[#2528366b]">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"
+              />
+            </svg>
           </div>
         </div>
       </div>
 
       <div>
         <div class="flex flex-col justify-start items-start">
-          <label
-            for="name-input"
-            class="my-2 text-14px"
-          >
+          <label for="name-input" class="my-2 text-14px">
             名称
           </label>
           <input
-            id="name-input"
-            v-model="currentSiteCfg.webName"
-            :maxlength="128"
-            type="text"
-            class="
+            id="name-input" v-model="currentSiteCfg.webName" :maxlength="128" type="text" class="
             w-225px h-8 text-14px
             rounded-6px
           bg-[#404459] text-[#fafafa]
@@ -292,17 +308,11 @@ function handleSelectContextMenu(e: typeof contextMenuOptions[number]) {
           "
           >
 
-          <label
-            for="url-input"
-            class="my-2 text-14px"
-          >
+          <label for="url-input" class="my-2 text-14px">
             地址
           </label>
           <input
-            id="url-input"
-            v-model="currentSiteCfg.url" :maxlength="128"
-            type="text"
-            class="
+            id="url-input" v-model="currentSiteCfg.url" :maxlength="128" type="text" class="
             w-225px h-8 text-14px
             rounded-6px
           bg-[#404459] text-[#fafafa]
@@ -320,8 +330,7 @@ function handleSelectContextMenu(e: typeof contextMenuOptions[number]) {
             rounded-6px
             bg-[#404459] text-[#fafafa]
             hover:bg-[#4044596b]
-          "
-            @click="addWebsite"
+          " @click="addWebsite"
           >
             确定
           </button>
@@ -332,8 +341,7 @@ function handleSelectContextMenu(e: typeof contextMenuOptions[number]) {
             rounded-6px
             bg-[#40445990] text-[#fafafa]
             hover:bg-[#4044596b]
-          "
-            @click="closeSiteModal"
+          " @click="closeSiteModal"
           >
             取消
           </button>
@@ -343,21 +351,19 @@ function handleSelectContextMenu(e: typeof contextMenuOptions[number]) {
   </CustomModal>
 
   <CustomContextMenu
-    ref="contextMenuRef"
-    :x="contextMenuPosition.x"
-    :y="contextMenuPosition.y"
-    :options="contextMenuOptions"
-    @select="handleSelectContextMenu"
+    ref="contextMenuRef" :x="contextMenuPosition.x" :y="contextMenuPosition.y"
+    :options="contextMenuOptions" @select="handleSelectContextMenu"
   />
 </template>
 
 <style scoped>
-.my-website-box{
-  will-change: width,height;
-  transition-property: width,height;
+.my-website-box {
+  will-change: width, height;
+  transition-property: width, height;
   transition-duration: 300ms;
   transition-timing-function: linear;
 }
+
 .my-website-item {
   background-color: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(40px);
@@ -386,7 +392,7 @@ function handleSelectContextMenu(e: typeof contextMenuOptions[number]) {
 }
 
 @media screen and (max-width: 710px) {
-  .modal-content-container{
+  .modal-content-container {
     flex-direction: column;
     min-width: 260px;
     width: 260px;
