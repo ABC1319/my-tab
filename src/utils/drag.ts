@@ -54,6 +54,11 @@ export function createDragInHorizontal(options: DragInHorizonProps) {
   let mouseFrom = { x: 0, y: 0 }
   let mouseTo = { x: 0, y: 0 }
 
+  // 初始位置，这个变量只判断是否进入拖拽模式
+  let initialPosition = { x: 0, y: 0 }
+  // 移动距离超过 ELASTIC 的时候，才会被判断为拖拽过
+  const ELASTIC = 5
+
   // DOM
   const containerDOM = computed<HTMLElement | null>(() => document?.querySelector(`.${containerClassName}`))
   const itemsDOM = computed<NodeListOf<HTMLElement> | null>(() => document?.querySelectorAll(`.${elementsClassName}`))
@@ -293,6 +298,8 @@ export function createDragInHorizontal(options: DragInHorizonProps) {
     if (isDragging)
       return
 
+    initialPosition = { x: e.clientX, y: e.clientY }
+
     mouseFrom = { x: e.clientX, y: e.clientY }
 
     // 3. 设置当前点击元素的位置。并且将当前点击元素的顺序放在最后
@@ -329,18 +336,18 @@ export function createDragInHorizontal(options: DragInHorizonProps) {
     const disX = mouseTo.x - mouseFrom.x
     const disY = mouseTo.y - mouseFrom.y
 
+    // 移动位置超过了 ELASTIC，设置已经状态拖拽了
+    const relativeDistance = Math.sqrt((initialPosition.x - mouseTo.x) ** 2 + (initialPosition.y - mouseTo.y) ** 2)
+    if (relativeDistance > ELASTIC)
+      isDragged.value = true
+
     // 计算当前点击元素的位置
     currentClickedBox.value.x += disX
     currentClickedBox.value.y += disY
 
-    // const currentWebName = currentClickedBox.value.ele?.className.match(/webName-(\S+)/)?.[1]
-
     placeholderBox.value.ele!.style.transition = 'all 500ms ease 0s'
     placeholderBox.value!.x = Math.round(currentClickedBox.value.x / (size.width + gap)) * (size.width + gap)
     placeholderBox.value!.y = Math.round(currentClickedBox.value.y / (size.height + gap)) * (size.height + gap)
-
-    // 设置已经状态拖拽了
-    isDragged.value = true
 
     // 限制拖拽范围
     if (placeholderBox.value!.x < 0)
@@ -371,6 +378,7 @@ export function createDragInHorizontal(options: DragInHorizonProps) {
 
     mouseFrom = { x: 0, y: 0 }
     mouseTo = { x: 0, y: 0 }
+    initialPosition = { x: 0, y: 0 }
   }
 
   function hitAllEle(node: ElemensBoxType, allNodes: ElemensBoxType[]) {
