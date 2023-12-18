@@ -189,6 +189,7 @@ function closeSiteModal() {
 
 function addWebsite() {
   if (currentSiteCfg.value.url === '' || currentSiteCfg.value.webName === '') {
+    // eslint-disable-next-line no-alert
     alert('请先输入网站地址')
   }
   else {
@@ -430,7 +431,9 @@ function handleSelectContextMenu(e: typeof contextMenuOptions[number]) {
 .my-website-item {
   background-color: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(40px);
-  clip-path: path("M 0 44 C 0 0.9849735503722608 0.9849735503722608 0 44 0 L 100 0 C 143.01502644962773 0 144 0.9849735503722608 144 44 L 144 44 C 144 87.01502644962774 143.01502644962773 88 100 88 L 44 88 C 0.9849735503722608 88 0 87.01502644962774 0 44 z");
+  clip-path: path(
+    'M 0 44 C 0 0.9849735503722608 0.9849735503722608 0 44 0 L 100 0 C 143.01502644962773 0 144 0.9849735503722608 144 44 L 144 44 C 144 87.01502644962774 143.01502644962773 88 100 88 L 44 88 C 0.9849735503722608 88 0 87.01502644962774 0 44 z'
+  );
 }
 
 .my-website-item::before {
@@ -451,7 +454,11 @@ function handleSelectContextMenu(e: typeof contextMenuOptions[number]) {
 
 .ok-btn,
 .cancel-btn {
-  clip-path: path(M 0 16 C 0 0.358172 0.358172 0 16 0 L 92 0 C 107.642 0 108 0.358172 108 16 L 108 16 C 108 31.6418 107.642 32 92 32 L 16 32 C 0.358172 32 0 31.6418 0 16 Z);
+  clip-path: path(
+    M 0 16 C 0 0.358172 0.358172 0 16 0 L 92 0 C 107.642 0 108 0.358172 108 16 L
+      108 16 C 108 31.6418 107.642 32 92 32 L 16 32 C 0.358172 32 0 31.6418 0 16
+      Z
+  );
 }
 
 @media screen and (max-width: 710px) {
