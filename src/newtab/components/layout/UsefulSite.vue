@@ -274,22 +274,36 @@ function handleSelectContextMenu(e: typeof contextMenuOptions[number]) {
     modalRef.value?.open()
   }
 }
+
+const isShowUrlDropdown = computed(() => {
+  const isNeedComplete
+    = !(
+      currentSiteCfg.value.url.includes('http://')
+      || currentSiteCfg.value.url.includes('https://')
+    ) && currentSiteCfg.value.url.includes('.')
+
+  return isNeedComplete
+})
+
+function handleClickUrlDropdown(item: string) {
+  const isNeedComplete = !(currentSiteCfg.value.url.includes('http://')
+    || currentSiteCfg.value.url.includes('https://'))
+
+  if (isNeedComplete)
+    currentSiteCfg.value.url = `${item}${currentSiteCfg.value.url}`
+}
 </script>
 
 <template>
   <div ref="outerContainerRef" class="w-full flex justify-center items-center min-w-[320px]">
     <div
-      :class="options.containerClassName"
-      class="my-website-box"
-      :style="{
+      :class="options.containerClassName" class="my-website-box" :style="{
         width: containerWidth,
         height: containerHeight,
       }"
     >
       <div
-        v-for="item in websites"
-        :key="item.webName"
-        :class="`${options.elementsClassName} webName-${item.webName}`"
+        v-for="item in websites" :key="item.webName" :class="`${options.elementsClassName} webName-${item.webName}`"
         class="
           w-144px h-88px
           flex flex-col justify-center items-center gap-5px flex-shrink-0 flex-grow-0
@@ -351,32 +365,47 @@ function handleSelectContextMenu(e: typeof contextMenuOptions[number]) {
 
       <div>
         <div class="flex flex-col justify-start items-start">
+          <label for="url-input" class="my-2 text-14px relative">
+            <span class="text-red-600 absolute top-5px left-[-10px] leading-1rem">
+              *
+            </span>
+            地址
+          </label>
+
+          <div class="dropdown">
+            <input
+              id="url-input" v-model="currentSiteCfg.url" :maxlength="128" type="text" class="
+                w-225px h-8 text-14px
+                rounded-6px
+              bg-[#404459] text-[#fafafa]
+                box-border px-16px py-8px
+                outline-none
+              "
+            >
+            <ul
+              v-if="isShowUrlDropdown" tabindex="0" class="
+                dropdown-content menu
+                mt-5px rounded-5px bg-[#030615]
+                w-[-webkit-fill-available]
+                z-[1] shadow
+              "
+            >
+              <li
+                v-for="item in ['https://', 'http://']" :key="item" class="rounded-5px hover:bg-[#3b5078]"
+                @click="handleClickUrlDropdown(item)"
+              >
+                <a class="px-7px py-3px rounded-4px">
+                  {{ `${item}${currentSiteCfg.url}` }}
+                </a>
+              </li>
+            </ul>
+          </div>
+
           <label for="name-input" class="my-2 text-14px">
             名称
           </label>
           <input
-            id="name-input"
-            v-model="currentSiteCfg.webName"
-            :maxlength="128"
-            type="text"
-            class="
-              w-225px h-8 text-14px
-              rounded-6px
-            bg-[#404459] text-[#fafafa]
-              box-border px-16px py-8px
-              outline-none
-            "
-          >
-
-          <label for="url-input" class="my-2 text-14px">
-            地址
-          </label>
-          <input
-            id="url-input"
-            v-model="currentSiteCfg.url"
-            :maxlength="128"
-            type="text"
-            class="
+            id="name-input" v-model="currentSiteCfg.webName" :maxlength="128" type="text" class="
               w-225px h-8 text-14px
               rounded-6px
             bg-[#404459] text-[#fafafa]
