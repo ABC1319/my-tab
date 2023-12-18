@@ -188,34 +188,38 @@ function closeSiteModal() {
 }
 
 function addWebsite() {
+  // 1. 名称
   if (currentSiteCfg.value.url === '' || currentSiteCfg.value.webName === '') {
-    // eslint-disable-next-line no-alert
-    alert('请先输入网站地址')
+    const webName = currentSiteCfg.value.url.match(/:\/\/(\S+)\./)?.[1]
+
+    if (webName)
+      currentSiteCfg.value.webName = webName
+    else
+      currentSiteCfg.value.webName = currentSiteCfg.value.url
   }
-  else {
-    const { id, webName, url, remark, index } = currentSiteCfg.value
+  // 2. 存储
+  const { id, webName, url, remark, index } = currentSiteCfg.value
 
-    editPinedWebsite({
-      id,
-      url,
-      webName,
-      index,
-      icon: '',
-      type: 0,
-      remark: {
-        defaultIcon: defaultIcon.value,
-        color: remark?.color || getColorFromPalettes(),
-      },
-    }).then(async () => {
-      await getList()
+  editPinedWebsite({
+    id,
+    url,
+    webName,
+    index,
+    icon: '',
+    type: 0,
+    remark: {
+      defaultIcon: defaultIcon.value,
+      color: remark?.color || getColorFromPalettes(),
+    },
+  }).then(async () => {
+    await getList()
 
-      closeSiteModal()
-      nextTick(() => {
-        resetLayout()
-        noticeSynchronize()
-      })
+    closeSiteModal()
+    nextTick(() => {
+      resetLayout()
+      noticeSynchronize()
     })
-  }
+  })
 }
 
 const contextMenuPosition = ref({
@@ -291,6 +295,10 @@ function handleClickUrlDropdown(item: string) {
 
   if (isNeedComplete)
     currentSiteCfg.value.url = `${item}${currentSiteCfg.value.url}`
+}
+
+function handleUploadUrlIcon() {
+
 }
 </script>
 
@@ -447,6 +455,12 @@ function handleClickUrlDropdown(item: string) {
     ref="contextMenuRef" :x="contextMenuPosition.x" :y="contextMenuPosition.y"
     :options="contextMenuOptions" @select="handleSelectContextMenu"
   />
+
+  <input
+    v-show="false"
+    type="file"
+    @click="handleUploadUrlIcon"
+  >
 </template>
 
 <style scoped>
