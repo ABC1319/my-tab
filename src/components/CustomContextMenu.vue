@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { onClickOutside, useWindowSize } from '@vueuse/core'
+
 interface PropsType {
-  x: Number
-  y: Number
-  options: { label: string; key: string }[]
+  x: number
+  y: number
+  options: { label: string, key: string }[]
 }
 
 defineProps<PropsType>()

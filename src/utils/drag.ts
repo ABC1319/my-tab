@@ -19,7 +19,7 @@ interface DragInHorizonProps {
   containerClassName: string
   elementsClassName: string
   defaultPinedClassName: string
-  size: { width: number; height: number }
+  size: { width: number, height: number }
   gap: number
   maximumInLine: number
   duration?: number
@@ -147,14 +147,13 @@ export function createDragInHorizontal(options: DragInHorizonProps) {
   /**
    * 重新设置布局
    * demo: resetLayout(undefined, 30, 6, 200)
-   * @param newSize item 尺寸
-   * @param newGap 间隔
-   * @param newMaximumInLine 每行最大个数
-   * @param newDuration 动画过渡
-   * @returns void
+   * newSize item 尺寸
+   * newGap 间隔
+   * newMaximumInLine 每行最大个数
+   * newDuration 动画过渡
    */
   function resetLayout(
-    newSize: { width: number; height: number } = size,
+    newSize: { width: number, height: number } = size,
     newGap: number = gap,
     newMaximumInLine: number = maximumInLine,
     newDuration: number = duration,
@@ -258,12 +257,14 @@ export function createDragInHorizontal(options: DragInHorizonProps) {
 
   // 2. 监听设置所有元素的位置
   watch(elementsBox, () => {
-    elementsBox.value.forEach((item, index) => {
-      item.ele!.style.transform = `
-        translate3d(
-          ${item.x}px,
-          ${item.y}px,
-        0)`
+    elementsBox.value.forEach((item, _index) => {
+      item.ele!.style.transform
+        = `
+          translate3d(
+            ${item.x}px,
+            ${item.y}px,
+          0)
+        `
     })
   }, { deep: true, immediate: true })
 
@@ -354,7 +355,7 @@ export function createDragInHorizontal(options: DragInHorizonProps) {
     // 赋值给鼠标初始位置
     mouseFrom = { x: e.clientX, y: e.clientY }
   }
-  function handlePointerup(e: PointerEvent) {
+  function handlePointerup(_e: PointerEvent) {
     isDragging = false
     isDragged.value = false
 
@@ -376,7 +377,7 @@ export function createDragInHorizontal(options: DragInHorizonProps) {
     const hittedNodes: any = []
 
     // 1. 遍历所有元素，检测是否碰撞。这里碰撞的只有一个，因为所有的大小一样
-    allNodes.forEach((n: ElemensBoxType, index: number) => {
+    allNodes.forEach((n: ElemensBoxType, _index: number) => {
       if (!node.id.startsWith(n.id) && checkHit(node, n))
         hittedNodes.push(n)
     })

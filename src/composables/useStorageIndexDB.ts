@@ -43,7 +43,7 @@ export function useStorageIndexDB(dataName: string, storeDetails: string) {
      * @param args 命令参数
      * @returns 查询结果
      */
-    async getItemBySQL(...args: { key: string; value: string | number | null }[]) {
+    async getItemBySQL(...args: { key: string, value: string | number | null }[]) {
       let i = 0
       let m = args[0]
       let result = await (db.common as any)[m.key](m.value)

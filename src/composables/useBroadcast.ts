@@ -20,6 +20,7 @@
  * function noticeSynchronize() {
  *   broadcast.syncWebsites.call()
  * }
+ * @return broadcast
  */
 export function useBroadcast() {
   const broadcastChannel = new BroadcastChannel('broadcast')

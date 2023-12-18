@@ -1,5 +1,5 @@
+/* eslint-disable ts/ban-ts-comment */
 export function faviconURL(u: any) {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-expect-error
   const url = new URL(chrome.runtime.getURL('/_favicon/'))
   url.searchParams.set('pageUrl', u) // this encodes the URL as well

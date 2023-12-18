@@ -84,7 +84,7 @@ defineExpose({
 </template>
 
 <style scoped>
-.glass-modal-mask{
+.glass-modal-mask {
   @apply flex justify-center items-center;
   position: fixed;
   top: 0;
@@ -93,11 +93,13 @@ defineExpose({
   height: 100%;
   background-color: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(5px);
-  box-shadow: 0 0 1px 1px #ffffff, 0 1px 5px 0px #ffffff;
+  box-shadow:
+    0 0 1px 1px #ffffff,
+    0 1px 5px 0px #ffffff;
   padding: 12px;
   z-index: 9999;
 }
-.glass-modal{
+.glass-modal {
   min-height: 300px;
   width: 500px;
   height: auto;
@@ -108,7 +110,7 @@ defineExpose({
   padding: 12px;
   z-index: 100;
 }
-.modal-box{
+.modal-box {
   width: 100%;
   height: 100%;
   border-radius: 15px;
@@ -117,52 +119,52 @@ defineExpose({
   z-index: 100;
   padding-top: 10px;
 }
-.modal-header{
+.modal-header {
   @apply flex flex-row justify-between items-center;
   height: 40px;
   border-bottom: 1px solid #f4f4f4;
   padding: 0 20px;
   font-size: 20px;
 }
-.modal-content{
+.modal-content {
   height: calc(100% - 40px);
   padding: 20px;
 }
 
-.scale-up-center{
-  animation:scale-up-center 0.2s;
+.scale-up-center {
+  animation: scale-up-center 0.2s;
 }
-@keyframes scale-up-center{
-  0%{
-    transform:scale(.5)
+@keyframes scale-up-center {
+  0% {
+    transform: scale(0.5);
   }
-  100%{
-    transform:scale(1)
-  }
-}
-
-.scale-down-center{
-  animation:scale-down-center 0.2s forwards;
-}
-@keyframes scale-down-center{
-  0%{
-    transform:scale(1);
-  }
-  100%{
-    transform:scale(.5);
+  100% {
+    transform: scale(1);
   }
 }
 
-.fade-out{
+.scale-down-center {
+  animation: scale-down-center 0.2s forwards;
+}
+@keyframes scale-down-center {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0.5);
+  }
+}
+
+.fade-out {
   animation-name: fade-out;
   animation-duration: 0.2s;
   animation-fill-mode: forwards; /* 动画结束后停留在最终状态 */
 }
-@keyframes fade-out{
-  0%{
+@keyframes fade-out {
+  0% {
     opacity: 1;
   }
-  100%{
+  100% {
     opacity: 0;
   }
 }

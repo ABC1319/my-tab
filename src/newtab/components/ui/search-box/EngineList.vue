@@ -19,7 +19,7 @@ const options = {
 }
 
 const { isDragged } = createDragInHorizontal(options)
-watch(isDragged, (val) => {
+watch(isDragged, () => {
   isDraggedEngineList = true
 })
 
@@ -51,11 +51,11 @@ function handleSelectedSearchEngine(item: typeof searchConfig.value[0]) {
 </template>
 
 <style scoped>
-.search-engine-item{
+.search-engine-item {
   overflow: hidden;
   border-radius: 10px;
 }
-.search-engine-item:hover{
+.search-engine-item:hover {
   background-color: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(80px);
 }

@@ -21,7 +21,7 @@ import Home from './components/layout/Home.vue'
 </template>
 
 <style scoped>
-.main-container{
+.main-container {
   background-image: url(/assets/main_resource.png);
   background-size: cover;
   background-position: center;

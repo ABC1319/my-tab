@@ -150,7 +150,7 @@ function handleSaveEngineModal() {
         absolute top-full
       "
     >
-      <EngineList @handleSelectedSearchEngine="handleSelectedSearchEngine" />
+      <EngineList @handle-selected-search-engine="handleSelectedSearchEngine" />
     </section>
 
     <GlassModal ref="engineModalRef" title="title">
@@ -214,7 +214,7 @@ function handleSaveEngineModal() {
 
 <style scoped>
 .search-box {
-  background-color: #F5F7F8;
+  background-color: #f5f7f8;
   backdrop-filter: blur(40px);
   border: 1px solid #ffffff1a;
   box-shadow: 0 4px 16px 0 #0000001a;
@@ -233,26 +233,28 @@ function handleSaveEngineModal() {
 .tag-box {
   border: 2px solid white;
   background: #d6dbf9;
-  box-shadow: 20px 20px 60px #d5d4d4,
+  box-shadow:
+    20px 20px 60px #d5d4d4,
     -20px -20px 60px #ffffff;
 }
 
 .btn-box {
-  box-shadow: 20px 20px 60px #d5d4d4,
+  box-shadow:
+    20px 20px 60px #d5d4d4,
     -20px -20px 60px #ffffff;
 }
 
 .change-engine {
-  animation: riseAnimation .3s both;
+  animation: riseAnimation 0.3s both;
 }
 @keyframes riseAnimation {
   0% {
     opacity: 0;
-    transform: translateY(50%)
+    transform: translateY(50%);
   }
   100% {
     opacity: 1;
-    transform: none
+    transform: none;
   }
 }
 </style>
