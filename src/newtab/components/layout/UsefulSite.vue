@@ -10,7 +10,7 @@ import { getColorFromPalettes } from '~/utils/random-color'
 const reg = /:\/\/(?:www\.)?(.)/
 
 const DEFAULT_SITES: WebsiteParams = {
-  id: -1,
+  id: 0,
   webName: 'default-add',
   url: 'https://mmeme.me/',
   icon: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M11 13v3q0 .425.288.713T12 17q.425 0 .713-.288T13 16v-3h3q.425 0 .713-.288T17 12q0-.425-.288-.713T16 11h-3V8q0-.425-.288-.713T12 7q-.425 0-.713.288T11 8v3H8q-.425 0-.713.288T7 12q0 .425.288.713T8 13h3Zm1 9q-2.075 0-3.9-.788t-3.175-2.137q-1.35-1.35-2.137-3.175T2 12q0-2.075.788-3.9t2.137-3.175q1.35-1.35 3.175-2.137T12 2q2.075 0 3.9.788t3.175 2.137q1.35 1.35 2.138 3.175T22 12q0 2.075-.788 3.9t-2.137 3.175q-1.35 1.35-3.175 2.138T12 22Z"/></svg>',
@@ -76,15 +76,27 @@ await getList()
 async function getList() {
   const webs = await getPinedWebsite()
 
-  webs.filter((item: { webName: string }) => {
-    return item.webName !== 'default-add'
-  })
-
-  webs.sort((a: any, b: any) => {
-    return Number(a.index) - Number(b.index)
-  })
-
-  websites.value = [...webs, DEFAULT_SITES]
+  if (webs.length === 0) {
+    editPinedWebsite({
+      id: 0,
+      url: '',
+      webName: 'default-add',
+      index: 0,
+      icon: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M11 13v3q0 .425.288.713T12 17q.425 0 .713-.288T13 16v-3h3q.425 0 .713-.288T17 12q0-.425-.288-.713T16 11h-3V8q0-.425-.288-.713T12 7q-.425 0-.713.288T11 8v3H8q-.425 0-.713.288T7 12q0 .425.288.713T8 13h3Zm1 9q-2.075 0-3.9-.788t-3.175-2.137q-1.35-1.35-2.137-3.175T2 12q0-2.075.788-3.9t2.137-3.175q1.35-1.35 3.175-2.137T12 2q2.075 0 3.9.788t3.175 2.137q1.35 1.35 2.138 3.175T22 12q0 2.075-.788 3.9t-2.137 3.175q-1.35 1.35-3.175 2.138T12 22Z"/></svg>',
+      type: 0,
+      remark: {
+        defaultIcon: '',
+        color: '',
+      },
+    })
+    websites.value = [DEFAULT_SITES]
+  }
+  else {
+    webs.sort((a: any, b: any) => {
+      return Number(a.index) - Number(b.index)
+    })
+    websites.value = [...webs]
+  }
 }
 
 let isDraggedSite = false
@@ -98,29 +110,23 @@ watch(isDragged, async (val) => {
     }).filter(item => item)
 
     websites.value.forEach((item) => {
-      const index = sorts.indexOf(item.webName)
+      const index = sorts.indexOf(`${item.index}`)
       item.index = index + 1
     })
 
-    // websites.value.sort((a, b) => {
-    //   return sorts.indexOf(a.webName) - sorts.indexOf(b.webName)
-    // })
-
     websites.value.forEach((item) => {
-      if (item.webName !== 'default-add') {
-        editPinedWebsite({
-          id: item.id,
-          url: item.url,
-          webName: item.webName,
-          index: item.index,
-          icon: item.icon,
-          type: item.type,
-          remark: {
-            defaultIcon: '',
-            color: item?.remark?.color,
-          },
-        })
-      }
+      editPinedWebsite({
+        id: item.id,
+        url: item.url,
+        webName: item.webName,
+        index: item.index,
+        icon: item.icon,
+        type: item.type,
+        remark: {
+          defaultIcon: '',
+          color: item?.remark?.color,
+        },
+      })
     })
 
     // 2.说明拖拽结束，通知一下同步
@@ -159,12 +165,17 @@ function openSiteModalToAdd(item: WebsiteParams) {
   }
   else {
     if (item.webName === DEFAULT_SITES.webName) {
+      const maxIndex = websites.value.reduce(
+        (max, item) => Math.max(max, item.index),
+        0,
+      )
+
       currentSiteCfg.value = {
         webName: '',
         url: '',
         icon: '',
         type: 0,
-        index: websites.value.length,
+        index: maxIndex + 1,
         remark: {
           color: getColorFromPalettes(),
         },
@@ -312,7 +323,7 @@ function handleUploadUrlIcon() {
       }"
     >
       <div
-        v-for="item in websites" :key="item.id" :class="`${options.elementsClassName} webName-${item.webName}`"
+        v-for="item in websites" :key="item.id" :class="`${options.elementsClassName} webName-${item.index}-${item.webName}`"
         class="
           w-144px h-88px
           flex flex-col justify-center items-center gap-5px flex-shrink-0 flex-grow-0

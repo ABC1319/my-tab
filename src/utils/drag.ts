@@ -39,6 +39,7 @@ export function createDragInHorizontal(options: DragInHorizonProps) {
   let {
     containerClassName,
     elementsClassName,
+    // eslint-disable-next-line unused-imports/no-unused-vars
     defaultPinedClassName,
     size,
     gap,
@@ -185,18 +186,18 @@ export function createDragInHorizontal(options: DragInHorizonProps) {
 
     if (addedItems.length > 0) {
       // 3. 将 add 筛出来，放到最后一个
-      let defaultAddElementBox = null
-      elementsBox.value = elementsBox.value.filter((item) => {
-        if (item.ele) {
-          if (item.ele.className.includes(defaultPinedClassName))
-            defaultAddElementBox = item
+      // let defaultAddElementBox = null
+      // elementsBox.value = elementsBox.value.filter((item) => {
+      //   if (item.ele) {
+      // if (item.ele.className.includes(defaultPinedClassName))
+      //   defaultAddElementBox = item
 
-          return !item.ele.className.includes(defaultPinedClassName)
-        }
-        else {
-          return null
-        }
-      }).filter(item => item !== null)
+      //     return !item.ele.className.includes(defaultPinedClassName)
+      //   }
+      //   else {
+      //     return null
+      //   }
+      // }).filter(item => item !== null)
 
       addedItems.forEach((element, index) => {
         element.id = `elements${generateUuid()}`
@@ -220,8 +221,8 @@ export function createDragInHorizontal(options: DragInHorizonProps) {
         })
       })
 
-      if (defaultAddElementBox)
-        elementsBox.value.push(defaultAddElementBox)
+      // if (defaultAddElementBox)
+      //   elementsBox.value.push(defaultAddElementBox)
     }
 
     // 将 elementBox 按照实际 DOM 的顺序进行排列
