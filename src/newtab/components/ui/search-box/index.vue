@@ -118,6 +118,7 @@ function handleSaveEngineModal() {
             text-gray-900 placeholder:text-gray-400 bg-[transparent]
             py-[12px] pl-1 pr-[42px]
             outline-none grow
+            placeholder-select-none
           "
           placeholder="输入搜索内容" autocomplete="off" @keydown.enter="handleSearch"
         >

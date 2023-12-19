@@ -60,7 +60,7 @@ const currentSiteCfg = ref<WebsiteParams>({
   type: 0,
   index: -1,
   remark: {
-    color: '',
+    color: getColorFromPalettes(),
   },
 })
 
@@ -212,7 +212,12 @@ function closeSiteModal() {
 
 function addWebsite() {
   // 1. 名称
-  if (currentSiteCfg.value.url === '' || currentSiteCfg.value.webName === '') {
+  if (currentSiteCfg.value.url === '') {
+    // alert('请输入地址')
+    addShakeAnimation()
+    return
+  }
+  if (currentSiteCfg.value.webName === '') {
     const webName = currentSiteCfg.value.url.match(/:\/\/(\S+)\./)?.[1]
 
     if (webName)
@@ -321,9 +326,11 @@ function handleClickUrlDropdown(item: string) {
 }
 
 const urlIconFileInputRef = ref<HTMLInputElement | null>(null)
+
 function toggleUpload() {
   urlIconFileInputRef.value?.click()
 }
+
 function handleUploadUrlIcon(e: any) {
   const file = e.target.files[0]
   currentSiteCfg.value.icon = file
@@ -335,6 +342,10 @@ function handleUploadUrlIcon(e: any) {
   })
 }
 
+function clearUrlIcon() {
+  currentSiteCfg.value.icon = ''
+}
+
 function renderBlobUrlIcon(file: Blob) {
   return new Promise((resolve) => {
     const reader = new FileReader()
@@ -344,7 +355,7 @@ function renderBlobUrlIcon(file: Blob) {
       resolve(
         `
           <img
-            class="w-full h-full object-cover"
+            class="w-full h-full object-cover pointer-events-none select-none"
             src="${iconUrl}"
             alt="自定义图标"
           >
@@ -352,6 +363,17 @@ function renderBlobUrlIcon(file: Blob) {
       )
     }
   })
+}
+
+async function addShakeAnimation() {
+  const animateOutDom1 = document.querySelectorAll('.address-tooltip')[0] as HTMLElement
+  animateOutDom1.classList.add('shake-animation')
+  animateOutDom1.innerHTML = '请输入地址'
+
+  const ANIMATIONS = animateOutDom1.getAnimations()
+  await Promise.all(ANIMATIONS.map(animation => animation.finished))
+  animateOutDom1.classList.remove('shake-animation')
+  animateOutDom1.innerHTML = '(必填)'
 }
 </script>
 
@@ -433,7 +455,7 @@ function renderBlobUrlIcon(file: Blob) {
             </svg>
           </div>
           <div class="h-full w-1px bg-[#00000036]" />
-          <div class="w-24px h-full grid place-items-center flex-1 hover:bg-[#2528366b]">
+          <div class="w-24px h-full grid place-items-center flex-1 hover:bg-[#2528366b]" @click="clearUrlIcon">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
               <path
                 fill="currentColor"
@@ -446,11 +468,14 @@ function renderBlobUrlIcon(file: Blob) {
 
       <div>
         <div class="flex flex-col justify-start items-start">
-          <label for="url-input" class="my-2 text-14px relative">
-            <span class="text-red-600 absolute top-5px left-[-10px] leading-1rem">
+          <label for="url-input" class="my-2 text-14px relative select-none">
+            <!-- <span class="text-red-600 absolute top-5px left-[-10px] leading-1rem">
               *
-            </span>
+            </span> -->
             地址
+            <div class="address-tooltip text-red-600 text-12px inline-block">
+              (必填)
+            </div>
           </label>
 
           <div class="dropdown">
@@ -482,7 +507,7 @@ function renderBlobUrlIcon(file: Blob) {
             </ul>
           </div>
 
-          <label for="name-input" class="my-2 text-14px">
+          <label for="name-input" class="my-2 text-14px select-none">
             名称
           </label>
           <input
@@ -585,6 +610,13 @@ function renderBlobUrlIcon(file: Blob) {
   box-shadow: inset 0 0 0 200px rgb(255, 255, 255, 0.2);
   filter: blur(16px);
   pointer-events: none;
+}
+
+.shake-animation {
+  animation: move 2s 0s forwards;
+  -webkit-animation: move 2s 0s forwards;
+  transform-origin: bottom;
+  -webkit-transform-origin: bottom;
 }
 
 .ok-btn,
