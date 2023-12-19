@@ -60,7 +60,7 @@ const currentSiteCfg = ref<WebsiteParams>({
   type: 0,
   index: -1,
   remark: {
-    color: getColorFromPalettes(),
+    color: '',
   },
 })
 
@@ -95,7 +95,18 @@ async function getList() {
     webs.sort((a: any, b: any) => {
       return Number(a.index) - Number(b.index)
     })
+
     websites.value = [...webs]
+
+    // 渲染 Icon
+    websites.value.forEach((item: WebsiteParams) => {
+      if (item.icon && item.icon instanceof Blob) {
+        renderBlobUrlIcon(item.icon).then((res) => {
+          // eslint-disable-next-line dot-notation
+          item!['remark']!['renderIcon'] = res
+        })
+      }
+    })
   }
 }
 
@@ -210,14 +221,14 @@ function addWebsite() {
       currentSiteCfg.value.webName = currentSiteCfg.value.url
   }
   // 2. 存储
-  const { id, webName, url, remark, index } = currentSiteCfg.value
+  const { id, webName, url, remark, index, icon } = currentSiteCfg.value
 
   editPinedWebsite({
     id,
     url,
     webName,
     index,
-    icon: '',
+    icon,
     type: 0,
     remark: {
       defaultIcon: defaultIcon.value,
@@ -309,8 +320,38 @@ function handleClickUrlDropdown(item: string) {
     currentSiteCfg.value.url = `${item}${currentSiteCfg.value.url}`
 }
 
-function handleUploadUrlIcon() {
+const urlIconFileInputRef = ref<HTMLInputElement | null>(null)
+function toggleUpload() {
+  urlIconFileInputRef.value?.click()
+}
+function handleUploadUrlIcon(e: any) {
+  const file = e.target.files[0]
+  currentSiteCfg.value.icon = file
 
+  // 将 blob 转为图片渲染到页面
+  renderBlobUrlIcon(file).then((res) => {
+    // eslint-disable-next-line dot-notation
+    currentSiteCfg.value!['remark']!['renderIcon'] = res
+  })
+}
+
+function renderBlobUrlIcon(file: Blob) {
+  return new Promise((resolve) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = async function () {
+      const iconUrl = URL.createObjectURL(file)
+      resolve(
+        `
+          <img
+            class="w-full h-full object-cover"
+            src="${iconUrl}"
+            alt="自定义图标"
+          >
+        `,
+      )
+    }
+  })
 }
 </script>
 
@@ -323,7 +364,8 @@ function handleUploadUrlIcon() {
       }"
     >
       <div
-        v-for="item in websites" :key="item.id" :class="`${options.elementsClassName} webName-${item.index}-${item.webName}`"
+        v-for="item in websites" :key="item.id"
+        :class="`${options.elementsClassName} webName-${item.index}-${item.webName}`"
         class="
           w-144px h-88px
           flex flex-col justify-center items-center gap-5px flex-shrink-0 flex-grow-0
@@ -331,12 +373,23 @@ function handleUploadUrlIcon() {
           overflow-hidden
           rounded-10px
           text-center
-        " @click="openSiteModalToAdd(item)" @contextmenu="e => openContextmenuToEdit(item, e)"
+        "
+        @click="openSiteModalToAdd(item)" @contextmenu="e => openContextmenuToEdit(item, e)"
       >
-        <div v-if="item.icon" class="w-10 h-10 grid place-items-center" v-html="item.icon" />
         <div
-          v-else class="alpha-icon w-10 h-10 grid place-items-center text-18px"
-          :style="{ background: item?.remark?.color || 'green' }"
+          v-if="item.webName === 'default-add'"
+          class="w-10 h-10 grid place-items-center"
+          v-html="item.icon"
+        />
+        <div
+          v-else-if="item.icon && item?.remark?.renderIcon"
+          class="w-10 h-10 grid place-items-center"
+          v-html="item.remark.renderIcon"
+        />
+        <div
+          v-else
+          class="alpha-icon w-10 h-10 grid place-items-center text-18px"
+          :style="{ background: item?.remark?.color || 'transparent' }"
         >
           {{ item?.remark && item?.remark?.defaultIcon }}
         </div>
@@ -350,11 +403,19 @@ function handleUploadUrlIcon() {
 
   <CustomModal ref="modalRef">
     <div class="modal-content-container flex flex-row justify-around items-center my-8 w-560px max-w-66vw min-w-350px">
-      <div class="mt-34px">
-        <div class="w-220px h-130px grid place-items-center bg-white rounded-10px">
+      <div class="flex flex-col gap-10px mt-22px">
+        <div
+          class="new-website-item w-215px h-130px grid place-items-center bg-white rounded-10px"
+        >
           <div
+            v-if="currentSiteCfg.icon && currentSiteCfg?.remark?.renderIcon"
+            class="w-10 h-10 grid place-items-center"
+            v-html="currentSiteCfg.remark.renderIcon"
+          />
+          <div
+            v-else
             class="alpha-icon w-10 h-10 grid place-items-center text-18px"
-            :style="{ background: currentSiteCfg.remark?.color || 'green' }"
+            :style="{ background: currentSiteCfg.remark?.color || 'transparent' }"
           >
             {{ defaultIcon }}
           </div>
@@ -363,7 +424,7 @@ function handleUploadUrlIcon() {
         <div
           class="w-58px h-24px mt-14px bg-[#404459] rounded-md text-[#fafafa] ml-auto flex flex-row cursor-pointer overflow-hidden "
         >
-          <div class="w-24px h-full grid place-items-center flex-1 hover:bg-[#2528366b]">
+          <div class="w-24px h-full grid place-items-center flex-1 hover:bg-[#2528366b]" @click="toggleUpload">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
               <path
                 fill="currentColor"
@@ -468,7 +529,7 @@ function handleUploadUrlIcon() {
     :options="contextMenuOptions" @select="handleSelectContextMenu"
   />
 
-  <input v-show="false" type="file" @click="handleUploadUrlIcon">
+  <input v-show="false" ref="urlIconFileInputRef" type="file" accept="image/*" @change="handleUploadUrlIcon">
 </template>
 
 <style scoped>
@@ -488,6 +549,29 @@ function handleUploadUrlIcon() {
 }
 
 .my-website-item::before {
+  content: '';
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-radius: 8px;
+  background: none;
+  box-shadow: inset 0 0 0 200px rgb(255, 255, 255, 0.2);
+  filter: blur(16px);
+  pointer-events: none;
+}
+
+.new-website-item {
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(40px);
+  clip-path: path(
+    'M 0 64.58 C 0 1.4394601316828674 1.4394601316828674 0 64.58 0 L 146.5 0 C 212.42517298148912 0 213.86 1.4394601316828674 213.86 64.58 L 213.86 64.58 C 213.86 127.72153986831713 212.42517298148912 129.16 146.5 129.16 L 64.58 129.16 C 1.4394601316828674 129.16 0 127.72153986831713 0 64.58 z'
+  );
+}
+.new-website-item::before {
   content: '';
   width: 100%;
   height: 100%;
