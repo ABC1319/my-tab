@@ -152,7 +152,7 @@ function noticeSynchronize() {
   broadcast.syncWebsites.call()
 }
 
-function openSiteModal(item: WebsiteParams) {
+function openSiteModalToAdd(item: WebsiteParams) {
   if (isDraggedSite) {
     isDraggedSite = false
   }
@@ -232,7 +232,7 @@ const contextMenuOptions = [
   { label: '删除', key: 'delete' },
 ]
 
-function openContextmenu(item: WebsiteParams, e: MouseEvent) {
+function openContextmenuToEdit(item: WebsiteParams, e: MouseEvent) {
   e.preventDefault()
 
   if (item.webName === DEFAULT_SITES.webName)
@@ -244,7 +244,7 @@ function openContextmenu(item: WebsiteParams, e: MouseEvent) {
   }
   contextMenuRef.value?.open()
 
-  currentSiteCfg.value = item
+  currentSiteCfg.value = { ...item }
 }
 function handleSelectContextMenu(e: typeof contextMenuOptions[number]) {
   switch (e.key) {
@@ -311,7 +311,7 @@ function handleUploadUrlIcon() {
       }"
     >
       <div
-        v-for="item in websites" :key="item.webName" :class="`${options.elementsClassName} webName-${item.webName}`"
+        v-for="item in websites" :key="item.index" :class="`${options.elementsClassName} webName-${item.webName}`"
         class="
           w-144px h-88px
           flex flex-col justify-center items-center gap-5px flex-shrink-0 flex-grow-0
@@ -319,7 +319,7 @@ function handleUploadUrlIcon() {
           overflow-hidden
           rounded-10px
           text-center
-        " @click="openSiteModal(item)" @contextmenu="e => openContextmenu(item, e)"
+        " @click="openSiteModalToAdd(item)" @contextmenu="e => openContextmenuToEdit(item, e)"
       >
         <div v-if="item.icon" class="w-10 h-10 grid place-items-center" v-html="item.icon" />
         <div
@@ -456,11 +456,7 @@ function handleUploadUrlIcon() {
     :options="contextMenuOptions" @select="handleSelectContextMenu"
   />
 
-  <input
-    v-show="false"
-    type="file"
-    @click="handleUploadUrlIcon"
-  >
+  <input v-show="false" type="file" @click="handleUploadUrlIcon">
 </template>
 
 <style scoped>
