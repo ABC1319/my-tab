@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { searchEngine } from './engine'
+import { searchEngine } from '~/params/searchEngine'
 import { createDragInHorizontal } from '~/utils/drag'
 
 const emits = defineEmits(['handleSelectedSearchEngine'])
