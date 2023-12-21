@@ -2,10 +2,8 @@
 import Sidebar from './components/layout/Sidebar.vue'
 import NormalHome from './components/layout/NormalHome.vue'
 import CleanHome from './components/layout/CleanHome.vue'
-import type { IAppStatus } from '~/typings/app'
+import { appHomeShowMode } from '~/logic/storage'
 
-// 实际的app状态
-const appHomeShowMode = ref<NonNullable<IAppStatus['appShowMode']>>('normal')
 // 只是为了动画效果设置的变量
 const isShowNormalHomeAnimate = ref(appHomeShowMode.value === 'normal')
 const isShowCleanHomeAnimate = ref(appHomeShowMode.value === 'clean')

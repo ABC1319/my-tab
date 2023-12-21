@@ -5,7 +5,8 @@ import { broadcast, isShrinkSidebar } from '~/logic/storage'
 import type { IAppStatus } from '~/typings/app'
 
 defineProps<{
-  appHomeShowMode: NonNullable<IAppStatus['appShowMode']>
+  // appHomeShowMode: NonNullable<IAppStatus['appShowMode']>
+  appHomeShowMode: IAppStatus['appShowMode']
 }>()
 const emits = defineEmits(['update:appHomeShowMode'])
 
@@ -75,7 +76,7 @@ const toggleAppHomeShowMode = useThrottleFn ((item: 'normal' | 'clean') => {
   >
     <div class="w-full h-full bg-[#252835] rounded-10px py-10px flex flex-col gap-10px flex-shrink-0">
       <div class="w-full flex-1 flex flex-col justify-start items-center gap-10px">
-        <div class="tooltip tooltip-right before:ml-10px before:bg-[#252835]" data-tip="正常模式">
+        <div class="tooltip tooltip-right before:text-12px before:ml-10px before:bg-[#252835]" data-tip="正常模式">
           <div
             :class="appHomeShowMode === 'normal' ? 'bg-[#5021FF]' : ''"
             class="w-32px h-32px bg-[#484E64] rounded-6px grid place-items-center cursor-pointer [&>*:hover]:scale-120"
@@ -85,7 +86,7 @@ const toggleAppHomeShowMode = useThrottleFn ((item: 'normal' | 'clean') => {
           </div>
         </div>
 
-        <div class="tooltip tooltip-right before:ml-10px before:bg-[#252835]" data-tip="极简模式">
+        <div class="tooltip tooltip-right before:text-12px before:ml-10px before:bg-[#252835]" data-tip="极简模式">
           <div
             :class="appHomeShowMode === 'clean' ? 'bg-[#5021FF]' : ''"
             class="w-32px h-32px bg-[#484E64] rounded-6px grid place-items-center cursor-pointer [&>*:hover]:scale-120"
