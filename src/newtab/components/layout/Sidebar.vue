@@ -75,20 +75,24 @@ const toggleAppHomeShowMode = useThrottleFn ((item: 'normal' | 'clean') => {
   >
     <div class="w-full h-full bg-[#252835] rounded-10px py-10px flex flex-col gap-10px flex-shrink-0">
       <div class="w-full flex-1 flex flex-col justify-start items-center gap-10px">
-        <div
-          :class="appHomeShowMode === 'normal' ? 'bg-[#5021FF]' : ''"
-          class="w-32px h-32px bg-[#484E64] rounded-6px grid place-items-center cursor-pointer [&>*:hover]:scale-120"
-          @click="toggleAppHomeShowMode('normal')"
-        >
-          <div class="transition-transform ease-in-out w-5 h-5" i-carbon-grid />
+        <div class="tooltip tooltip-right before:ml-10px before:bg-[#252835]" data-tip="正常模式">
+          <div
+            :class="appHomeShowMode === 'normal' ? 'bg-[#5021FF]' : ''"
+            class="w-32px h-32px bg-[#484E64] rounded-6px grid place-items-center cursor-pointer [&>*:hover]:scale-120"
+            @click="toggleAppHomeShowMode('normal')"
+          >
+            <div class="transition-transform ease-in-out w-5 h-5" i-carbon-grid />
+          </div>
         </div>
 
-        <div
-          :class="appHomeShowMode === 'clean' ? 'bg-[#5021FF]' : ''"
-          class="w-32px h-32px bg-[#484E64] rounded-6px grid place-items-center cursor-pointer [&>*:hover]:scale-120"
-          @click="toggleAppHomeShowMode('clean')"
-        >
-          <div class="transition-transform ease-in-out w-5 h-5" i-carbon-clean />
+        <div class="tooltip tooltip-right before:ml-10px before:bg-[#252835]" data-tip="极简模式">
+          <div
+            :class="appHomeShowMode === 'clean' ? 'bg-[#5021FF]' : ''"
+            class="w-32px h-32px bg-[#484E64] rounded-6px grid place-items-center cursor-pointer [&>*:hover]:scale-120"
+            @click="toggleAppHomeShowMode('clean')"
+          >
+            <div class="transition-transform ease-in-out w-5 h-5" i-carbon-clean />
+          </div>
         </div>
       </div>
 
