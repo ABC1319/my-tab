@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import SearchBox from '../ui/search-box/index.vue'
+// import SearchBox from '../ui/search-box/index.vue'
+import DigitalClock from '../ui/DigitalClock.vue'
 
 const containerRef = ref<HTMLElement | null>(null)
 
@@ -46,10 +47,11 @@ defineExpose({ hide, show })
       relative
       flex-1 h-full flex flex-col justify-start items-center
       text-white
-      overflow-x-hidden
+      overflow-hidden
     "
   >
-    <SearchBox />
+    <!-- <SearchBox /> -->
+    <DigitalClock />
   </div>
 </template>
 
