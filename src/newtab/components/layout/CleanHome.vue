@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// import SearchBox from '../ui/search-box/index.vue'
+import SearchBox from '../ui/search-box/index.vue'
 import DigitalClock from '../ui/DigitalClock.vue'
 
 const containerRef = ref<HTMLElement | null>(null)
@@ -50,8 +50,8 @@ defineExpose({ hide, show })
       overflow-hidden
     "
   >
-    <!-- <SearchBox /> -->
     <DigitalClock />
+    <SearchBox />
   </div>
 </template>
 
