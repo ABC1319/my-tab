@@ -1,5 +1,3 @@
-import type { IAppStatus } from '~/typings/app'
-
 /**
  * 窗口通信
  * 1. sidebar
@@ -31,20 +29,6 @@ export function useBroadcast() {
   const broadcast = {
 
     data: broadcastChannel,
-
-    syncAppStatus: {
-      call(value?: IAppStatus) {
-        broadcastChannel.postMessage(
-          JSON.stringify({
-            cmd: 'syncAppStatus',
-            data: value,
-          }),
-        )
-      },
-      listen(callback: (event: MessageEvent<any>) => void) {
-        messageCallbacks.push(callback)
-      },
-    },
 
     syncWebsites: {
       call(value?: any) {

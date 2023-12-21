@@ -1,28 +1,29 @@
-import { storage } from 'webextension-polyfill'
+// 使用 localStorage 替代 webextension-polyfill 的 storage
+// import { storage } from 'webextension-polyfill'
 import type {
   MaybeRef,
   RemovableRef,
-  StorageLikeAsync,
+  // StorageLikeAsync,
   UseStorageAsyncOptions,
 } from '@vueuse/core'
 import {
   useStorageAsync,
 } from '@vueuse/core'
 
-const storageLocal: StorageLikeAsync = {
-  removeItem(key: string) {
-    return storage.local.remove(key)
-  },
+// const storageLocal: StorageLikeAsync = {
+//   removeItem(key: string) {
+//     return storage.local.remove(key)
+//   },
 
-  setItem(key: string, value: string) {
-    return storage.local.set({ [key]: value })
-  },
+//   setItem(key: string, value: string) {
+//     return storage.local.set({ [key]: value })
+//   },
 
-  async getItem(key: string) {
-    return (await storage.local.get(key))[key]
-  },
-}
+//   async getItem(key: string) {
+//     return (await storage.local.get(key))[key]
+//   },
+// }
 
 export function useStorageLocal<T>(key: string, initialValue: MaybeRef<T>, options?: UseStorageAsyncOptions<T>): RemovableRef<T> {
-  return useStorageAsync(key, initialValue, storageLocal, options)
+  return useStorageAsync(key, initialValue, localStorage, options)
 }

@@ -3,6 +3,7 @@ import Sidebar from './components/layout/Sidebar.vue'
 import NormalHome from './components/layout/NormalHome.vue'
 import CleanHome from './components/layout/CleanHome.vue'
 import { appHomeShowMode } from '~/logic/storage'
+import type { IAppStatus } from '~/typings/app'
 
 // 只是为了动画效果设置的变量
 const isShowNormalHomeAnimate = ref(appHomeShowMode.value === 'normal')
@@ -13,8 +14,10 @@ const cleanHomeRef = ref<InstanceType<typeof CleanHome>>()
 
 // 动画是否进行中，防抖
 watch(appHomeShowMode, async (val) => {
-  // 动画过快
+  handleSwitchHomeShowMode(val)
+})
 
+function handleSwitchHomeShowMode(val: IAppStatus['appShowMode']) {
   if (val === 'normal') {
     cleanHomeRef.value?.hide().then(() => {
       isShowCleanHomeAnimate.value = false
@@ -37,7 +40,7 @@ watch(appHomeShowMode, async (val) => {
       })
     })
   }
-})
+}
 </script>
 
 <template>
