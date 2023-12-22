@@ -38,14 +38,14 @@ function handleSelectedSearchEngine(item: typeof searchConfig.value[0]) {
   >
     <div
       v-for="item in searchConfig.slice(0, 9)"
-      :key="item.label"
-      :class="`${options.elementsClassName} search-${item.label}`"
+      :key="item.webName"
+      :class="`${options.elementsClassName} search-${item.webName}`"
       class="w-70px h-64px flex flex-col justify-center items-center cursor-pointer gap-5px flex-shrink-0 flex-grow-0"
       @click="handleSelectedSearchEngine(item)"
     >
       <div class="w-36px h-36px text-blue-500 rounded-8px bg-white flex flex-col justify-center items-center" v-html="item.icon" />
 
-      <span class="text-12px">{{ item.label }}</span>
+      <span class="text-12px">{{ item.webName }}</span>
     </div>
   </div>
 </template>

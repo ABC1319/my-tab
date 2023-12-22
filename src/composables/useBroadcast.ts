@@ -44,6 +44,20 @@ export function useBroadcast() {
       },
     },
 
+    syncSearchEngine: {
+      call(value?: any) {
+        broadcastChannel.postMessage(
+          JSON.stringify({
+            cmd: 'syncSearchEngine',
+            data: value,
+          }),
+        )
+      },
+      listen(callback: (event: MessageEvent<any>) => void) {
+        messageCallbacks.push(callback)
+      },
+    },
+
     syncSidebar: {
       call(value?: any) {
         broadcastChannel.postMessage(
@@ -57,6 +71,7 @@ export function useBroadcast() {
         messageCallbacks.push(callback)
       },
     },
+
   }
 
   broadcastChannel.onmessage = (event) => {

@@ -1,11 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import EngineModal from './EngineModal.vue'
-import { searchEngine } from '~/params/searchEngine'
 
-const searchConfig = ref(searchEngine)
-
-const currentSearchEngine = ref(searchConfig.value[0])
+import { appSearchEngine } from '~/logic/storage'
 
 const searchText = ref('')
 
@@ -16,7 +13,7 @@ const searchText = ref('')
 function handleSearch(e: KeyboardEvent) {
   if (!e.isComposing) {
     setTimeout(() => {
-      window.open(`${currentSearchEngine.value.url}${searchText.value}`)
+      window.open(`${appSearchEngine.value.url}${searchText.value}`)
     })
   }
 }
@@ -57,7 +54,7 @@ function isOpenSearchEngineList() {
         >
           <div class="pointer-events-none flex h-[28px] w-[28px] cursor-pointer items-center justify-center rounded-[8px] bg-opacity-80 hover:bg-color-white hover:bg-opacity-80">
             <section class=" flex items-center justify-center overflow-hidden bg-cover h-[24px] w-[24px] rounded-[6px] bg-transparent">
-              <div class="text-blue-500 " v-html="currentSearchEngine.icon" />
+              <div class="text-blue-500 " v-html="appSearchEngine.icon" />
             </section>
           </div>
         </div>
@@ -87,7 +84,6 @@ function isOpenSearchEngineList() {
     <!-- 搜索引擎 ，最多 9 个 -->
     <EngineModal
       ref="engineModalRef"
-      v-model:current-search-engine="currentSearchEngine"
     />
   </div>
 </template>

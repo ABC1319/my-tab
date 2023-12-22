@@ -5,7 +5,11 @@ export interface IAppStatus {
 }
 
 export interface ISearchEngine {
-  label: string
+  id?: number
+  webName: string
   url: string
-  icon: string
+  icon: string | File
+  type: number
+  index: number
+  remark: Record<string, any>
 }
