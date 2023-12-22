@@ -58,6 +58,11 @@ export function useBroadcast() {
       },
     },
 
+    /**
+     * 这里的同步，纯粹是不同窗口直接动画时间的一致性
+     * 否则，因为 sidebar 的状态是存储在 useStorageLocal 中，直接 watch 监听就行了
+     * 但是因为状态是在第一个窗口的动画结束后才更改的，所以如果 watch 状态，会导致别的窗口动画慢一步
+     */
     syncSidebar: {
       call(value?: any) {
         broadcastChannel.postMessage(

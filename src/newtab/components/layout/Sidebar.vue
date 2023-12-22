@@ -5,15 +5,9 @@ import { broadcast, isShrinkSidebar } from '~/logic/storage'
 import type { IAppStatus } from '~/typings/app'
 
 defineProps<{
-  // appHomeShowMode: NonNullable<IAppStatus['appShowMode']>
   appHomeShowMode: IAppStatus['appShowMode']
 }>()
 const emits = defineEmits(['update:appHomeShowMode'])
-
-const isShrink = ref(isShrinkSidebar.value === 'true')
-watch(isShrink, (v) => {
-  isShrinkSidebar.value = `${v}`
-})
 
 const shrinkBtnRef = ref<HTMLElement | null>(null)
 const isHideBtn = ref(true) // 这个变量纯纯的是为了让按钮隐藏的时候延迟几秒
@@ -24,13 +18,13 @@ function toggleShrink() {
 
   const rotate = ['rotate(0)', 'rotate(180deg)']
   const animation = shrinkBtnRef.value.animate(
-    { transform: isShrink.value ? [...rotate].reverse() : rotate },
+    { transform: isShrinkSidebar.value ? [...rotate].reverse() : rotate },
     { duration: 300, fill: 'forwards' },
   )
   animation.onfinish = () => {
-    isShrink.value = !isShrink.value
+    isShrinkSidebar.value = !isShrinkSidebar.value
 
-    if (isShrink.value) {
+    if (isShrinkSidebar.value) {
       setTimeout(() => {
         isHideBtn.value = true
       }, 1000 * 1)
@@ -57,7 +51,6 @@ function noticeSynchronize() {
 }
 
 // -----------------显示模式: 'normal' || 'clean' -------------------------//
-
 const toggleAppHomeShowMode = useThrottleFn ((item: 'normal' | 'clean') => {
   emits('update:appHomeShowMode', item)
 }, 400)
@@ -66,10 +59,10 @@ const toggleAppHomeShowMode = useThrottleFn ((item: 'normal' | 'clean') => {
 <template>
   <div
     :style="{
-      width: isShrink ? '0px' : '48px',
-      marginLeft: isShrink ? '0px' : '5px',
-      marginRight: isShrink ? '0px' : '5px',
-      transform: isShrink ? 'translateX(-24px)' : 'unset',
+      width: isShrinkSidebar ? '0px' : '48px',
+      marginLeft: isShrinkSidebar ? '0px' : '5px',
+      marginRight: isShrinkSidebar ? '0px' : '5px',
+      transform: isShrinkSidebar ? 'translateX(-24px)' : 'unset',
       transitionProperty: 'transform,width',
     }"
     class="h-[calc(100vh_-_10px)] my-auto text-white duration-300 ease-in-out relative flex-shrink-0"
@@ -146,10 +139,10 @@ const toggleAppHomeShowMode = useThrottleFn ((item: 'normal' | 'clean') => {
           ease-linear transition-opacity duration-300
         "
         :style="{
-          transform: isShrink ? 'rotate(180deg)' : 'rotate(0deg)',
+          transform: isShrinkSidebar ? 'rotate(180deg)' : 'rotate(0deg)',
         }"
         :class="
-          isShrink
+          isShrinkSidebar
             ? isHideBtn
               ? 'opacity-0 hover:opacity-100'
               : 'opacity-100'
