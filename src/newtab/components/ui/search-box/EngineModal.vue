@@ -79,22 +79,22 @@ defineExpose({
   </CustomAlert>
 
   <CustomModal ref="engineModalRef">
-    <div class=" max-w-66vw min-w-350px p-10px">
-      <span class="mb-16px block select-none">点击选择搜索引擎</span>
+    <div class=" max-w-66vw min-w-350px p-20px">
+      <span class="mb-20px block select-none">点击选择搜索引擎</span>
 
       <!-- 固定的导航 -->
-      <div class="modal-content-container grid grid-cols-2 gap-10px ">
+      <div class="modal-content-container grid grid-cols-2 gap-20px ">
         <div
           v-for="item in defaultSearchArr"
           :key="item.webName"
           class="
             w-full h-54px
             flex flex-row justify-start items-center gap-5px
-            rounded-10px px-2
+            rounded-10px px-4
             cursor-pointer
-            border border-solid border-[#484E6450]
+            bg-[#404459]
           "
-          :class="appSearchEngine.webName === item.webName ? 'bg-[#484E6450]' : ''"
+          :class="appSearchEngine.webName === item.webName ? 'bg-[#5021FF45]' : ''"
           @click="handleSelectEngine(item)"
         >
           <div
@@ -108,11 +108,14 @@ defineExpose({
             <div class="text-12px">
               {{ item.webName }}
             </div>
-            <div class="text-12px truncate text-[#b7b4b4a6]">
+            <div
+              class="text-12px truncate text-[#b7b4b4a6]"
+              :class="appSearchEngine.webName === item.webName ? 'text-[#f3f3f3b0]' : ''"
+            >
               {{ item.url }}
             </div>
           </div>
-          <div
+          <!-- <div
             class="
               w-18px h-18px
               text-[#b7b4b4a6]
@@ -123,22 +126,22 @@ defineExpose({
           >
             <svg v-if="appSearchEngine.webName === item.webName" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2m-2 15l-5-5l1.41-1.41L10 14.17l7.59-7.59L19 8z" /></svg>
             <svg v-else xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8m4.59-12.42L10 14.17l-2.59-2.58L6 13l4 4l8-8z" /></svg>
-          </div>
+          </div> -->
         </div>
       </div>
 
       <!-- 自定义导航 -->
-      <span class="my-16px block select-none">自定义搜索引擎地址</span>
-      <div class="modal-content-container gap-10px ">
+      <span class="my-20px block select-none">自定义搜索引擎地址</span>
+      <div class="modal-content-container gap-20px ">
         <div
           class="
             w-full h-54px
             flex flex-row justify-start items-center gap-5px
             cursor-pointer
-            rounded-10px px-2
-            border border-solid border-[#484E6450]
+            rounded-10px px-4
+            bg-[#404459]
           "
-          :class="appSearchEngine.webName === customSearch.webName ? 'bg-[#484E6450]' : ''"
+          :class="appSearchEngine.webName === customSearch.webName ? 'bg-[#5021FF45]' : ''"
           @click="handleSelectEngine(customSearch)"
         >
           <div
@@ -155,7 +158,7 @@ defineExpose({
               class="
                 text-12px
                 border border-solid border-[#484E6450]
-                bg-[#484E6450]
+                bg-[#2528368c]
                 leading-30px
                 rounded-6px
                 px-6px
@@ -163,12 +166,13 @@ defineExpose({
                 outline-none
                 focus:border-[#4e1fff]
               "
+              :class="appSearchEngine.webName === customSearch.webName ? 'bg-[#484E6450]' : ''"
               @focusout="handleEditCustomSearch(customSearch)"
               @click.stop
             >
           </div>
 
-          <div
+          <!-- <div
             class="
               w-18px h-18px
               text-[#b7b4b4a6]
@@ -180,7 +184,7 @@ defineExpose({
           >
             <svg v-if="appSearchEngine.webName === customSearch.webName" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2m-2 15l-5-5l1.41-1.41L10 14.17l7.59-7.59L19 8z" /></svg>
             <svg v-else xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10s10-4.48 10-10S17.52 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8m4.59-12.42L10 14.17l-2.59-2.58L6 13l4 4l8-8z" /></svg>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
