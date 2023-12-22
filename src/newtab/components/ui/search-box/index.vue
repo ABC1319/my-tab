@@ -49,10 +49,10 @@ function isOpenSearchEngineList() {
       >
         <!-- icon -->
         <div
-          class="search-icon cursor-pointer flex h-full w-[48px] items-center justify-center"
+          class="search-icon cursor-pointer flex h-full w-[48px] items-center justify-center hover:bg-[#e9e9ee]"
           @click="isOpenSearchEngineList"
         >
-          <div class="pointer-events-none flex h-[28px] w-[28px] cursor-pointer items-center justify-center rounded-[8px] bg-opacity-80 hover:bg-color-white hover:bg-opacity-80">
+          <div class=" pointer-events-none flex h-[28px] w-[28px] cursor-pointer items-center justify-center rounded-[8px] ">
             <section class=" flex items-center justify-center overflow-hidden bg-cover h-[24px] w-[24px] rounded-[6px] bg-transparent">
               <div class="text-blue-500 " v-html="appSearchEngine.icon" />
             </section>
@@ -101,10 +101,10 @@ function isOpenSearchEngineList() {
   backdrop-filter: blur(40px);
 }
 
-.search-icon:hover {
+/* .search-icon:hover {
   background-color: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(80px);
-}
+} */
 
 .tag-box {
   border: 2px solid white;

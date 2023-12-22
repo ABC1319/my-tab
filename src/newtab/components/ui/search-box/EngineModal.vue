@@ -6,11 +6,13 @@ import { editSearchEngine, getSearchEngine } from '~/logic/searchEngineData'
 import { broadcast } from '~/logic'
 import { appSearchEngine } from '~/logic/storage'
 
+const customAlertRef = ref<typeof import('~/components/CustomAlert.vue').default | null>(null)
+
 const defaultSearchArr = ref<ISearchEngine[]>(searchEngine)
 
 const customSearch = ref<ISearchEngine>({
   id: 0,
-  webName: '自定义',
+  webName: '自定义搜索',
   url: '',
   index: 0,
   type: 0,
@@ -45,6 +47,8 @@ function close() {
 
 function handleSelectEngine(item: ISearchEngine) {
   appSearchEngine.value = item
+  customAlertRef.value?.open()
+  close()
 }
 
 onMounted(() => {
@@ -69,6 +73,11 @@ defineExpose({
 </script>
 
 <template>
+  <CustomAlert ref="customAlertRef">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+    <span>{{ `成功使用 “${appSearchEngine.webName}” 作为默认搜索` }}</span>
+  </CustomAlert>
+
   <CustomModal ref="engineModalRef">
     <div class=" max-w-66vw min-w-350px p-10px">
       <span class="mb-16px block select-none">点击选择搜索引擎</span>
@@ -83,7 +92,7 @@ defineExpose({
             flex flex-row justify-start items-center gap-5px
             rounded-10px px-2
             cursor-pointer
-            border border-solid border-[#484E64]
+            border border-solid border-[#484E6450]
           "
           :class="appSearchEngine.webName === item.webName ? 'bg-[#484E6450]' : ''"
           @click="handleSelectEngine(item)"
@@ -127,7 +136,7 @@ defineExpose({
             flex flex-row justify-start items-center gap-5px
             cursor-pointer
             rounded-10px px-2
-            border border-solid border-[#484E64]
+            border border-solid border-[#484E6450]
           "
           :class="appSearchEngine.webName === customSearch.webName ? 'bg-[#484E6450]' : ''"
           @click="handleSelectEngine(customSearch)"
@@ -145,7 +154,7 @@ defineExpose({
               type="text"
               class="
                 text-12px
-                border border-solid border-[#484E64]
+                border border-solid border-[#484E6450]
                 bg-[#484E6450]
                 leading-30px
                 rounded-6px

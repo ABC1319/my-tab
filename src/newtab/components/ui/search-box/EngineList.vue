@@ -12,7 +12,7 @@ let isDraggedEngineList = false
 const options = {
   containerClassName: 'search-engine-container',
   elementsClassName: 'search-engine-item',
-  defaultPinedClassName: '自定义',
+  defaultPinedClassName: '自定义网址',
   size: { width: 70, height: 70 },
   gap: 0,
   maximumInLine: 9,
