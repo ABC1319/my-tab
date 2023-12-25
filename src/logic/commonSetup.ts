@@ -1,9 +1,11 @@
 import type { App } from 'vue'
+import Message from '~/components/custom-message'
 
 export function setupApp(app: App) {
   // Inject a globally available `$app` object in template
   app.config.globalProperties.$app = {
     context: '',
+    $message: Message, // 注册全局性组件 Message
   }
 
   // Provide access to `app` in script setup with `const app = inject('app')`

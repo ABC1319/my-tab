@@ -1,12 +1,11 @@
 <script setup lang="ts">
+import type { ComponentCustomProperties } from 'vue'
 import type { ISearchEngine } from '~/typings/app'
 import CustomModal from '~/components/CustomModal.vue'
 import { searchEngine } from '~/params/searchEngine'
 import { editSearchEngine, getSearchEngine } from '~/logic/searchEngineData'
 import { broadcast } from '~/logic'
 import { appSearchEngine } from '~/logic/storage'
-
-const customAlertRef = ref<typeof import('~/components/CustomAlert.vue').default | null>(null)
 
 const defaultSearchArr = ref<ISearchEngine[]>(searchEngine)
 
@@ -45,9 +44,17 @@ function close() {
   engineModalRef.value?.close()
 }
 
+const app = inject('app') as ComponentCustomProperties['$app']
+const { $message } = app
 function handleSelectEngine(item: ISearchEngine) {
   appSearchEngine.value = item
-  customAlertRef.value?.open()
+
+  $message({
+    type: 'success',
+    message: `成功使用 “${appSearchEngine.value.webName}” 作为默认搜索`,
+    center: true,
+  })
+
   close()
 }
 
@@ -73,11 +80,6 @@ defineExpose({
 </script>
 
 <template>
-  <CustomAlert ref="customAlertRef">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-    <span>{{ `成功使用 “${appSearchEngine.webName}” 作为默认搜索` }}</span>
-  </CustomAlert>
-
   <CustomModal ref="engineModalRef">
     <div class=" max-w-66vw min-w-350px p-20px">
       <span class="mb-20px block select-none">点击选择搜索引擎</span>
