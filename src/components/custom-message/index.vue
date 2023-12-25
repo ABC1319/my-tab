@@ -33,10 +33,10 @@ function open() {
 
 function handleMultiAlertsPosition() {
   const doms = document.querySelectorAll('.custom-alert')
-  const customAlert = Array.from(doms)
+  const customMessage = Array.from(doms)
 
-  if (customAlert.length > 0)
-    currentAlertPosition.value.top = customAlert.length * (40 + 20) + 20
+  if (customMessage.length > 0)
+    currentAlertPosition.value.top = customMessage.length * (40 + 20) + 20
 }
 
 onMounted(() => {
