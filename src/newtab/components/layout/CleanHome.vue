@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import SearchBox from '../ui/search-box/index.vue'
 import DigitalClock from '../ui/DigitalClock.vue'
+import LayoutCanvas from '../ui/layout-canvas/index.vue'
 
 const containerRef = ref<HTMLElement | null>(null)
 
@@ -85,6 +86,7 @@ function handleSelectContextMenu(e: typeof contextMenuOptions[number]) {
     "
     @contextmenu="e => openContextmenu(e)"
   >
+    <LayoutCanvas />
     <DigitalClock />
     <SearchBox />
   </div>
