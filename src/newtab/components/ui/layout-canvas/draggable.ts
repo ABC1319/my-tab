@@ -23,7 +23,7 @@ export function initGridContainer(
     unBindMouseEvent()
   })
 
-  const containerDom = document.querySelector('.bento-container')
+  const containerDom = document.querySelector('.bento-container') as HTMLElement
 
   function bindMouseEvent() {
     window.addEventListener('pointerdown', mousedown, false)
