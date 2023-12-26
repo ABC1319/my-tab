@@ -39,40 +39,6 @@ function show() {
 }
 
 defineExpose({ hide, show })
-
-const contextMenuPosition = ref({
-  x: 0,
-  y: 0,
-})
-const contextMenuRef = ref<typeof import('~/components/CustomContextMenu.vue').default | null>(null)
-const contextMenuOptions = [
-  { label: '编辑', key: 'edit' },
-  { label: '删除', key: 'delete' },
-]
-function openContextmenu(e: MouseEvent) {
-  e.preventDefault()
-  contextMenuPosition.value = {
-    x: e.clientX,
-    y: e.clientY,
-  }
-  contextMenuRef.value?.open()
-}
-
-function handleSelectContextMenu(e: typeof contextMenuOptions[number]) {
-  switch (e.key) {
-    case 'edit':
-      // eslint-disable-next-line no-console
-      console.log('edit')
-      break
-    case 'delete':
-      // eslint-disable-next-line no-console
-      console.log('delete')
-      break
-
-    default:
-      break
-  }
-}
 </script>
 
 <template>
@@ -84,20 +50,11 @@ function handleSelectContextMenu(e: typeof contextMenuOptions[number]) {
       text-white
       overflow-hidden
     "
-    @contextmenu="e => openContextmenu(e)"
   >
     <LayoutCanvas />
     <!-- <DigitalClock />
     <SearchBox /> -->
   </div>
-
-  <CustomContextMenu
-    ref="contextMenuRef"
-    :x="contextMenuPosition.x"
-    :y="contextMenuPosition.y"
-    :options="contextMenuOptions"
-    @select="handleSelectContextMenu"
-  />
 </template>
 
 <style scoped>

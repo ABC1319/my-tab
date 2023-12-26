@@ -25,6 +25,38 @@ onMounted(() => {
   initGridContainer(bentoCells, currentClickedElement)
 })
 
+// ------------------右键弹窗 start ----------------------- //
+const contextMenuPosition = ref({ x: 0, y: 0 })
+const contextMenuRef = ref<typeof import('~/components/CustomContextMenu.vue').default | null>(null)
+const contextMenuOptions = [
+  { label: '添加小组件', key: 'addWidgets' },
+]
+function openContextmenu(e: MouseEvent) {
+  e.preventDefault()
+  contextMenuPosition.value = {
+    x: e.clientX,
+    y: e.clientY,
+  }
+  contextMenuRef.value?.open()
+}
+
+function handleSelectContextMenu(e: typeof contextMenuOptions[number]) {
+  switch (e.key) {
+    case 'addWidgets':
+      addWidgets()
+      break
+
+    default:
+      break
+  }
+}
+
+function addWidgets() {
+  // eslint-disable-next-line no-console
+  console.log(contextMenuPosition.value)
+}
+// ------------------右键弹窗 end ----------------------- //
+
 // 从单个文件目录获取原始文件内容
 async function getAllCustomLayoutComponentsRaw() {
   const posts = await Promise.all(
@@ -47,6 +79,7 @@ async function getAllCustomLayoutComponentsRaw() {
   <div
     ref="bentoContainerRef"
     class="bento-container w-full h-full absolute top-0 left-0 overflow-hidden z-50"
+    @contextmenu="e => openContextmenu(e)"
   >
     <div v-for="item in bentoCells" :key="item.id">
       <component
@@ -66,4 +99,12 @@ async function getAllCustomLayoutComponentsRaw() {
       />
     </div>
   </div>
+
+  <CustomContextMenu
+    ref="contextMenuRef"
+    :x="contextMenuPosition.x"
+    :y="contextMenuPosition.y"
+    :options="contextMenuOptions"
+    @select="handleSelectContextMenu"
+  />
 </template>
