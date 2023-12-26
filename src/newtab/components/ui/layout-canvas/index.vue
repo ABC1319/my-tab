@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { initGridContainer } from './draggable'
+import { watchMouseShake } from '~/utils/watchMouseShake'
 
 interface BentoCellsType {
   id: string
@@ -20,6 +21,11 @@ const cfg = customLayoutAllComponents.map((components) => {
 const bentoCells = ref<BentoCellsType[]>(cfg)
 const bentoContainerRef = ref()
 const currentClickedElement: Ref<any> = ref()
+
+/**
+ * 1. 编辑模式
+ * 2. 添加小组件
+ */
 
 onMounted(() => {
   initGridContainer(bentoCells, currentClickedElement)
@@ -73,6 +79,10 @@ async function getAllCustomLayoutComponentsRaw() {
   )
   return posts
 }
+
+onMounted(() => {
+  watchMouseShake()
+})
 </script>
 
 <template>
@@ -108,3 +118,7 @@ async function getAllCustomLayoutComponentsRaw() {
     @select="handleSelectContextMenu"
   />
 </template>
+
+<style scoped>
+
+</style>
