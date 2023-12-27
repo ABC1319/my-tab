@@ -62,6 +62,7 @@ function addWidgets() {
 <template>
   <div>
     <button
+      title="帮助和资源"
       draggable="false"
       class="
         fixed bottom-2 right-2 z-99
