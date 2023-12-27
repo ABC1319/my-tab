@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { initGridContainer } from './draggable'
-import { watchMouseShake } from '~/utils/watchMouseShake'
 
 interface BentoCellsType {
   id: string
@@ -79,10 +78,6 @@ async function getAllCustomLayoutComponentsRaw() {
   )
   return posts
 }
-
-onMounted(() => {
-  watchMouseShake()
-})
 </script>
 
 <template>
