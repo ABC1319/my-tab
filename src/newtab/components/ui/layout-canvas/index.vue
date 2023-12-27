@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { initGridContainer } from './draggable'
+import { appIsEditCleanHome } from '~/logic/storage'
 
 interface BentoCellsType {
   id: string
@@ -102,6 +103,10 @@ async function getAllCustomLayoutComponentsRaw() {
           willChange: 'transform',
         }"
       />
+    </div>
+
+    <div>
+      {{ appIsEditCleanHome }}
     </div>
   </div>
 

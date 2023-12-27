@@ -2,6 +2,7 @@ export interface IAppStatus {
   appShowMode: 'normal' | 'clean'
   appSidebarMode: 'shrink' | 'grow'
   isShrinkSidebar: boolean
+  appIsEditCleanHome: boolean
 }
 
 export interface ISearchEngine {
