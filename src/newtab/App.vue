@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Sidebar from './components/layout/Sidebar.vue'
+import AppTip from './components/layout/AppTip.vue'
 import NormalHome from './components/layout/NormalHome.vue'
 import CleanHome from './components/layout/CleanHome.vue'
 import { appHomeShowMode } from '~/logic/storage'
@@ -63,6 +64,8 @@ function handleSwitchHomeShowMode(val: IAppStatus['appShowMode']) {
         <NormalHome v-if="isShowNormalHomeAnimate" ref="normalHomeRef" />
         <CleanHome v-if="isShowCleanHomeAnimate" ref="cleanHomeRef" />
       </div>
+
+      <AppTip />
     </div>
   </Suspense>
 </template>
