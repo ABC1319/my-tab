@@ -77,7 +77,6 @@ defineExpose({
         w-32 fixed z-999
         opacity-0 origin-right-bottom
         rounded-10px
-        border border-solid border-[#bcbbc18c]
         bg-[#252835] text-white
         select-none py-1
         flex flex-col justify-around
@@ -93,7 +92,7 @@ defineExpose({
         v-for="item in options"
         :key="item.label"
       >
-        <div v-if="item.key === 'Divider'" class="w-full h-1px bg-[#bcbbc18c] my-1" />
+        <div v-if="item.key === 'Divider'" class="w-full h-1px bg-[#bcbbc130] my-1" />
         <div
           v-else
           class="
