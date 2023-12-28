@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useWindowSize } from '@vueuse/core'
 import { initGridContainer } from './draggable'
 import CustomLayoutComponentsList from './CustomLayoutComponentsList.vue'
 import { appIsEditCleanHome } from '~/logic/storage'
@@ -10,7 +11,7 @@ import { getLayoutComponents } from '~/logic/layoutComponentsData'
 const customLayoutAllComponents = await getAllCustomLayoutComponentsRaw()
 
 const bentoCells = ref<ILayoutComponentTypeInPage[]>([])
-const bentoContainerRef = ref()
+const layoutContainerRef = ref()
 const currentClickedElement: Ref<any> = ref()
 await getList()
 
@@ -52,12 +53,36 @@ onMounted(async () => {
   initGridContainer(
     bentoCells,
     currentClickedElement,
-    bentoContainerRef.value,
+    layoutContainerRef.value,
   )
+})
+
+// 计算缩放比例
+const layoutContainerScale = ref('')
+const { width, height } = useWindowSize()
+onMounted(() => {
+  layoutContainerScale.value = `scale(${calculateMainScale()})`
+})
+watch([width, height], () => {
+  layoutContainerScale.value = `scale(${calculateMainScale()})`
 })
 
 function handleSwitchCleanHomeMode() {
   appIsEditCleanHome.value = !appIsEditCleanHome.value
+}
+
+function calculateMainScale() {
+  // 距离间隔
+  const g = 80
+  // 获取初始页面的宽度
+  const ow = layoutContainerRef.value.offsetWidth
+  // 获取抽屉的宽度
+  const w = 200
+  // 页面的宽度减去抽屉的宽度再减去Gap的值，就是main缩放后的值
+  const d = ow - w - g
+  // 缩放后的宽度除以初始宽度，得到要缩放的比例
+  const percentage = (d / ow).toFixed(6)
+  return percentage
 }
 
 // ------------------拖拽 start -------------------------//
@@ -91,15 +116,18 @@ function handleDragover(e: DragEvent) {
 
 <template>
   <div
-    ref="bentoContainerRef"
+    ref="layoutContainerRef"
     class="
       layout-container
       w-full h-full
       absolute top-0 left-0 overflow-hidden z-50
       transition-all duration-300 ease-in-out
       outline-10px outline-solid outline-[#474d63]
+      origin-[10%_50%] rounded-[10px]
     "
-    :class="appIsEditCleanHome ? 'layout-container-edit-mode' : ''"
+    :style="{
+      transform: appIsEditCleanHome ? layoutContainerScale : '',
+    }"
     @drop="handleDrop"
     @dragover="handleDragover"
   >
@@ -177,13 +205,7 @@ function handleDragover(e: DragEvent) {
   background-size: cover;
   background-position: center;
 }
-.layout-container-edit-mode {
-  transform: scaleY(0.8);
-  width: calc(100% - 250px);
-  margin-left: 20px;
-  border-radius: 10px;
-  transform-origin: 10% 50%;
-}
+
 .scale-enter-active {
   animation: scale-in 0.5s;
   transform-origin: bottom left;
