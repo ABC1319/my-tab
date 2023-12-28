@@ -1,5 +1,19 @@
 <script setup lang="ts">
+import { getAllCustomLayoutComponentsRaw } from '~/utils/layout-components'
 
+const customLayoutAllComponents = await getAllCustomLayoutComponentsRaw()
+const allComponents = customLayoutAllComponents.map((components) => {
+  return {
+    title: components.title,
+    components: markRaw(components.raw.default),
+  }
+})
+
+function handleDragstart(e: DragEvent, title: string) {
+  e.dataTransfer!.setData('text/plain', title)
+  // eslint-disable-next-line no-console
+  console.log('开始拖拽')
+}
 </script>
 
 <template>
@@ -23,15 +37,22 @@
     >
       <div>拖拽布置组件</div>
       <div
-        v-for="item in 10"
-        :key="item"
+        v-for="item in allComponents"
+        :key="item.title"
+        :draggable="true"
         class="
           w-full h-100px bg-[#484E64] rounded-10px
           flex-shrink-0 grid place-items-center
           hover:cursor-grab active:cursor-grabbing
+          overflow-hidden
         "
+        @dragstart="(e) => handleDragstart(e, item.title)"
       >
-        {{ item }}
+        <component
+          :is="item.components"
+          :id="`${item.title}`"
+          class="w-full h-full"
+        />
       </div>
     </div>
   </div>

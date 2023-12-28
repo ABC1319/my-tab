@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { initGridContainer } from './draggable'
 import CustomLayoutComponentsList from './CustomLayoutComponentsList.vue'
 import { appIsEditCleanHome } from '~/logic/storage'
+import { getAllCustomLayoutComponentsRaw } from '~/utils/layout-components'
 
 interface BentoCellsType {
   id: string
@@ -68,22 +69,18 @@ function handleSwitchCleanHomeMode() {
   appIsEditCleanHome.value = !appIsEditCleanHome.value
 }
 
-// 从单个文件目录获取原始文件内容
-async function getAllCustomLayoutComponentsRaw() {
-  const posts = await Promise.all(
-    Object.entries(
-      import.meta.glob('~/components/custom-layout-card/*.vue'),
-    )
-      .map(async ([path, resolver]) => {
-        return {
-          raw: await resolver() as any,
-          title: (path as any).split('/').pop().split('.')[0],
-          path,
-        }
-      }),
-  )
-  return posts
+// ------------------拖拽 start -------------------------//
+
+function handleDrop(_e: DragEvent) {
+  // eslint-disable-next-line no-console
+  console.log('放下拖拽的要素')
 }
+function handleDragover(e: DragEvent) {
+  e.preventDefault()
+  // eslint-disable-next-line no-console
+  console.log('拖拽的要素在可放置的区域上')
+}
+// ------------------拖拽 end ---------------------------//
 </script>
 
 <template>
@@ -98,6 +95,8 @@ async function getAllCustomLayoutComponentsRaw() {
     "
     :class="appIsEditCleanHome ? 'bento-container-edit-mode' : ''"
     @contextmenu="e => openContextmenu(e)"
+    @drop="handleDrop"
+    @dragover="handleDragover"
   >
     <div
       v-for="item in bentoCells"
@@ -127,9 +126,6 @@ async function getAllCustomLayoutComponentsRaw() {
       </div>
     </div>
 
-    <div>
-      {{ appIsEditCleanHome }}
-    </div>
     <!-- 编辑模式 -->
     <Teleport to="body">
       <button
