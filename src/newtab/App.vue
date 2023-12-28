@@ -48,6 +48,7 @@ function handleSwitchHomeShowMode(val: IAppStatus['appShowMode']) {
   <Suspense>
     <!-- 背景 -->
     <div
+      id="app-container"
       class="
         main-container
         w-screen h-screen overflow-hidden
