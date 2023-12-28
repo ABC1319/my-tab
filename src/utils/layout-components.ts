@@ -7,7 +7,7 @@ export async function getAllCustomLayoutComponentsRaw() {
       .map(async ([path, resolver]) => {
         return {
           raw: await resolver() as any,
-          title: (path as any).split('/').pop().split('.')[0],
+          name: (path as any).split('/').pop().split('.')[0],
           path,
         }
       }),

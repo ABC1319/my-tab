@@ -14,3 +14,4 @@ export const appIsEditCleanHome = useStorageLocal('appIsEditCleanHome', false) a
 
 export const storageWebsiteDB = useStorageIndexDB('website_db', '++id, webName, url, icon, type, remark, index')
 export const storageSearchEngineDB = useStorageIndexDB('search_engine_db', '++id, webName, url, icon, type, remark, index')
+export const storageLayoutDB = useStorageIndexDB('search_layout_db', '++id, layoutName, componentName, x, y, width, height, remark')

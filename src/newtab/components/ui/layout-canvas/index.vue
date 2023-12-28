@@ -4,66 +4,57 @@ import { initGridContainer } from './draggable'
 import CustomLayoutComponentsList from './CustomLayoutComponentsList.vue'
 import { appIsEditCleanHome } from '~/logic/storage'
 import { getAllCustomLayoutComponentsRaw } from '~/utils/layout-components'
-
-interface BentoCellsType {
-  id: string
-  x: number
-  y: number
-  width: number
-  height: number
-  [key: string]: any
-}
+import type { ILayoutComponentTypeInData, ILayoutComponentTypeInPage } from '~/typings/layout'
+import { getLayoutComponents } from '~/logic/layoutComponentsData'
 
 const customLayoutAllComponents = await getAllCustomLayoutComponentsRaw()
 
-const cfg = customLayoutAllComponents.map((components) => {
-  return { id: '1', x: 0, y: 0, width: 100, height: 100, component: markRaw(components.raw.default) }
-})
-
-const bentoCells = ref<BentoCellsType[]>(cfg)
+const bentoCells = ref<ILayoutComponentTypeInPage[]>([])
 const bentoContainerRef = ref()
 const currentClickedElement: Ref<any> = ref()
+await getList()
+
+async function getList() {
+  const allComponentsData = await getLayoutComponents() as ILayoutComponentTypeInData[]
+
+  if (allComponentsData.length === 0) {
+    // 说明没有查到，这里是空白
+  }
+  else {
+    const processingData = allComponentsData.map((item) => {
+      const component = customLayoutAllComponents.find(cp => cp.name === item.componentName)
+      if (component) {
+        return {
+          id: item.id,
+          layoutName: item.layoutName,
+          x: item.x,
+          y: item.y,
+          width: item.width,
+          height: item.height,
+          componentName: item.componentName,
+          component: markRaw(component.raw.default),
+        }
+      }
+      else {
+        return null!
+      }
+    })
+
+    bentoCells.value = processingData.filter(r => r !== null)
+  }
+}
 
 /**
- * 1. 编辑模式
+ * 1. 进入编辑模式
  * 2. 添加小组件
  */
-
-onMounted(() => {
-  initGridContainer(bentoCells, currentClickedElement)
+onMounted(async () => {
+  initGridContainer(
+    bentoCells,
+    currentClickedElement,
+    bentoContainerRef.value,
+  )
 })
-
-// ------------------右键弹窗 start ----------------------- //
-const contextMenuPosition = ref({ x: 0, y: 0 })
-const contextMenuRef = ref<typeof import('~/components/CustomContextMenu.vue').default | null>(null)
-const contextMenuOptions = [
-  { label: '添加小组件', key: 'addWidgets' },
-]
-function openContextmenu(e: MouseEvent) {
-  e.preventDefault()
-  contextMenuPosition.value = {
-    x: e.clientX,
-    y: e.clientY,
-  }
-  contextMenuRef.value?.open()
-}
-
-function handleSelectContextMenu(e: typeof contextMenuOptions[number]) {
-  switch (e.key) {
-    case 'addWidgets':
-      addWidgets()
-      break
-
-    default:
-      break
-  }
-}
-
-function addWidgets() {
-  // eslint-disable-next-line no-console
-  console.log(contextMenuPosition.value)
-}
-// ------------------右键弹窗 end ----------------------- //
 
 function handleSwitchCleanHomeMode() {
   appIsEditCleanHome.value = !appIsEditCleanHome.value
@@ -71,14 +62,29 @@ function handleSwitchCleanHomeMode() {
 
 // ------------------拖拽 start -------------------------//
 
-function handleDrop(_e: DragEvent) {
-  // eslint-disable-next-line no-console
-  console.log('放下拖拽的要素')
+function handleDrop(e: DragEvent) {
+  e.preventDefault()
+  const componentName = e.dataTransfer!.getData('text/plain')
+
+  // 1. 通过 componentName 去匹配组件
+  // 2. 赋值给 bentoCells
+  const component = customLayoutAllComponents.find(components => components.name === componentName)
+
+  if (component) {
+    bentoCells.value.push({
+      id: `${bentoCells.value.length + 1}`,
+      layoutName: '1',
+      x: e.clientX,
+      y: e.clientY,
+      width: 100,
+      height: 100,
+      componentName: component.name,
+      component: markRaw(component.raw.default),
+    })
+  }
 }
 function handleDragover(e: DragEvent) {
   e.preventDefault()
-  // eslint-disable-next-line no-console
-  console.log('拖拽的要素在可放置的区域上')
 }
 // ------------------拖拽 end ---------------------------//
 </script>
@@ -87,14 +93,13 @@ function handleDragover(e: DragEvent) {
   <div
     ref="bentoContainerRef"
     class="
-      bento-container
+      layout-container
       w-full h-full
       absolute top-0 left-0 overflow-hidden z-50
       transition-all duration-300 ease-in-out
       outline-10px outline-solid outline-[#474d63]
     "
-    :class="appIsEditCleanHome ? 'bento-container-edit-mode' : ''"
-    @contextmenu="e => openContextmenu(e)"
+    :class="appIsEditCleanHome ? 'layout-container-edit-mode' : ''"
     @drop="handleDrop"
     @dragover="handleDragover"
   >
@@ -108,15 +113,13 @@ function handleDragover(e: DragEvent) {
             ${item.x}px,
             ${item.y}px,
           0)`,
-        width: `${item.width}px`,
-        height: `${item.height}px`,
         willChange: 'transform',
       }"
     >
       <component
         :is="item.component"
-        :id="`${item.id}`"
-        class="w-full h-full"
+        :id="item.id"
+        class="w-fit h-fit"
       />
 
       <div v-if="appIsEditCleanHome" class="absolute top-0 left-0 cursor-pointer">
@@ -166,23 +169,15 @@ function handleDragover(e: DragEvent) {
   >
     <CustomLayoutComponentsList v-if="appIsEditCleanHome" />
   </Transition>
-
-  <CustomContextMenu
-    ref="contextMenuRef"
-    :x="contextMenuPosition.x"
-    :y="contextMenuPosition.y"
-    :options="contextMenuOptions"
-    @select="handleSelectContextMenu"
-  />
 </template>
 
 <style scoped>
-.bento-container {
+.layout-container {
   background-image: url(/assets/main_resource.png);
   background-size: cover;
   background-position: center;
 }
-.bento-container-edit-mode {
+.layout-container-edit-mode {
   transform: scaleY(0.8);
   width: calc(100% - 250px);
   margin-left: 20px;

@@ -4,13 +4,14 @@ import { getAllCustomLayoutComponentsRaw } from '~/utils/layout-components'
 const customLayoutAllComponents = await getAllCustomLayoutComponentsRaw()
 const allComponents = customLayoutAllComponents.map((components) => {
   return {
-    title: components.title,
+    name: components.name,
     components: markRaw(components.raw.default),
   }
 })
 
 function handleDragstart(e: DragEvent, title: string) {
   e.dataTransfer!.setData('text/plain', title)
+  e.dataTransfer!.dropEffect = 'move'
   // eslint-disable-next-line no-console
   console.log('开始拖拽')
 }
@@ -38,7 +39,7 @@ function handleDragstart(e: DragEvent, title: string) {
       <div>拖拽布置组件</div>
       <div
         v-for="item in allComponents"
-        :key="item.title"
+        :key="item.name"
         :draggable="true"
         class="
           w-full h-100px bg-[#484E64] rounded-10px
@@ -46,11 +47,11 @@ function handleDragstart(e: DragEvent, title: string) {
           hover:cursor-grab active:cursor-grabbing
           overflow-hidden
         "
-        @dragstart="(e) => handleDragstart(e, item.title)"
+        @dragstart="(e) => handleDragstart(e, item.name)"
       >
         <component
           :is="item.components"
-          :id="`${item.title}`"
+          :id="`${item.name}`"
           class="w-full h-full"
         />
       </div>

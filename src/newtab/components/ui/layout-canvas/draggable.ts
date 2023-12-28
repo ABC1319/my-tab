@@ -1,11 +1,4 @@
-export interface BentoCellsType {
-  id: string
-  x: number
-  y: number
-  width: number
-  height: number
-  [key: string]: any
-}
+import type { ILayoutComponentTypeInData } from '~/typings/layout'
 
 const isDraggingElement = ref(false)
 const isDraggingCanvas = ref(false)
@@ -14,8 +7,9 @@ const isPressingMouseLeft = ref(false)
 let mouseFrom = { x: 0, y: 0 }
 let mouseTo = { x: 0, y: 0 }
 export function initGridContainer(
-  bentoCells: Ref<BentoCellsType[]>,
+  bentoCells: Ref<ILayoutComponentTypeInData[]>,
   currentClickedElement: Ref<any>,
+  containerDom: HTMLElement,
 ) {
   bindMouseEvent()
 
@@ -23,23 +17,23 @@ export function initGridContainer(
     unBindMouseEvent()
   })
 
-  const containerDom = document.querySelector('.bento-container') as HTMLElement
-
   function bindMouseEvent() {
-    window.addEventListener('pointerdown', mousedown, false)
-    window.addEventListener('pointermove', mousemove, false)
-    window.addEventListener('pointerup', mouseup, false)
-    window.addEventListener('keydown', spaceDown, false)
-    window.addEventListener('keyup', spaceUp, false)
+    containerDom.focus()
+    containerDom.addEventListener('pointerdown', mousedown, false)
+    containerDom.addEventListener('pointermove', mousemove, false)
+    containerDom.addEventListener('pointerup', mouseup, false)
+
+    document.addEventListener('keydown', spaceDown, false)
+    document.addEventListener('keyup', spaceUp, false)
   }
 
   function unBindMouseEvent() {
-    window.removeEventListener('pointerdown', mousedown, false)
-    window.removeEventListener('pointermove', mousemove, false)
-    window.removeEventListener('pointerup', mouseup, false)
+    containerDom.removeEventListener('pointerdown', mousedown, false)
+    containerDom.removeEventListener('pointermove', mousemove, false)
+    containerDom.removeEventListener('pointerup', mouseup, false)
 
-    window.removeEventListener('keydown', spaceDown, false)
-    window.removeEventListener('keyup', spaceUp, false)
+    document.removeEventListener('keydown', spaceDown, false)
+    document.removeEventListener('keyup', spaceUp, false)
   }
 
   function spaceDown(event: KeyboardEvent) {
@@ -49,10 +43,7 @@ export function initGridContainer(
     if (event.key === ' ') {
       isPressingSpace.value = true
 
-      if (containerDom) {
-        // 只要空格按下就是开始拖拽了
-        containerDom.style.cursor = 'grab'
-      }
+      containerDom.style.cursor = 'grab'
 
       if (isPressingMouseLeft.value) {
         isDraggingCanvas.value = true
@@ -69,13 +60,11 @@ export function initGridContainer(
       isPressingSpace.value = false
       isDraggingCanvas.value = false
 
-      if (containerDom) {
-        // 只有空格松开就是取消拖拽了
-        if (isDraggingCanvas.value)
-          containerDom.style.cursor = 'grab'
-        else
-          containerDom.style.cursor = 'default'
-      }
+      // 只有空格松开就是取消拖拽了
+      if (isDraggingCanvas.value)
+        containerDom.style.cursor = 'grab'
+      else
+        containerDom.style.cursor = 'default'
     }
   }
 
@@ -127,13 +116,11 @@ export function initGridContainer(
     }
   }
   function mouseup(_e: MouseEvent) {
-    if (containerDom) {
-      // 只有空格松开就是取消拖拽了
-      if (isDraggingCanvas.value)
-        containerDom.style.cursor = 'grab'
-      else
-        containerDom.style.cursor = 'default'
-    }
+    // 只有空格松开就是取消拖拽了
+    if (isDraggingCanvas.value)
+      containerDom.style.cursor = 'grab'
+    else
+      containerDom.style.cursor = 'default'
 
     currentClickedElement.value = null
     mouseFrom.x = 0
@@ -148,7 +135,7 @@ export function initGridContainer(
     const point = { x: position.x, y: position.y }
     const initElement = document.elementFromPoint(point.x, point.y)
     if (initElement)
-      result = bentoCells.value.filter((ele: { id: string }) => ele.id === initElement.id)
+      result = bentoCells.value?.filter((ele: { id: string }) => ele.id === initElement.id)
 
     return result ? result[0] : null
   }

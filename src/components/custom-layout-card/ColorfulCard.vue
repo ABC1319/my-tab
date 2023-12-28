@@ -8,6 +8,8 @@ const colors = 'cae7b9-f3de8a-eb9486-7e7f9a-97a7b3-4059ad'.split('-').map(a => `
       background: `${colors[Number(4) - 1]}`,
       placeItems: 'center',
       userSelect: 'none',
+      width: '100px',
+      height: '100px',
     }"
   />
 </template>
