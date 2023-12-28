@@ -123,8 +123,9 @@ function handleDragover(e: DragEvent) {
       absolute top-0 left-0 overflow-hidden z-50
       transition-all duration-300 ease-in-out
       outline-10px outline-solid outline-[#474d63]
-      origin-[10%_50%] rounded-[10px]
+      origin-[10%_50%]
     "
+    :class="appIsEditCleanHome ? 'rounded-[10px]' : ''"
     :style="{
       transform: appIsEditCleanHome ? layoutContainerScale : '',
     }"
