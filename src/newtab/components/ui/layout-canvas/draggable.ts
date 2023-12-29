@@ -9,12 +9,24 @@ let mouseTo = { x: 0, y: 0 }
 export function initGridContainer(
   bentoCells: Ref<ILayoutComponentTypeInData[]>,
   currentClickedElement: Ref<any>,
+  disabled: Ref<boolean>,
   containerDom: HTMLElement,
+  scale: Ref<number>,
 ) {
   bindMouseEvent()
 
   onUnmounted(() => {
     unBindMouseEvent()
+  })
+
+  watchEffect(() => {
+    if (disabled.value) {
+      // 说明禁止拖拽
+      unBindMouseEvent()
+    }
+    else {
+      bindMouseEvent()
+    }
   })
 
   function bindMouseEvent() {
@@ -101,8 +113,8 @@ export function initGridContainer(
     // 移动画布
     if (isDraggingCanvas.value) {
       bentoCells.value.forEach((cell) => {
-        cell.x += disX
-        cell.y += disY
+        cell.x += (disX / scale.value)
+        cell.y += (disY / scale.value)
       })
       mouseFrom = { x: e.clientX, y: e.clientY }
       return
@@ -110,8 +122,8 @@ export function initGridContainer(
 
     // 移动元素
     if (isDraggingElement.value) {
-      currentClickedElement.value.x += disX
-      currentClickedElement.value.y += disY
+      currentClickedElement.value.x += (disX / scale.value)
+      currentClickedElement.value.y += (disY / scale.value)
       mouseFrom = { x: e.clientX, y: e.clientY }
     }
   }

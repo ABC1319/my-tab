@@ -13,6 +13,7 @@ const customLayoutAllComponents = await getAllCustomLayoutComponentsRaw()
 const bentoCells = ref<ILayoutComponentTypeInPage[]>([])
 const layoutContainerRef = ref()
 const currentClickedElement: Ref<any> = ref()
+const disabledDraggable = ref(!appIsEditCleanHome.value)
 await getList()
 
 async function getList() {
@@ -45,30 +46,27 @@ async function getList() {
   }
 }
 
-/**
- * 1. 进入编辑模式
- * 2. 添加小组件
- */
-onMounted(async () => {
-  initGridContainer(
-    bentoCells,
-    currentClickedElement,
-    layoutContainerRef.value,
-  )
-})
-
 // 计算缩放比例
-const layoutContainerScale = ref('')
+const layoutContainerScale = ref(1)
 const { width, height } = useWindowSize()
 onMounted(() => {
-  layoutContainerScale.value = `scale(${calculateMainScale()})`
+  layoutContainerScale.value = calculateMainScale()
 })
 watch([width, height], () => {
-  layoutContainerScale.value = `scale(${calculateMainScale()})`
+  layoutContainerScale.value = calculateMainScale()
 })
 
 function handleSwitchCleanHomeMode() {
   appIsEditCleanHome.value = !appIsEditCleanHome.value
+
+  if (appIsEditCleanHome.value) {
+    // 说明进入了编辑模式
+    disabledDraggable.value = false
+  }
+  else {
+    // 说明退出了编辑模式
+    disabledDraggable.value = true
+  }
 }
 
 function calculateMainScale() {
@@ -82,8 +80,21 @@ function calculateMainScale() {
   const d = ow - w - g
   // 缩放后的宽度除以初始宽度，得到要缩放的比例
   const percentage = (d / ow).toFixed(6)
-  return percentage
+  return Number(percentage)
 }
+/**
+ * 1. 进入编辑模式
+ * 2. 添加小组件
+ */
+onMounted(async () => {
+  initGridContainer(
+    bentoCells,
+    currentClickedElement,
+    disabledDraggable,
+    layoutContainerRef.value,
+    layoutContainerScale,
+  )
+})
 
 // ------------------拖拽 start -------------------------//
 
@@ -127,7 +138,7 @@ function handleDragover(e: DragEvent) {
     "
     :class="appIsEditCleanHome ? 'rounded-[10px]' : ''"
     :style="{
-      transform: appIsEditCleanHome ? layoutContainerScale : '',
+      transform: appIsEditCleanHome ? `scale(${layoutContainerScale})` : '',
     }"
     @drop="handleDrop"
     @dragover="handleDragover"
