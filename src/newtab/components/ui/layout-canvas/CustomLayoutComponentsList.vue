@@ -36,7 +36,7 @@ function handleDragstart(e: DragEvent, title: string) {
         overflow-auto select-none
       "
     >
-      <div>拖拽布置组件</div>
+      <div>拖拽布局组件</div>
       <div
         v-for="item in allComponents"
         :key="item.name"

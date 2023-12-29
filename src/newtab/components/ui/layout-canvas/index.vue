@@ -97,7 +97,6 @@ onMounted(async () => {
 })
 
 // ------------------拖拽 start -------------------------//
-
 function handleDrop(e: DragEvent) {
   e.preventDefault()
   const componentName = e.dataTransfer!.getData('text/plain')
@@ -105,20 +104,35 @@ function handleDrop(e: DragEvent) {
   // 1. 通过 componentName 去匹配组件
   // 2. 赋值给 bentoCells
   const component = customLayoutAllComponents.find(components => components.name === componentName)
+  const mouseXY = calcPosition()
 
   if (component) {
     bentoCells.value.push({
       id: `${bentoCells.value.length + 1}`,
       layoutName: '1',
-      x: e.clientX,
-      y: e.clientY,
+      x: mouseXY.x,
+      y: mouseXY.y,
       width: 100,
       height: 100,
       componentName: component.name,
       component: markRaw(component.raw.default),
     })
   }
+
+  function calcPosition() {
+    const originX = layoutContainerRef.value.getBoundingClientRect().left
+    const originY = layoutContainerRef.value.getBoundingClientRect().top
+
+    const mouseX = (e.clientX - originX) / layoutContainerScale.value
+    const mouseY = (e.clientY - originY) / layoutContainerScale.value
+
+    return {
+      x: mouseX,
+      y: mouseY,
+    }
+  }
 }
+
 function handleDragover(e: DragEvent) {
   e.preventDefault()
 }
