@@ -123,10 +123,10 @@ const toggleAppHomeShowMode = useThrottleFn ((item: 'normal' | 'clean') => {
           </svg>
         </div>
 
-        <div class="w-32px h-32px hover:bg-[#484E64] rounded-6px grid place-items-center cursor-pointer [&>svg:hover]:scale-120">
-          <svg class=" transition-transform ease-in-out" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
-            <path fill="currentColor" d="M12.5 8H11v6l4.75 2.85l.75-1.23l-4-2.37zm4.837-6.19l4.607 3.845l-1.28 1.535l-4.61-3.843zm-10.674 0l1.282 1.536L3.337 7.19l-1.28-1.536zM12 4a9 9 0 1 0 .001 18.001A9 9 0 0 0 12 4zm0 16c-3.86 0-7-3.14-7-7s3.14-7 7-7s7 3.14 7 7s-3.14 7-7 7z" />
-          </svg>
+        <div class="tooltip tooltip-right before:text-12px before:ml-10px before:bg-[#252835]" data-tip="侧边栏设置">
+          <div class="w-32px h-32px hover:bg-[#484E64] rounded-6px grid place-items-center cursor-pointer [&>svg:hover]:scale-120">
+            <div class="w-5 h-5 " i-carbon:settings />
+          </div>
         </div>
       </div>
       <!-- base -->
