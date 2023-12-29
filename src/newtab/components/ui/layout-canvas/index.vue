@@ -6,7 +6,7 @@ import CustomLayoutComponentsList from './CustomLayoutComponentsList.vue'
 import { appIsEditCleanHome } from '~/logic/storage'
 import { getAllCustomLayoutComponentsRaw } from '~/utils/layout-components'
 import type { ILayoutComponentTypeInData, ILayoutComponentTypeInPage } from '~/typings/layout'
-import { getLayoutComponents } from '~/logic/layoutComponentsData'
+import { editLayoutComponents, getLayoutComponents } from '~/logic/layoutComponentsData'
 
 const customLayoutAllComponents = await getAllCustomLayoutComponentsRaw()
 
@@ -137,6 +137,34 @@ function handleDragover(e: DragEvent) {
   e.preventDefault()
 }
 // ------------------拖拽 end ---------------------------//
+
+// ------------------保存 start -------------------------//
+function handleSaveLayout() {
+  const promises = bentoCells.value.map((item) => {
+    return new Promise((resolve) => {
+      editLayoutComponents({
+        id: item.id,
+        layoutName: item.layoutName,
+        x: item.x,
+        y: item.y,
+        width: item.width,
+        height: item.height,
+        componentName: item.componentName,
+      }).then(resolve)
+    })
+  })
+
+  Promise.all(promises).then(() => {
+    // eslint-disable-next-line no-alert
+    alert('保存成功')
+  })
+}
+function handleCancelLayout() {
+  handleSwitchCleanHomeMode()
+
+  getList()
+}
+// ------------------保存 end ---------------------------//
 </script>
 
 <template>
@@ -221,7 +249,11 @@ function handleDragover(e: DragEvent) {
     name="slide-x"
     @after-leave="$emit('destroy')"
   >
-    <CustomLayoutComponentsList v-if="appIsEditCleanHome" />
+    <CustomLayoutComponentsList
+      v-if="appIsEditCleanHome"
+      @cancel="handleCancelLayout"
+      @save="handleSaveLayout"
+    />
   </Transition>
 </template>
 

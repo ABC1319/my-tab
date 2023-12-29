@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { getAllCustomLayoutComponentsRaw } from '~/utils/layout-components'
 
+const emit = defineEmits(['save', 'cancel'])
 const customLayoutAllComponents = await getAllCustomLayoutComponentsRaw()
 const allComponents = customLayoutAllComponents.map((components) => {
   return {
@@ -14,6 +15,13 @@ function handleDragstart(e: DragEvent, title: string) {
   e.dataTransfer!.dropEffect = 'move'
   // eslint-disable-next-line no-console
   console.log('开始拖拽')
+}
+
+function handleSaveLayout() {
+  emit('save')
+}
+function handleCancelLayout() {
+  emit('cancel')
 }
 </script>
 
@@ -36,24 +44,55 @@ function handleDragstart(e: DragEvent, title: string) {
         overflow-auto select-none
       "
     >
-      <div>拖拽布局组件</div>
-      <div
-        v-for="item in allComponents"
-        :key="item.name"
-        :draggable="true"
-        class="
-          w-full h-100px bg-[#484E64] rounded-10px
-          flex-shrink-0 grid place-items-center
-          hover:cursor-grab active:cursor-grabbing
-          overflow-hidden
-        "
-        @dragstart="(e) => handleDragstart(e, item.name)"
-      >
-        <component
-          :is="item.components"
-          :id="`${item.name}`"
-          class="w-full h-full"
-        />
+      <div class="w-full h-1rem">
+        拖拽布局组件
+      </div>
+      <div class="flex flex-col flex-1 gap-10px ">
+        <div
+          v-for="item in allComponents"
+          :key="item.name"
+          :draggable="true"
+          class="
+            w-full h-100px bg-[#484E64] rounded-10px
+            flex-shrink-0 grid place-items-center
+            hover:cursor-grab active:cursor-grabbing
+            overflow-hidden
+          "
+          @dragstart="(e) => handleDragstart(e, item.name)"
+        >
+          <component
+            :is="item.components"
+            :id="`${item.name}`"
+            class="w-full h-full"
+          />
+        </div>
+      </div>
+
+      <div class="w-full h-40px flex flex-row justify-around items-center gap-10px">
+        <button
+          class="
+            ok-btn
+            w-1/2 h-32px text-14px
+            rounded-6px
+            bg-[#404459] text-[#fafafa]
+            hover:bg-[#4044596b]
+          "
+          @click="handleSaveLayout"
+        >
+          保存布局
+        </button>
+        <button
+          class="
+            cancel-btn
+            w-1/2 h-32px text-14px
+            rounded-6px
+            bg-[#40445990] text-[#fafafa]
+            hover:bg-[#4044596b]
+          "
+          @click="handleCancelLayout"
+        >
+          取消
+        </button>
       </div>
     </div>
   </div>
