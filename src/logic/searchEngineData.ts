@@ -1,5 +1,5 @@
 import { storageSearchEngineDB } from '.'
-import type { ISearchEngine } from '~/typings/app.ts'
+import type { ISearchEngine } from '~/typings/app'
 
 export async function getSearchEngine() {
   const queryResult = await storageSearchEngineDB.getItemBySQL(
