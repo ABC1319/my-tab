@@ -30,22 +30,21 @@ export function initGridContainer(
   })
 
   function bindMouseEvent() {
-    containerDom.focus()
-    containerDom.addEventListener('pointerdown', mousedown, false)
-    containerDom.addEventListener('pointermove', mousemove, false)
-    containerDom.addEventListener('pointerup', mouseup, false)
+    window.addEventListener('pointerdown', mousedown, false)
+    window.addEventListener('pointermove', mousemove, false)
+    window.addEventListener('pointerup', mouseup, false)
 
-    document.addEventListener('keydown', spaceDown, false)
-    document.addEventListener('keyup', spaceUp, false)
+    window.addEventListener('keydown', spaceDown, false)
+    window.addEventListener('keyup', spaceUp, false)
   }
 
   function unBindMouseEvent() {
-    containerDom.removeEventListener('pointerdown', mousedown, false)
-    containerDom.removeEventListener('pointermove', mousemove, false)
-    containerDom.removeEventListener('pointerup', mouseup, false)
+    window.removeEventListener('pointerdown', mousedown, false)
+    window.removeEventListener('pointermove', mousemove, false)
+    window.removeEventListener('pointerup', mouseup, false)
 
-    document.removeEventListener('keydown', spaceDown, false)
-    document.removeEventListener('keyup', spaceUp, false)
+    window.removeEventListener('keydown', spaceDown, false)
+    window.removeEventListener('keyup', spaceUp, false)
   }
 
   function spaceDown(event: KeyboardEvent) {
