@@ -3,10 +3,14 @@ import { ref } from 'vue'
 import { useWindowSize } from '@vueuse/core'
 import { initGridContainer } from './draggable'
 import CustomLayoutComponentsList from './CustomLayoutComponentsList.vue'
-import { appIsEditCleanHome } from '~/logic/storage'
+import { appHomeShowMode, appIsEditCleanHome } from '~/logic/storage'
 import { getAllCustomLayoutComponentsRaw } from '~/utils/layout-components'
 import type { ILayoutComponentTypeInData, ILayoutComponentTypeInPage } from '~/typings/layout'
-import { editLayoutComponents, getLayoutComponents } from '~/logic/layoutComponentsData'
+import { editLayoutComponents, getComponentsById } from '~/logic/layoutComponentsData'
+
+watch(appHomeShowMode, async () => {
+  getList()
+})
 
 const customLayoutAllComponents = await getAllCustomLayoutComponentsRaw()
 
@@ -17,10 +21,11 @@ const disabledDraggable = ref(!appIsEditCleanHome.value)
 await getList()
 
 async function getList() {
-  const allComponentsData = await getLayoutComponents() as ILayoutComponentTypeInData[]
+  const allComponentsData = await getComponentsById(appHomeShowMode.value || 0) as ILayoutComponentTypeInData[]
 
   if (allComponentsData.length === 0) {
     // 说明没有查到，这里是空白
+    bentoCells.value = []
   }
   else {
     const processingData = allComponentsData.map((item) => {
@@ -108,8 +113,7 @@ function handleDrop(e: DragEvent) {
 
   if (component) {
     bentoCells.value.push({
-      id: `${bentoCells.value.length + 1}`,
-      layoutName: '1',
+      layoutName: appHomeShowMode.value,
       x: mouseXY.x,
       y: mouseXY.y,
       width: 100,
@@ -140,6 +144,8 @@ function handleDragover(e: DragEvent) {
 
 // ------------------保存 start -------------------------//
 function handleSaveLayout() {
+  // 1. 如果之前已经有的，那么就是更新
+  // 2. 如果没有，那么就是新增
   const promises = bentoCells.value.map((item) => {
     return new Promise((resolve) => {
       editLayoutComponents({
@@ -157,6 +163,7 @@ function handleSaveLayout() {
   Promise.all(promises).then(() => {
     // eslint-disable-next-line no-alert
     alert('保存成功')
+    getList()
   })
 }
 function handleCancelLayout() {
@@ -200,7 +207,7 @@ function handleCancelLayout() {
     >
       <component
         :is="item.component"
-        :id="item.id"
+        :id="`layout-component-${item.id}`"
         class="w-fit h-fit"
       />
 

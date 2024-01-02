@@ -1,5 +1,5 @@
 export interface IAppStatus {
-  appShowMode: 'normal' | 'clean'
+  appShowMode: number
   appSidebarMode: 'shrink' | 'grow'
   isShrinkSidebar: boolean
   appIsEditCleanHome: boolean

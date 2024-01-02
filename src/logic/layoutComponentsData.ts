@@ -1,10 +1,10 @@
 import { storageLayoutComponentsDB } from '.'
 import type { ILayoutComponentTypeInData } from '~/typings/layout'
 
-export async function getLayoutComponents() {
+export async function getComponentsById(id: number) {
   const queryResult = await storageLayoutComponentsDB.getItemBySQL(
     { key: 'where', value: 'layoutName' },
-    { key: 'equals', value: '1' },
+    { key: 'equals', value: id },
     { key: 'toArray', value: null },
   )
 

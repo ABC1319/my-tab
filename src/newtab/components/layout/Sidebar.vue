@@ -1,13 +1,51 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useThrottleFn } from '@vueuse/core'
-import { broadcast, isShrinkSidebar } from '~/logic/storage'
-import type { IAppStatus } from '~/typings/app'
+import SidebarSetting from '../ui/SidebarSetting.vue'
+import { appHomeShowMode, broadcast, isShrinkSidebar } from '~/logic/storage'
+import type { WorkAreaParams } from '~/typings/website'
+import { editWorkArea, getWorkArea } from '~/logic/workAreaData'
+import { workAreaIcon } from '~/params/workAreaIcon'
 
-defineProps<{
-  appHomeShowMode: IAppStatus['appShowMode']
-}>()
-const emits = defineEmits(['update:appHomeShowMode'])
+// 1. 查询有多少个布局 存在了 indexDB
+// 2. 查询当前是第几个布局 存在了 localStorage
+
+// ------------------------------------------------------------------------------------//
+const currentWorkAreaCfg = ref<WorkAreaParams>({
+  layoutName: '',
+  icon: '',
+  index: -1,
+  remark: {},
+})
+const workAreas = ref<WorkAreaParams[]>([])
+
+await getWorkAreasList()
+async function getWorkAreasList() {
+  const areas = await getWorkArea()
+
+  if (areas.length === 0) {
+    const defaultLayout = {
+      id: 0,
+      layoutName: '默认布局',
+      index: 0,
+      icon: workAreaIcon.find(res => res.name === 'tabler-category-filled')?.icon || '',
+      remark: {},
+    }
+    editWorkArea(defaultLayout).then(() => {
+      currentWorkAreaCfg.value = defaultLayout
+    })
+
+    workAreas.value = [defaultLayout]
+  }
+  else {
+    areas.sort((a: any, b: any) => {
+      return Number(a.index) - Number(b.index)
+    })
+
+    workAreas.value = [...areas]
+  }
+}
+// ------------------------------------------------------------------------------------//
 
 const shrinkBtnRef = ref<HTMLElement | null>(null)
 const isHideBtn = ref(true) // 这个变量纯纯的是为了让按钮隐藏的时候延迟几秒
@@ -38,6 +76,7 @@ function toggleShrink() {
 onMounted(() => {
   handleSynchronize()
 })
+
 function handleSynchronize() {
   broadcast.syncSidebar.listen(async (event: MessageEvent<any>) => {
     if (JSON.parse(event.data).cmd === 'syncSidebar') {
@@ -50,9 +89,9 @@ function noticeSynchronize() {
   broadcast.syncSidebar.call()
 }
 
-// -----------------显示模式: 'normal' || 'clean' -------------------------//
-const toggleAppHomeShowMode = useThrottleFn ((item: 'normal' | 'clean') => {
-  emits('update:appHomeShowMode', item)
+// -----------------显示模式-------------------------//
+const toggleAppHomeShowMode = useThrottleFn ((item: number) => {
+  appHomeShowMode.value = item
 }, 400)
 </script>
 
@@ -70,34 +109,18 @@ const toggleAppHomeShowMode = useThrottleFn ((item: 'normal' | 'clean') => {
     <div class="w-full h-full bg-[#252835] rounded-10px py-10px flex flex-col gap-10px flex-shrink-0">
       <!-- top -->
       <div class="w-full h-fit  flex flex-col flex-shrink-0 justify-start items-center gap-10px">
-        <div class="tooltip tooltip-right before:text-12px before:ml-10px before:bg-[#252835]" data-tip="正常模式">
+        <div
+          v-for="item in workAreas"
+          :key="item.id"
+          class="tooltip tooltip-right before:text-12px before:ml-10px before:bg-[#252835]"
+          data-tip="正常模式"
+        >
           <div
-            :class="appHomeShowMode === 'normal' ? 'bg-[#5021FF]' : ''"
+            :class="appHomeShowMode === item.id ? 'bg-[#5021FF]' : ''"
             class="w-32px h-32px bg-[#484E64] rounded-6px grid place-items-center cursor-pointer [&>*:hover]:scale-120"
-            @click="toggleAppHomeShowMode('normal')"
+            @click="toggleAppHomeShowMode(item.id || 0)"
           >
-            <div class="transition-transform ease-in-out w-5 h-5" i-carbon-grid />
-          </div>
-        </div>
-
-        <div class="tooltip tooltip-right before:text-12px before:ml-10px before:bg-[#252835]" data-tip="极简模式">
-          <div
-            :class="appHomeShowMode === 'clean' ? 'bg-[#5021FF]' : ''"
-            class="w-32px h-32px bg-[#484E64] rounded-6px grid place-items-center cursor-pointer [&>*:hover]:scale-120"
-            @click="toggleAppHomeShowMode('clean')"
-          >
-            <svg class="transition-transform ease-in-out w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-              <g fill="none">
-                <g clip-path="url(#solarGamepadOldLineDuotone0)">
-                  <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M12 4V3a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1V0" opacity=".5" />
-                  <path stroke="currentColor" stroke-width="1.5" d="M2 12c0-2.8 0-4.2.545-5.27A5 5 0 0 1 4.73 4.545C5.8 4 7.2 4 10 4h4c2.8 0 4.2 0 5.27.545a5 5 0 0 1 2.185 2.185C22 7.8 22 9.2 22 12c0 2.8 0 4.2-.545 5.27a5 5 0 0 1-2.185 2.185C18.2 20 16.8 20 14 20h-4c-2.8 0-4.2 0-5.27-.545a5 5 0 0 1-2.185-2.185C2 16.2 2 14.8 2 12Z" />
-                </g>
-                <defs>
-                  <clipPath id="solarGamepadOldLineDuotone0"><path fill="#fff" d="M0 0h24v24H0z" />
-                  </clipPath>
-                </defs>
-              </g>
-            </svg>
+            <div class="transition-transform ease-in-out w-5 h-5" v-html="item.icon" />
           </div>
         </div>
       </div>
@@ -123,11 +146,12 @@ const toggleAppHomeShowMode = useThrottleFn ((item: 'normal' | 'clean') => {
           </svg>
         </div>
 
-        <div class="tooltip tooltip-right before:text-12px before:ml-10px before:bg-[#252835]" data-tip="侧边栏设置">
-          <div class="w-32px h-32px hover:bg-[#484E64] rounded-6px grid place-items-center cursor-pointer [&>svg:hover]:scale-120">
-            <div class="w-5 h-5 " i-carbon:settings />
-          </div>
-        </div>
+        <!-- <div class="tooltip tooltip-right before:text-12px before:ml-10px before:bg-[#252835]" data-tip="侧边栏设置"> -->
+        <SidebarSetting
+          :work-areas="workAreas"
+          @get-work-areas-list="getWorkAreasList"
+        />
+        <!-- </div> -->
       </div>
       <!-- base -->
       <div

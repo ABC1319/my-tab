@@ -7,3 +7,11 @@ export interface WebsiteParams {
   index: number
   remark?: Record<string, any>
 }
+
+export interface WorkAreaParams {
+  id?: number
+  layoutName: string
+  icon: string | File
+  index: number
+  remark?: Record<string, any>
+}

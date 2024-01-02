@@ -98,7 +98,7 @@ export function initGridContainer(
       isDraggingElement.value = true
 
       // 将当前拖拽的元素放到最上面
-      const index = bentoCells.value.findIndex((ele: { id: string }) => ele.id === currentClickedElement.value.id)
+      const index = bentoCells.value.findIndex(ele => ele.id === currentClickedElement.value.id)
       if (index !== -1) {
         const ele = bentoCells.value.splice(index, 1)
         bentoCells.value.push(ele[0])
@@ -146,9 +146,11 @@ export function initGridContainer(
     let result: any = null
     const point = { x: position.x, y: position.y }
     const initElement = document.elementFromPoint(point.x, point.y)
-    if (initElement)
-      result = bentoCells.value?.filter((ele: { id: string }) => ele.id === initElement.id)
+    if (initElement) {
+      const domIdToNumber = Number(initElement.id.match(/layout-component-(\S*)/)?.[1] || -1)
+      result = bentoCells.value?.find(ele => ele.id === domIdToNumber)
+    }
 
-    return result ? result[0] : null
+    return result || null
   }
 }
