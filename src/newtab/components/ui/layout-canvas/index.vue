@@ -9,16 +9,30 @@ import { getAllCustomLayoutComponentsRaw } from '~/utils/layout-components'
 import type { ILayoutComponentTypeInData, ILayoutComponentTypeInPage } from '~/typings/layout'
 import { editLayoutComponents, getComponentsById } from '~/logic/layoutComponentsData'
 
-watch(appHomeShowMode, async () => {
-  getList()
-})
-
 const customLayoutAllComponents = await getAllCustomLayoutComponentsRaw()
 
 const bentoCells = ref<ILayoutComponentTypeInPage[]>([])
 const layoutContainerRef = ref()
 const currentClickedElement: Ref<any> = ref()
 const disabledDraggable = ref(!appIsEditCleanHome.value)
+
+// 是否已经进行了更改，主要是两处，一是新增或者删除组件，一是移动位置
+// 其实应该在 drop 和 mousemove 的时候监听，这里直接使用 watch 监听，可能会损耗一些性能
+const isAlreadyEdited = ref(false)
+watch(bentoCells, async (nVal, oVal) => {
+  if (nVal.length === 0 && oVal.length === 0)
+    isAlreadyEdited.value = false
+  else
+    isAlreadyEdited.value = true
+}, { deep: true })
+
+watch(appHomeShowMode, async () => {
+  if (isAlreadyEdited.value)
+    handleOpenModal()
+  else
+    getList()
+})
+
 await getList()
 
 async function getList() {
@@ -144,9 +158,9 @@ function handleDrop(e: DragEvent) {
 function handleDragover(e: DragEvent) {
   e.preventDefault()
 }
-// ------------------拖拽 end ---------------------------//
+// ------------------拖拽 end -----------------------------//
 
-// ------------------保存 start -------------------------//
+// ------------------保存 start ---------------------------//
 const app = inject('app') as ComponentCustomProperties['$app']
 const { $message } = app
 function handleSaveLayout() {
@@ -172,16 +186,33 @@ function handleSaveLayout() {
       message: `保存布局成功`,
       center: true,
     })
-
+    isAlreadyEdited.value = false
     handleCancelLayout()
   })
 }
 function handleCancelLayout() {
   handleSwitchCleanHomeMode()
-
+  isAlreadyEdited.value = false
   getList()
 }
-// ------------------保存 end ---------------------------//
+// ------------------保存 end -----------------------------//
+
+// ------------------弹窗 start ---------------------------//
+const modalRef = ref<typeof import('~/components/CustomModal.vue').default | null>(null)
+function handleOpenModal() {
+  modalRef.value?.open()
+}
+
+function handleCancelInModal() {
+  modalRef.value?.close()
+  isAlreadyEdited.value = false
+  getList()
+}
+function handleSaveInModal() {
+  handleSaveLayout()
+  handleCancelInModal()
+}
+// ------------------弹窗 end -----------------------------//
 </script>
 
 <template>
@@ -262,6 +293,7 @@ function handleCancelLayout() {
     </Transition>
   </div>
 
+  <!-- 右侧布局组件列表 -->
   <Transition
     name="slide-x"
     @after-leave="$emit('destroy')"
@@ -272,6 +304,32 @@ function handleCancelLayout() {
       @cancel="handleCancelLayout"
     />
   </Transition>
+
+  <!-- 确认是否保存布局弹窗 -->
+  <CustomModal ref="modalRef" :is-show-close="false">
+    <div class="modal-content-container flex flex-col justify-around items-center my-4 mx-2 w-270px">
+      <!-- title -->
+      <div class="text-14px">
+        是否保存刚才编辑的布局
+      </div>
+      <!-- button -->
+      <div class="flex flex-row justify-between gap-6 mt-32px w-full">
+        <button
+          class=" w-1/2 h-32px text-14px rounded-6px bg-[#40445955] text-[#fafafa] hover:bg-[#4044596b] "
+          @click="handleCancelInModal"
+        >
+          不保存
+        </button>
+
+        <button
+          class=" w-1/2 h-32px text-14px rounded-6px bg-[#404459] text-[#fafafa] hover:bg-[#4044596b] "
+          @click="handleSaveInModal"
+        >
+          保存
+        </button>
+      </div>
+    </div>
+  </CustomModal>
 </template>
 
 <style scoped>

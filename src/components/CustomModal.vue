@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+defineProps({
+  isShowClose: {
+    default: true, // 是否显示关闭按钮
+    required: false,
+    type: Boolean,
+  },
+})
+
 const visible = ref(false)
 async function close() {
   const animateDom = document.querySelectorAll('.custom-modal-mask')[0] as HTMLElement
@@ -38,6 +46,7 @@ defineExpose({
           <slot />
         </div>
         <div
+          v-show="isShowClose"
           class="
             absolute right-10px top-10px
             cursor-pointer
@@ -71,7 +80,7 @@ defineExpose({
   z-index: 9999;
 }
 .custom-modal {
-  min-height: 300px;
+  /* min-height: 300px; */
   width: fit-content;
   height: auto;
   border-radius: 20px;

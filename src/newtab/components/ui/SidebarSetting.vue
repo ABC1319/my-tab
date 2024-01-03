@@ -34,11 +34,17 @@ watch(() => props.workAreas, () => {
     remark: {},
   }
 })
-const modalRef = ref<typeof import('~/components/CustomModal.vue').default | null>(null)
 
+// ------------------------------弹窗 start-----------------------------------------//
+const modalRef = ref<typeof import('~/components/CustomModal.vue').default | null>(null)
 function handleOpenModal() {
   modalRef.value?.open()
 }
+function handleCloseModal() {
+  modalRef.value?.close()
+}
+// ------------------------------弹窗 start-----------------------------------------//
+
 function handleSelectedCurrentWorkAreaIcon(item: typeof workAreaIcon[number]) {
   if (currentWorkAreaCfg.value.icon === item.icon)
     currentWorkAreaCfg.value.icon = ''
@@ -98,9 +104,6 @@ function handleAddWorkArea() {
     animateOutDom1.classList.remove('shake-animation')
     animateOutDom1.innerHTML = ''
   }
-}
-function handleCloseModal() {
-  modalRef.value?.close()
 }
 
 function changeCheckbox(item: WorkAreaParams) {
@@ -295,17 +298,18 @@ onClickOutside(sideBarSettingRef, () => {
 
                     <div class="flex flex-row justify-start items-center gap-10px ">
                       <div @click="e => openMenuToEdit(item, e)">
-                        <div class="w-6 h-6 cursor-pointer" i-carbon-overflow-menu-horizontal />
+                        <div class="w-4 h-4 cursor-pointer" i-carbon-overflow-menu-horizontal />
                       </div>
 
                       <div>
                         <input
                           v-model="item.isChecked"
                           type="checkbox"
+                          title="隐藏/显示"
                           class="
-                          checkbox checkbox-xs [--chkbg:#45B0E6]
-                        border-#45B0E6 checked:border-#45B0E6
-                        "
+                            checkbox checkbox-xs [--chkbg:#45B0E6]
+                          border-#45B0E6 checked:border-#45B0E6
+                          "
                           @change="changeCheckbox(item)"
                         >
                       </div>
