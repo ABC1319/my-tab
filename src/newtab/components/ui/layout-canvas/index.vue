@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ComponentCustomProperties } from 'vue'
 import { ref } from 'vue'
 import { useWindowSize } from '@vueuse/core'
 import { initGridContainer } from './draggable'
@@ -112,7 +113,10 @@ function handleDrop(e: DragEvent) {
   const mouseXY = calcPosition()
 
   if (component) {
+    const newId = bentoCells.value.reduce((maxId, cell) => Math.max(maxId, cell.id || 0), 0) + 1
+
     bentoCells.value.push({
+      id: newId,
       layoutName: appHomeShowMode.value,
       x: mouseXY.x,
       y: mouseXY.y,
@@ -143,6 +147,8 @@ function handleDragover(e: DragEvent) {
 // ------------------拖拽 end ---------------------------//
 
 // ------------------保存 start -------------------------//
+const app = inject('app') as ComponentCustomProperties['$app']
+const { $message } = app
 function handleSaveLayout() {
   // 1. 如果之前已经有的，那么就是更新
   // 2. 如果没有，那么就是新增
@@ -161,9 +167,13 @@ function handleSaveLayout() {
   })
 
   Promise.all(promises).then(() => {
-    // eslint-disable-next-line no-alert
-    alert('保存成功')
-    getList()
+    $message({
+      type: 'success',
+      message: `保存布局成功`,
+      center: true,
+    })
+
+    handleCancelLayout()
   })
 }
 function handleCancelLayout() {
@@ -258,8 +268,8 @@ function handleCancelLayout() {
   >
     <CustomLayoutComponentsList
       v-if="appIsEditCleanHome"
-      @cancel="handleCancelLayout"
       @save="handleSaveLayout"
+      @cancel="handleCancelLayout"
     />
   </Transition>
 </template>

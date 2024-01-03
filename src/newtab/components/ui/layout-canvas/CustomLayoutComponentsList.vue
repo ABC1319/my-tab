@@ -44,7 +44,7 @@ function handleCancelLayout() {
         overflow-auto select-none
       "
     >
-      <div class="w-full h-1rem">
+      <div class="w-full h-4 font-bold">
         拖拽布局组件
       </div>
       <div class="flex flex-col flex-1 gap-10px ">

@@ -4,7 +4,11 @@ import { onClickOutside, useWindowSize } from '@vueuse/core'
 interface PropsType {
   x: number
   y: number
-  options: { label: string, key: string }[]
+  options: {
+    label: string
+    key: string
+    disabled?: boolean
+  }[]
 }
 
 defineProps<PropsType>()
@@ -89,13 +93,21 @@ defineExpose({
         v-for="item in options"
         :key="item.label"
         class="
-        hover:text-white hover:bg-[#5021ff]
-          cursor-pointer
           px-2 py-1 rounded-md
+        "
+        :class="
+          (item.key === 'Divider' || item.disabled) ? 'font-bold cursor-default' : 'hover:bg-[#5021ff] cursor-pointer'
         "
         @click="handleSelect(item)"
       >
-        {{ item.label }}
+        <div
+          v-if="item.key === 'Divider'"
+          class="w-full h-1px bg-[#bcbbc130]"
+        />
+
+        <div v-else>
+          {{ item.label }}
+        </div>
       </li>
     </ul>
   </Teleport>

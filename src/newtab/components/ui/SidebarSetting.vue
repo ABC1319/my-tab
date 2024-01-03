@@ -106,16 +106,24 @@ function handleCloseModal() {
 function changeCheckbox(item: WorkAreaParams) {
   const { id, layoutName, isChecked, index, icon } = item
 
-  editWorkArea({
-    id,
-    layoutName,
-    index,
-    icon,
-    isChecked,
-    remark: {},
-  }).then(async () => {
+  const isCheckedAreas = props.workAreas.filter(item => item.isChecked === true)
+  if (isCheckedAreas.length > 1) {
+    editWorkArea({
+      id,
+      layoutName,
+      index,
+      icon,
+      isChecked,
+      remark: {},
+    }).then(async () => {
+      emits('getWorkAreasList')
+    })
+  }
+  else {
+    // eslint-disable-next-line no-alert
+    alert('请至少显示一个工作区')
     emits('getWorkAreasList')
-  })
+  }
 }
 
 // -------------------------------------------------------------------//
@@ -149,10 +157,16 @@ function handleSelectContextMenu(item: typeof contextMenuOptions[number]) {
   }
 
   function del() {
-    deleteWorkArea(currentWorkAreaCfg.value.id!)
-      .then(async () => {
-        emits('getWorkAreasList')
-      })
+    if (props.workAreas.length === 1) {
+      // eslint-disable-next-line no-alert
+      alert('最后一个工作区不能删除')
+    }
+    else {
+      deleteWorkArea(currentWorkAreaCfg.value.id!)
+        .then(async () => {
+          emits('getWorkAreasList')
+        })
+    }
   }
 
   function edit() {
@@ -187,6 +201,7 @@ onClickOutside(sideBarSettingRef, () => {
         relative
         hover:bg-[#484E64]
       "
+      :class="visible ? 'bg-[#484E64]' : ''"
       @click="handleShowSidebarSetting"
     >
       <div
@@ -215,8 +230,8 @@ onClickOutside(sideBarSettingRef, () => {
           @click.stop
         >
           <!-- title -->
-          <div class="w-full h-50px flex flex-row justify-between items-center px-4 pt-2 pb-4 border-b-1 border-[#bcbbc130]">
-            <div class="text-16px">
+          <div class="w-full h-8 flex flex-row justify-between items-center px-4">
+            <div class="text-14px font-bold">
               侧边栏设置
             </div>
 
@@ -225,7 +240,7 @@ onClickOutside(sideBarSettingRef, () => {
                 cursor-pointer
                 text-white
                 rounded-full
-                w-6 h-6
+                w-4 h-4
               "
             >
               <div class="w-full h-full" i-carbon-close @click="visible = !visible" />
@@ -233,79 +248,111 @@ onClickOutside(sideBarSettingRef, () => {
           </div>
 
           <!-- 工作区 -->
-          <div class="border-b-1 border-[#bcbbc130] p-4 pb-6">
-            <!-- 总 -->
-            <div class="w-full h-50px flex flex-row justify-between items-center">
-              <div class="text-16px font-bold">
-                工作区
-              </div>
+          <div class="w-full h-fit overflow-x-hidden overflow-y-auto ">
+            <div
+              class="
+                p-4 m-10px
+                rounded-10px
+                bg-[#484e6438]
+              "
+            >
+              <!-- 总 -->
+              <div class="w-full h-14px mb-10px flex flex-row justify-between items-center text-12px">
+                <div class="font-bold">
+                  工作区
+                </div>
               <!-- <input
                 type="checkbox"
                 class="text-16px select-none toggle toggle-sm [--tglbg:#bcbbc1] border-#aaaaaa checked:[--tglbg:#45B0E6] checked:border-#45B0E6 bg-white hover:bg-#ffffff "
                 checked
               > -->
-            </div>
-            <!-- 操作按钮 -->
-            <div
-              class="flex h-36px flex-row justify-start items-center gap-10px w-full cursor-pointer"
-              @click="handleOpenModal"
-            >
-              <svg class="w-20px h-20px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3c7.2 0 9 1.8 9 9s-1.8 9-9 9s-9-1.8-9-9s1.8-9 9-9m3 9H9m3-3v6" />
-              </svg>
-              <div class="text-14px">
-                添加更多
               </div>
-            </div>
-            <!-- 列表 -->
-            <div
-              v-for="item in workAreas"
-              :key="item.id"
-            >
-              <div
-                class="
-                  rounded-md
-                  flex flex-row justify-between items-center
-                  h-36px
-                "
-              >
-                <div class="flex flex-row justify-start items-center gap-10px ">
+
+              <div>
+                <!-- 列表 -->
+                <div
+                  v-for="item in workAreas"
+                  :key="item.id"
+                >
                   <div
-                    v-if="item.icon"
-                    class="w-20px h-20px"
-                    v-html="item.icon"
-                  />
-                  <div class="text-14px">
-                    {{ item.layoutName }}
+                    class="
+                    rounded-md
+                    flex flex-row justify-between items-center
+                    h-36px
+                    text-12px
+                  "
+                  >
+                    <div class="flex flex-row justify-start items-center gap-10px ">
+                      <div
+                        v-if="item.icon"
+                        class="w-18px h-18px"
+                        v-html="item.icon"
+                      />
+                      <div>
+                        {{ item.layoutName }}
+                      </div>
+                    </div>
+
+                    <div class="flex flex-row justify-start items-center gap-10px ">
+                      <div @click="e => openMenuToEdit(item, e)">
+                        <div class="w-6 h-6 cursor-pointer" i-carbon-overflow-menu-horizontal />
+                      </div>
+
+                      <div>
+                        <input
+                          v-model="item.isChecked"
+                          type="checkbox"
+                          class="
+                          checkbox checkbox-xs [--chkbg:#45B0E6]
+                        border-#45B0E6 checked:border-#45B0E6
+                        "
+                          @change="changeCheckbox(item)"
+                        >
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div class="flex flex-row justify-start items-center gap-10px ">
-                  <div @click="e => openMenuToEdit(item, e)">
-                    <div class="w-6 h-6" i-carbon-overflow-menu-horizontal />
-                  </div>
-
+                <!-- 操作按钮 -->
+                <div
+                  class="
+                    flex flex-row justify-center items-center gap-10px
+                    h-36px w-full text-12px
+                    cursor-pointer rounded-8px
+                    bg-#474d63
+                    mt-2
+                    border-2 border-transparent
+                    duration-200 ease-in-out transition-all
+                    hover:border-#767fa2a1
+                  "
+                  @click="handleOpenModal"
+                >
+                  <svg class="w-18px h-18px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3c7.2 0 9 1.8 9 9s-1.8 9-9 9s-9-1.8-9-9s1.8-9 9-9m3 9H9m3-3v6" />
+                  </svg>
                   <div>
-                    <input
-                      v-model="item.isChecked"
-                      type="checkbox"
-                      class="
-                        checkbox checkbox-xs [--chkbg:#45B0E6]
-                      border-#45B0E6 checked:border-#45B0E6
-                      "
-                      @change="changeCheckbox(item)"
-                    >
+                    添加更多
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- 设置 -->
-          <div class="border-b-1 border-[#bcbbc130] py-4">
-            <div class="w-full flex flex-row justify-between py-2 ">
-              <div class="text-16px px-4 font-bold">
-                设置
+            <!-- 设置 -->
+            <div
+              class="
+                p-4 m-10px
+                rounded-10px
+                bg-[#484e6438]
+              "
+            >
+              <div class="w-full h-14px flex flex-row justify-between items-center text-12px ">
+                <div class="font-bold">
+                  设置
+                </div>
+              </div>
+
+              <div>
+              <!-- 列表 -->
               </div>
             </div>
           </div>
@@ -380,7 +427,7 @@ onClickOutside(sideBarSettingRef, () => {
               "
               @click="handleAddWorkArea"
             >
-              创建
+              保存
             </button>
           </div>
         </div>
