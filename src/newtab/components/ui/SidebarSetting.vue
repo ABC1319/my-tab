@@ -36,12 +36,6 @@ watch(() => props.workAreas, () => {
 })
 const modalRef = ref<typeof import('~/components/CustomModal.vue').default | null>(null)
 
-onClickOutside(sideBarSettingRef, () => {
-  // 要是修改或者新增弹窗并没有打开的话，鼠标点到其他地方，当前设置面板关闭
-  if (!(modalRef.value && modalRef.value.visible))
-    visible.value = false
-})
-
 function handleOpenModal() {
   modalRef.value?.open()
 }
@@ -52,11 +46,14 @@ function handleSelectedCurrentWorkAreaIcon(item: typeof workAreaIcon[number]) {
     currentWorkAreaCfg.value.icon = item.icon
 }
 function handleAddWorkArea() {
-  // 1. 名称
+  // 名称
   if (currentWorkAreaCfg.value.layoutName === '') {
-    // eslint-disable-next-line no-alert
-    alert('请输入名称')
-    // addShakeAnimation()
+    addNameShakeAnimation()
+    return
+  }
+  // 图标
+  if (currentWorkAreaCfg.value.icon === '') {
+    addIconShakeAnimation()
     return
   }
 
@@ -75,6 +72,32 @@ function handleAddWorkArea() {
 
     handleCloseModal()
   })
+
+  async function addNameShakeAnimation() {
+    const animateOutDom1 = document.querySelectorAll('.name-tooltip')[0] as HTMLElement
+    animateOutDom1.classList.add('shake-animation')
+    animateOutDom1.innerHTML = '请输入名称'
+
+    const ANIMATIONS1 = animateOutDom1.getAnimations()
+
+    await Promise.all(ANIMATIONS1.map(animation => animation.finished))
+
+    animateOutDom1.classList.remove('shake-animation')
+    animateOutDom1.innerHTML = ''
+  }
+
+  async function addIconShakeAnimation() {
+    const animateOutDom1 = document.querySelectorAll('.icon-tooltip')[0] as HTMLElement
+    animateOutDom1.classList.add('shake-animation')
+    animateOutDom1.innerHTML = '请选择图标'
+
+    const ANIMATIONS1 = animateOutDom1.getAnimations()
+
+    await Promise.all(ANIMATIONS1.map(animation => animation.finished))
+
+    animateOutDom1.classList.remove('shake-animation')
+    animateOutDom1.innerHTML = ''
+  }
 }
 function handleCloseModal() {
   modalRef.value?.close()
@@ -96,7 +119,7 @@ function changeCheckbox(item: WorkAreaParams) {
 }
 
 // -------------------------------------------------------------------//
-const contextMenuRef = ref<typeof import('~/components/CustomContextMenu.vue').default | null>(null)
+const operateMenuRef = ref<typeof import('~/components/CustomContextMenu.vue').default | null>(null)
 const contextMenuOptions = [
   { label: '编辑', key: 'edit' },
   { label: '删除', key: 'delete' },
@@ -104,10 +127,10 @@ const contextMenuOptions = [
 const contextMenuPosition = ref({ x: 0, y: 0 })
 function openMenuToEdit(item: WorkAreaParams, e: MouseEvent) {
   contextMenuPosition.value = {
-    x: e.clientX,
-    y: e.clientY,
+    x: e.clientX + 10,
+    y: e.clientY + 10,
   }
-  contextMenuRef.value?.open()
+  operateMenuRef.value?.open()
 
   currentWorkAreaCfg.value = { ...item }
 }
@@ -138,6 +161,19 @@ function handleSelectContextMenu(item: typeof contextMenuOptions[number]) {
 }
 
 // -------------------------------------------------------------------//
+
+onClickOutside(sideBarSettingRef, () => {
+  // 要是修改或者新增弹窗并没有打开的话，鼠标点到其他地方，当前设置面板关闭
+  if (
+    (operateMenuRef.value && operateMenuRef.value.visible)
+    || (modalRef.value && modalRef.value.visible)
+  ) {
+    // 小弹窗或者大弹窗打开的话，不关闭
+  }
+  else {
+    visible.value = false
+  }
+})
 </script>
 
 <template>
@@ -285,6 +321,7 @@ function handleSelectContextMenu(item: typeof contextMenuOptions[number]) {
           <div>
             <div class="my-2 text-14px select-none block">
               图标
+              <div class="icon-tooltip text-red-600 text-12px inline-block" />
             </div>
             <div class="w-full h-fit my-4 grid grid-cols-6 justify-items-center gap-y-15px">
               <div
@@ -302,6 +339,7 @@ function handleSelectContextMenu(item: typeof contextMenuOptions[number]) {
           <div>
             <label for="name-input" class="my-2 text-14px select-none block">
               名称
+              <div class="name-tooltip text-red-600 text-12px inline-block" />
             </label>
             <input
               id="name-input"
@@ -321,6 +359,19 @@ function handleSelectContextMenu(item: typeof contextMenuOptions[number]) {
           <div class="flex flex-row justify-between gap-6 mt-32px w-full">
             <button
               class="
+                cancel-btn
+                w-1/2 h-32px text-14px
+                rounded-6px
+                bg-[#40445955] text-[#fafafa]
+                hover:bg-[#4044596b]
+              "
+              @click="handleCloseModal"
+            >
+              取消
+            </button>
+
+            <button
+              class="
                 ok-btn
                 w-1/2 h-32px text-14px
                 rounded-6px
@@ -329,19 +380,7 @@ function handleSelectContextMenu(item: typeof contextMenuOptions[number]) {
               "
               @click="handleAddWorkArea"
             >
-              确定
-            </button>
-            <button
-              class="
-                cancel-btn
-                w-1/2 h-32px text-14px
-                rounded-6px
-                bg-[#40445990] text-[#fafafa]
-                hover:bg-[#4044596b]
-              "
-              @click="handleCloseModal"
-            >
-              取消
+              创建
             </button>
           </div>
         </div>
@@ -349,7 +388,7 @@ function handleSelectContextMenu(item: typeof contextMenuOptions[number]) {
     </CustomModal>
 
     <CustomContextMenu
-      ref="contextMenuRef"
+      ref="operateMenuRef"
       :x="contextMenuPosition.x"
       :y="contextMenuPosition.y"
       :options="contextMenuOptions"
@@ -375,6 +414,13 @@ function handleSelectContextMenu(item: typeof contextMenuOptions[number]) {
     opacity: 1;
     transform: scale(1);
   }
+}
+
+.shake-animation {
+  animation: move 2s 0s forwards;
+  -webkit-animation: move 2s 0s forwards;
+  transform-origin: bottom;
+  -webkit-transform-origin: bottom;
 }
 
 ::-webkit-scrollbar {

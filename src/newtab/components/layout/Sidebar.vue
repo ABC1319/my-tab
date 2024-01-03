@@ -45,6 +45,11 @@ async function getWorkAreasList() {
     })
 
     workAreas.value = [...areas]
+
+    // 判断当前应用的布局是否隐藏或者删除
+    const checkedAreas = workAreas.value.some(res => res.isChecked)
+    if (!JSON.stringify(checkedAreas).includes(`${appHomeShowMode.value}`))
+      appHomeShowMode.value = workAreas.value[0].id!
   }
 }
 // ------------------------------------------------------------------------------------//
