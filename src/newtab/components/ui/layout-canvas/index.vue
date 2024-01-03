@@ -306,7 +306,7 @@ function handleSaveInModal() {
   </Transition>
 
   <!-- 确认是否保存布局弹窗 -->
-  <CustomModal ref="modalRef" :is-show-close="false">
+  <CustomModal ref="modalRef" :is-show-close="false" :enable-click-outside="false">
     <div class="modal-content-container flex flex-col justify-around items-center my-4 mx-2 w-270px">
       <!-- title -->
       <div class="text-14px">

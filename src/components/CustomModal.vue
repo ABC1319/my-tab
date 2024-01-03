@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-defineProps({
+const props = defineProps({
   isShowClose: {
+    default: true, // 是否显示关闭按钮
+    required: false,
+    type: Boolean,
+  },
+  enableClickOutside: {
     default: true, // 是否显示关闭按钮
     required: false,
     type: Boolean,
@@ -11,16 +16,18 @@ defineProps({
 
 const visible = ref(false)
 async function close() {
-  const animateDom = document.querySelectorAll('.custom-modal-mask')[0] as HTMLElement
-  animateDom.classList.add('fade-out')
+  if (props.enableClickOutside) {
+    const animateDom = document.querySelectorAll('.custom-modal-mask')[0] as HTMLElement
+    animateDom.classList.add('fade-out')
 
-  const animateOutDom1 = document.querySelectorAll('.custom-modal')[0] as HTMLElement
-  animateOutDom1.classList.remove('scale-up-center')
-  animateOutDom1.classList.add('scale-down-center')
+    const animateOutDom1 = document.querySelectorAll('.custom-modal')[0] as HTMLElement
+    animateOutDom1.classList.remove('scale-up-center')
+    animateOutDom1.classList.add('scale-down-center')
 
-  const ANIMATIONS = animateOutDom1.getAnimations()
-  await Promise.all(ANIMATIONS.map(animation => animation.finished))
-  visible.value = false
+    const ANIMATIONS = animateOutDom1.getAnimations()
+    await Promise.all(ANIMATIONS.map(animation => animation.finished))
+    visible.value = false
+  }
 }
 
 function open() {
