@@ -15,6 +15,7 @@ const currentWorkAreaCfg = ref<WorkAreaParams>({
   layoutName: '',
   icon: '',
   index: -1,
+  isChecked: true,
   remark: {},
 })
 const workAreas = ref<WorkAreaParams[]>([])
@@ -29,6 +30,7 @@ async function getWorkAreasList() {
       layoutName: '默认布局',
       index: 0,
       icon: workAreaIcon.find(res => res.name === 'tabler-category-filled')?.icon || '',
+      isChecked: true,
       remark: {},
     }
     editWorkArea(defaultLayout).then(() => {
@@ -108,19 +110,23 @@ const toggleAppHomeShowMode = useThrottleFn ((item: number) => {
   >
     <div class="w-full h-full bg-[#252835] rounded-10px py-10px flex flex-col gap-10px flex-shrink-0">
       <!-- top -->
-      <div class="w-full h-fit  flex flex-col flex-shrink-0 justify-start items-center gap-10px">
+      <div class="w-full h-fit flex flex-col flex-shrink-0 justify-start items-center ">
         <div
           v-for="item in workAreas"
           :key="item.id"
-          class="tooltip tooltip-right before:text-12px before:ml-10px before:bg-[#252835]"
-          data-tip="正常模式"
         >
           <div
-            :class="appHomeShowMode === item.id ? 'bg-[#5021FF]' : ''"
-            class="w-32px h-32px bg-[#484E64] rounded-6px grid place-items-center cursor-pointer [&>*:hover]:scale-120"
-            @click="toggleAppHomeShowMode(item.id || 0)"
+            v-if="item.isChecked"
+            class="tooltip tooltip-right before:text-12px before:ml-10px before:bg-[#252835]"
+            data-tip="正常模式"
           >
-            <div class="transition-transform ease-in-out w-5 h-5" v-html="item.icon" />
+            <div
+              :class="appHomeShowMode === item.id ? 'bg-[#5021FF]' : ''"
+              class="w-32px h-32px bg-[#484E64] rounded-6px grid place-items-center cursor-pointer [&>*:hover]:scale-120 mb-10px"
+              @click="toggleAppHomeShowMode(item.id || 0)"
+            >
+              <div class="transition-transform ease-in-out w-5 h-5" v-html="item.icon" />
+            </div>
           </div>
         </div>
       </div>

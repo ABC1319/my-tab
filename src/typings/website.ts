@@ -13,5 +13,6 @@ export interface WorkAreaParams {
   layoutName: string
   icon: string | File
   index: number
+  isChecked: boolean
   remark?: Record<string, any>
 }

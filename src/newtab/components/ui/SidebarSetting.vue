@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core'
-import { editWorkArea } from '~/logic/workAreaData'
+import { deleteWorkArea, editWorkArea } from '~/logic/workAreaData'
 import { workAreaIcon } from '~/params/workAreaIcon'
 import type { WorkAreaParams } from '~/typings/website'
 
@@ -11,29 +11,8 @@ const emits = defineEmits(['getWorkAreasList', 'destroy'])
 
 const sideBarSettingRef = ref<HTMLElement | null>(null)
 
-// 工作区的设置
-const workOptions = [
-  {
-    icon: workAreaIcon.find(res => res.name === 'tabler-building-tunnel')?.icon,
-    label: '工作区1',
-    key: 'work-area-1',
-    shortcuts: '',
-    isChecked: true,
-  },
-  {
-    icon: workAreaIcon.find(res => res.name === 'tabler-brand-tabler')?.icon,
-    label: '工作区1',
-    key: 'work-area-2',
-    shortcuts: '',
-    isChecked: true,
-  },
-]
-
 const visible = ref(false)
 
-onClickOutside(sideBarSettingRef, () => {
-  // visible.value = false
-})
 function handleShowSidebarSetting() {
   visible.value = !visible.value
 }
@@ -43,6 +22,7 @@ const currentWorkAreaCfg = ref<WorkAreaParams>({
   layoutName: `新工作区${props.workAreas.length || 1}`,
   icon: '',
   index: props.workAreas.length + 1,
+  isChecked: true,
   remark: {},
 })
 watch(() => props.workAreas, () => {
@@ -50,10 +30,18 @@ watch(() => props.workAreas, () => {
     layoutName: `新工作区${props.workAreas.length || 1}`,
     icon: '',
     index: props.workAreas.length + 1,
+    isChecked: true,
     remark: {},
   }
 })
 const modalRef = ref<typeof import('~/components/CustomModal.vue').default | null>(null)
+
+onClickOutside(sideBarSettingRef, () => {
+  // 要是修改或者新增弹窗并没有打开的话，鼠标点到其他地方，当前设置面板关闭
+  if (!(modalRef.value && modalRef.value.visible))
+    visible.value = false
+})
+
 function handleOpenModal() {
   modalRef.value?.open()
 }
@@ -73,12 +61,14 @@ function handleAddWorkArea() {
   }
 
   // 2. 存储
-  const { layoutName, index, icon } = currentWorkAreaCfg.value
+  const { id, layoutName, index, icon, isChecked } = currentWorkAreaCfg.value
 
   editWorkArea({
+    id,
     layoutName,
     index,
     icon,
+    isChecked,
     remark: {},
   }).then(async () => {
     emits('getWorkAreasList')
@@ -89,6 +79,65 @@ function handleAddWorkArea() {
 function handleCloseModal() {
   modalRef.value?.close()
 }
+
+function changeCheckbox(item: WorkAreaParams) {
+  const { id, layoutName, isChecked, index, icon } = item
+
+  editWorkArea({
+    id,
+    layoutName,
+    index,
+    icon,
+    isChecked,
+    remark: {},
+  }).then(async () => {
+    emits('getWorkAreasList')
+  })
+}
+
+// -------------------------------------------------------------------//
+const contextMenuRef = ref<typeof import('~/components/CustomContextMenu.vue').default | null>(null)
+const contextMenuOptions = [
+  { label: '编辑', key: 'edit' },
+  { label: '删除', key: 'delete' },
+]
+const contextMenuPosition = ref({ x: 0, y: 0 })
+function openMenuToEdit(item: WorkAreaParams, e: MouseEvent) {
+  contextMenuPosition.value = {
+    x: e.clientX,
+    y: e.clientY,
+  }
+  contextMenuRef.value?.open()
+
+  currentWorkAreaCfg.value = { ...item }
+}
+
+function handleSelectContextMenu(item: typeof contextMenuOptions[number]) {
+  switch (item.key) {
+    case 'edit':
+      edit()
+      break
+    case 'delete':
+      del()
+      break
+
+    default:
+      break
+  }
+
+  function del() {
+    deleteWorkArea(currentWorkAreaCfg.value.id!)
+      .then(async () => {
+        emits('getWorkAreasList')
+      })
+  }
+
+  function edit() {
+    modalRef.value?.open()
+  }
+}
+
+// -------------------------------------------------------------------//
 </script>
 
 <template>
@@ -134,7 +183,17 @@ function handleCloseModal() {
             <div class="text-16px">
               侧边栏设置
             </div>
-            <div class="w-6 h-6" i-carbon-close @click="visible = !visible" />
+
+            <div
+              class="
+                cursor-pointer
+                text-white
+                rounded-full
+                w-6 h-6
+              "
+            >
+              <div class="w-full h-full" i-carbon-close @click="visible = !visible" />
+            </div>
           </div>
 
           <!-- 工作区 -->
@@ -144,26 +203,28 @@ function handleCloseModal() {
               <div class="text-16px font-bold">
                 工作区
               </div>
-              <input
+              <!-- <input
                 type="checkbox"
                 class="text-16px select-none toggle toggle-sm [--tglbg:#bcbbc1] border-#aaaaaa checked:[--tglbg:#45B0E6] checked:border-#45B0E6 bg-white hover:bg-#ffffff "
                 checked
-              >
+              > -->
             </div>
             <!-- 操作按钮 -->
             <div
               class="flex h-36px flex-row justify-start items-center gap-10px w-full cursor-pointer"
               @click="handleOpenModal"
             >
-              <svg class="w-20px h-20px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" @click="visible = !visible"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3c7.2 0 9 1.8 9 9s-1.8 9-9 9s-9-1.8-9-9s1.8-9 9-9m3 9H9m3-3v6" /></svg>
+              <svg class="w-20px h-20px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3c7.2 0 9 1.8 9 9s-1.8 9-9 9s-9-1.8-9-9s1.8-9 9-9m3 9H9m3-3v6" />
+              </svg>
               <div class="text-14px">
                 添加更多
               </div>
             </div>
             <!-- 列表 -->
             <div
-              v-for="item in workOptions"
-              :key="item.label"
+              v-for="item in workAreas"
+              :key="item.id"
             >
               <div
                 class="
@@ -174,28 +235,29 @@ function handleCloseModal() {
               >
                 <div class="flex flex-row justify-start items-center gap-10px ">
                   <div
-                    v-if="item?.icon"
+                    v-if="item.icon"
                     class="w-20px h-20px"
-                    v-html="item?.icon"
+                    v-html="item.icon"
                   />
                   <div class="text-14px">
-                    {{ item.label }}
+                    {{ item.layoutName }}
                   </div>
                 </div>
 
                 <div class="flex flex-row justify-start items-center gap-10px ">
-                  <div>
+                  <div @click="e => openMenuToEdit(item, e)">
                     <div class="w-6 h-6" i-carbon-overflow-menu-horizontal />
                   </div>
 
                   <div>
                     <input
+                      v-model="item.isChecked"
                       type="checkbox"
-                      :checked="item.isChecked"
                       class="
-                      checkbox checkbox-xs [--chkbg:#45B0E6]
+                        checkbox checkbox-xs [--chkbg:#45B0E6]
                       border-#45B0E6 checked:border-#45B0E6
-                    "
+                      "
+                      @change="changeCheckbox(item)"
                     >
                   </div>
                 </div>
@@ -285,6 +347,14 @@ function handleCloseModal() {
         </div>
       </div>
     </CustomModal>
+
+    <CustomContextMenu
+      ref="contextMenuRef"
+      :x="contextMenuPosition.x"
+      :y="contextMenuPosition.y"
+      :options="contextMenuOptions"
+      @select="handleSelectContextMenu"
+    />
   </div>
 </template>
 
