@@ -145,11 +145,18 @@ export function initGridContainer(
     let result: any = null
     const point = { x: position.x, y: position.y }
     const initElement = document.elementFromPoint(point.x, point.y)
-    if (initElement) {
-      const domIdToNumber = Number(initElement.id.match(/layout-component-(\S*)/)?.[1] || -1)
+
+    // 遍历 clickedElement 的父元素，直到找到 id 为 box1 的元素
+    let currentElement = initElement
+    while (currentElement && !currentElement.id.includes('layout-component'))
+      currentElement = currentElement.parentElement
+
+    // 如果找到了 id 为 box1 的元素
+    if (currentElement && currentElement.id.includes('layout-component')) {
+      const domIdToNumber = Number(currentElement.id.match(/layout-component-(\S*)/)?.[1] || -1)
       result = bentoCells.value?.find(ele => ele.id === domIdToNumber)
     }
 
-    return result || null
+    return result
   }
 }

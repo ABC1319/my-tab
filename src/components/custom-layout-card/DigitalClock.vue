@@ -31,7 +31,7 @@ function formatDateTime(timestamp: number) {
 
 <template>
   <div
-    class=" mt-120px text-18 opacity-80 select-none"
+    class="text-18 opacity-80 select-none"
     style="font-family: Digital;"
   >
     <span class="text-white mix-blend-difference">
@@ -39,7 +39,3 @@ function formatDateTime(timestamp: number) {
     </span>
   </div>
 </template>
-
-<style scoped>
-
-</style>

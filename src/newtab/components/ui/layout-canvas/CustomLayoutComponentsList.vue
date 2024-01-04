@@ -45,7 +45,7 @@ function handleDragstart(e: DragEvent, title: string) {
           :key="item.name"
           :draggable="true"
           class="
-            w-full h-100px bg-[#484E64] rounded-10px
+            w-full h-fit bg-[#484E64] rounded-10px
             flex-shrink-0 grid place-items-center
             hover:cursor-grab active:cursor-grabbing
             overflow-hidden
@@ -55,7 +55,7 @@ function handleDragstart(e: DragEvent, title: string) {
           <component
             :is="item.components"
             :id="`${item.name}`"
-            class="w-full h-full"
+            class="w-full h-full flex justify-center items-center"
           />
         </div>
       </div>
