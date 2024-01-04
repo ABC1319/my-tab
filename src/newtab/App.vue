@@ -10,9 +10,9 @@ import CustomHome from './components/layout/CustomHome.vue'
     <div
       id="app-container"
       class="
-        main-container
+        app-container
         w-screen h-screen overflow-hidden
-        bg-black
+        bg-#0a0a12
         flex flex-row
       "
     >
@@ -24,12 +24,3 @@ import CustomHome from './components/layout/CustomHome.vue'
     </div>
   </Suspense>
 </template>
-
-<style scoped>
-.main-container {
-  background-image: url(/assets/main_resource.png);
-  background-size: cover;
-  background-position: center;
-}
-</style>
-、

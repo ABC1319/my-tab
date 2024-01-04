@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { useWindowSize } from '@vueuse/core'
 import { initGridContainer } from './draggable'
 import CustomLayoutComponentsList from './CustomLayoutComponentsList.vue'
+import Ruler from './Ruler.vue'
 import { appHomeShowMode, appIsEditCleanHome } from '~/logic/storage'
 import { getAllCustomLayoutComponentsRaw } from '~/utils/layout-components'
 import type { ILayoutComponentTypeInData, ILayoutComponentTypeInPage } from '~/typings/layout'
@@ -332,6 +333,16 @@ function deleteComponent(item: ILayoutComponentTypeInPage) {
         </div>
       </div>
     </Transition>
+
+    <!-- 坐标系刻度尺 -->
+    <Transition
+      name="blur"
+      @after-leave="$emit('destroy')"
+    >
+      <Ruler
+        v-if="appIsEditCleanHome"
+      />
+    </Transition>
   </div>
 
   <!-- 右侧布局组件列表 -->
@@ -389,6 +400,23 @@ function deleteComponent(item: ILayoutComponentTypeInPage) {
   } */
   100% {
     transform: translateX(0);
+  }
+}
+
+.blur-enter-active {
+  animation: blur-in 0.3s;
+}
+.blur-leave-active {
+  animation: blur-in 0.2s reverse;
+}
+@keyframes blur-in {
+  0% {
+    opacity: 0;
+    filter: blur(4rem);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0rem);
   }
 }
 </style>
