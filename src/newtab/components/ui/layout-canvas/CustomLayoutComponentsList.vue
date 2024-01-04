@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { getAllCustomLayoutComponentsRaw } from '~/utils/layout-components'
 
-const emit = defineEmits(['save', 'cancel'])
 const customLayoutAllComponents = await getAllCustomLayoutComponentsRaw()
 const allComponents = customLayoutAllComponents.map((components) => {
   return {
@@ -15,13 +14,6 @@ function handleDragstart(e: DragEvent, title: string) {
   e.dataTransfer!.dropEffect = 'move'
   // eslint-disable-next-line no-console
   console.log('开始拖拽')
-}
-
-function handleSaveLayout() {
-  emit('save')
-}
-function handleCancelLayout() {
-  emit('cancel')
 }
 </script>
 
@@ -69,30 +61,25 @@ function handleCancelLayout() {
       </div>
 
       <div class="w-full h-40px flex flex-row justify-around items-center gap-10px">
-        <button
+        <div
           class="
-            ok-btn
-            w-1/2 h-32px text-14px
-            rounded-6px
-            bg-[#404459] text-[#fafafa]
-            hover:bg-[#4044596b]
+            flex flex-row justify-center items-center gap-10px
+            h-36px w-full text-12px
+            cursor-pointer rounded-8px
+            bg-#404459
+            mt-2
+            border-2 border-transparent
+            duration-200 ease-in-out transition-all
+            hover:border-#767fa2a1
           "
-          @click="handleSaveLayout"
         >
-          保存布局
-        </button>
-        <button
-          class="
-            cancel-btn
-            w-1/2 h-32px text-14px
-            rounded-6px
-            bg-[#40445990] text-[#fafafa]
-            hover:bg-[#4044596b]
-          "
-          @click="handleCancelLayout"
-        >
-          取消
-        </button>
+          <svg class="w-18px h-18px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h6v8H4zm0 12h6v4H4zm10-4h6v8h-6zm0-8h6v4h-6z" />
+          </svg>
+          <div>
+            预设布局
+          </div>
+        </div>
       </div>
     </div>
   </div>

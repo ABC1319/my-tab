@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { ComponentCustomProperties } from 'vue'
 import { ref } from 'vue'
 import { useWindowSize } from '@vueuse/core'
 import { initGridContainer } from './draggable'
@@ -16,22 +15,35 @@ const layoutContainerRef = ref()
 const currentClickedElement: Ref<any> = ref()
 const disabledDraggable = ref(!appIsEditCleanHome.value)
 
-// 是否已经进行了更改，主要是两处，一是新增或者删除组件，一是移动位置
-// 其实应该在 drop 和 mousemove 的时候监听，这里直接使用 watch 监听，可能会损耗一些性能
-const isAlreadyEdited = ref(false)
-watch(bentoCells, async (nVal, oVal) => {
-  if (nVal.length === 0 && oVal.length === 0)
-    isAlreadyEdited.value = false
-  else
-    isAlreadyEdited.value = true
-}, { deep: true })
+/**
+ * 全部逻辑：
+ * 1. 拖拽过来，其中有两种保存
+ *  a. 变化后保存
+ *  b. 离开前保存
+ *
+ * 2. 这里没有思考那么多可能会造成的性能损耗，直接在离开前保存（只考虑业务逻辑，不考虑其他比如刷新或者关闭造成的异常了）
+ * 2.1 一个是切换布局的时候，一个是离开编辑模式的时候。
+ * 2.2 此外，定时每 30s 主动保存一下。
+ */
 
+// ------------------保存 start -------------------------//
 watch(appHomeShowMode, async () => {
-  if (isAlreadyEdited.value)
-    handleOpenModal()
-  else
-    getList()
+  await handleOnlySaveLayout()
+  getList()
 })
+
+watch(appIsEditCleanHome, async () => {
+  await handleOnlySaveLayout()
+})
+
+const intervalID = setInterval(() => {
+  if (appIsEditCleanHome.value)
+    handleOnlySaveLayout()
+}, 1000 * 30)
+onUnmounted(() => {
+  clearInterval(intervalID && intervalID)
+})
+// ------------------保存 end -------------------------//
 
 await getList()
 
@@ -76,8 +88,12 @@ watch([width, height], () => {
   layoutContainerScale.value = calculateMainScale()
 })
 
-function handleSwitchCleanHomeMode() {
-  appIsEditCleanHome.value = !appIsEditCleanHome.value
+/**
+ * 切换当前编辑模式
+ * @param boo 是否是编辑模式
+ */
+function handleSwitchCleanHomeMode(boo: boolean) {
+  appIsEditCleanHome.value = boo
 
   if (appIsEditCleanHome.value) {
     // 说明进入了编辑模式
@@ -161,11 +177,7 @@ function handleDragover(e: DragEvent) {
 // ------------------拖拽 end -----------------------------//
 
 // ------------------保存 start ---------------------------//
-const app = inject('app') as ComponentCustomProperties['$app']
-const { $message } = app
-function handleSaveLayout() {
-  // 1. 如果之前已经有的，那么就是更新
-  // 2. 如果没有，那么就是新增
+function handleSaveLayoutAndClose() {
   const promises = bentoCells.value.map((item) => {
     return new Promise((resolve) => {
       editLayoutComponents({
@@ -181,38 +193,32 @@ function handleSaveLayout() {
   })
 
   Promise.all(promises).then(() => {
-    $message({
-      type: 'success',
-      message: `保存布局成功`,
-      center: true,
-    })
-    isAlreadyEdited.value = false
     handleCancelLayout()
   })
 }
+
+function handleOnlySaveLayout() {
+  const promises = bentoCells.value.map((item) => {
+    return new Promise((resolve) => {
+      editLayoutComponents({
+        id: item.id,
+        layoutName: item.layoutName,
+        x: item.x,
+        y: item.y,
+        width: item.width,
+        height: item.height,
+        componentName: item.componentName,
+      }).then(resolve)
+    })
+  })
+
+  Promise.all(promises).then(() => {})
+}
+
 function handleCancelLayout() {
-  handleSwitchCleanHomeMode()
-  isAlreadyEdited.value = false
-  getList()
+  handleSwitchCleanHomeMode(false)
 }
 // ------------------保存 end -----------------------------//
-
-// ------------------弹窗 start ---------------------------//
-const modalRef = ref<typeof import('~/components/CustomModal.vue').default | null>(null)
-function handleOpenModal() {
-  modalRef.value?.open()
-}
-
-function handleCancelInModal() {
-  modalRef.value?.close()
-  isAlreadyEdited.value = false
-  getList()
-}
-function handleSaveInModal() {
-  handleSaveLayout()
-  handleCancelInModal()
-}
-// ------------------弹窗 end -----------------------------//
 </script>
 
 <template>
@@ -272,7 +278,7 @@ function handleSaveInModal() {
         cursor-pointer
         text-[#ffffff90]
       "
-        @click="handleSwitchCleanHomeMode"
+        @click="handleSwitchCleanHomeMode(!appIsEditCleanHome)"
       >
         <svg class="w-14px h-14px rounded-full hover:scale-110" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
           <path fill="currentColor" fill-rule="evenodd" d="M11.943 1.25H13.5a.75.75 0 0 1 0 1.5H12c-2.378 0-4.086.002-5.386.176c-1.279.172-2.05.5-2.62 1.069c-.569.57-.896 1.34-1.068 2.619c-.174 1.3-.176 3.008-.176 5.386s.002 4.086.176 5.386c.172 1.279.5 2.05 1.069 2.62c.57.569 1.34.896 2.619 1.068c1.3.174 3.008.176 5.386.176s4.086-.002 5.386-.176c1.279-.172 2.05-.5 2.62-1.069c.569-.57.896-1.34 1.068-2.619c.174-1.3.176-3.008.176-5.386v-1.5a.75.75 0 0 1 1.5 0v1.557c0 2.309 0 4.118-.19 5.53c-.194 1.444-.6 2.584-1.494 3.479c-.895.895-2.035 1.3-3.48 1.494c-1.411.19-3.22.19-5.529.19h-.114c-2.309 0-4.118 0-5.53-.19c-1.444-.194-2.584-.6-3.479-1.494c-.895-.895-1.3-2.035-1.494-3.48c-.19-1.411-.19-3.22-.19-5.529v-.114c0-2.309 0-4.118.19-5.53c.194-1.444.6-2.584 1.494-3.479c.895-.895 2.035-1.3 3.48-1.494c1.411-.19 3.22-.19 5.529-.19m4.827 1.026a3.503 3.503 0 0 1 4.954 4.953l-6.648 6.649c-.371.37-.604.604-.863.806a5.34 5.34 0 0 1-.987.61c-.297.141-.61.245-1.107.411l-2.905.968a1.492 1.492 0 0 1-1.887-1.887l.968-2.905c.166-.498.27-.81.411-1.107c.167-.35.372-.68.61-.987c.202-.26.435-.492.806-.863zm3.893 1.06a2.003 2.003 0 0 0-2.832 0l-.376.377c.022.096.054.21.098.338c.143.413.415.957.927 1.469a3.875 3.875 0 0 0 1.807 1.025l.376-.376a2.003 2.003 0 0 0 0-2.832m-1.558 4.391a5.397 5.397 0 0 1-1.686-1.146a5.395 5.395 0 0 1-1.146-1.686L11.218 9.95c-.417.417-.58.582-.72.76a3.84 3.84 0 0 0-.437.71c-.098.203-.172.423-.359.982l-.431 1.295l1.032 1.033l1.295-.432c.56-.187.779-.261.983-.358c.251-.12.49-.267.71-.439c.177-.139.342-.302.759-.718z" clip-rule="evenodd" />
@@ -300,36 +306,10 @@ function handleSaveInModal() {
   >
     <CustomLayoutComponentsList
       v-if="appIsEditCleanHome"
-      @save="handleSaveLayout"
+      @save="handleSaveLayoutAndClose"
       @cancel="handleCancelLayout"
     />
   </Transition>
-
-  <!-- 确认是否保存布局弹窗 -->
-  <CustomModal ref="modalRef" :is-show-close="false" :enable-click-outside="false">
-    <div class="modal-content-container flex flex-col justify-around items-center my-4 mx-2 w-270px">
-      <!-- title -->
-      <div class="text-14px">
-        是否保存刚才编辑的布局
-      </div>
-      <!-- button -->
-      <div class="flex flex-row justify-between gap-6 mt-32px w-full">
-        <button
-          class=" w-1/2 h-32px text-14px rounded-6px bg-[#40445955] text-[#fafafa] hover:bg-[#4044596b] "
-          @click="handleCancelInModal"
-        >
-          不保存
-        </button>
-
-        <button
-          class=" w-1/2 h-32px text-14px rounded-6px bg-[#404459] text-[#fafafa] hover:bg-[#4044596b] "
-          @click="handleSaveInModal"
-        >
-          保存
-        </button>
-      </div>
-    </div>
-  </CustomModal>
 </template>
 
 <style scoped>
