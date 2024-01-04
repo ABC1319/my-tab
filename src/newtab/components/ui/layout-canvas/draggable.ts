@@ -8,7 +8,7 @@ let mouseFrom = { x: 0, y: 0 }
 let mouseTo = { x: 0, y: 0 }
 export function initGridContainer(
   bentoCells: Ref<ILayoutComponentTypeInData[]>,
-  currentClickedElement: Ref<any>,
+  currentClickedElement: Ref<ILayoutComponentTypeInData | null>,
   disabled: Ref<boolean>,
   containerDom: HTMLElement,
   scale: Ref<number>,
@@ -84,6 +84,10 @@ export function initGridContainer(
 
     currentClickedElement.value = getCellObjectInStoreFromPosition(mouseFrom)
 
+    // 如果当前选中的要素是已经被锁定的，那么就不对其操作
+    if (currentClickedElement.value && currentClickedElement.value.isFixed)
+      return
+
     // 移动画布三
     // 1. 鼠标左键按下的状态为 true
     // 2. 如果这时候空格也是按下的，那么就是移动画布
@@ -97,7 +101,7 @@ export function initGridContainer(
       isDraggingElement.value = true
 
       // 将当前拖拽的元素放到最上面
-      const index = bentoCells.value.findIndex(ele => ele.id === currentClickedElement.value.id)
+      const index = bentoCells.value.findIndex(ele => ele.id === currentClickedElement.value!.id)
       if (index !== -1) {
         const ele = bentoCells.value.splice(index, 1)
         bentoCells.value.push(ele[0])
@@ -120,7 +124,7 @@ export function initGridContainer(
     }
 
     // 移动元素
-    if (isDraggingElement.value) {
+    if (isDraggingElement.value && currentClickedElement.value) {
       currentClickedElement.value.x += (disX / scale.value)
       currentClickedElement.value.y += (disY / scale.value)
       mouseFrom = { x: e.clientX, y: e.clientY }
@@ -142,7 +146,7 @@ export function initGridContainer(
   }
 
   function getCellObjectInStoreFromPosition(position: { x: number, y: number }) {
-    let result: any = null
+    let result: ILayoutComponentTypeInData | null = null
     const point = { x: position.x, y: position.y }
     const initElement = document.elementFromPoint(point.x, point.y)
 
@@ -154,7 +158,7 @@ export function initGridContainer(
     // 如果找到了 id 为 box1 的元素
     if (currentElement && currentElement.id.includes('layout-component')) {
       const domIdToNumber = Number(currentElement.id.match(/layout-component-(\S*)/)?.[1] || -1)
-      result = bentoCells.value?.find(ele => ele.id === domIdToNumber)
+      result = bentoCells.value?.find(ele => ele.id === domIdToNumber) || null
     }
 
     return result

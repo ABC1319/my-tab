@@ -5,6 +5,7 @@ export interface ILayoutComponentTypeInData {
   width: number
   height: number
   componentName: string
+  isFixed: boolean
   layoutName: number
 }
 

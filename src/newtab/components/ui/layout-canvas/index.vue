@@ -66,6 +66,7 @@ async function getList() {
           y: item.y,
           width: item.width,
           height: item.height,
+          isFixed: item.isFixed,
           componentName: item.componentName,
           component: markRaw(component.raw.default),
         }
@@ -153,6 +154,7 @@ function handleDrop(e: DragEvent) {
       y: mouseXY.y,
       width: 100,
       height: 100,
+      isFixed: false,
       componentName: component.name,
       component: markRaw(component.raw.default),
     })
@@ -188,6 +190,7 @@ function handleSaveLayoutAndClose() {
         y: item.y,
         width: item.width,
         height: item.height,
+        isFixed: item.isFixed,
         componentName: item.componentName,
       }).then(resolve)
     })
@@ -208,6 +211,7 @@ function handleOnlySaveLayout() {
         y: item.y,
         width: item.width,
         height: item.height,
+        isFixed: item.isFixed,
         componentName: item.componentName,
       }).then(resolve)
     })
@@ -222,9 +226,20 @@ function handleCancelLayout() {
 // ------------------保存 end -----------------------------//
 
 // ------------------修改组件 end -----------------------------//
-// function hideComponent(_item: ILayoutComponentTypeInPage) {
+function lockComponent(item: ILayoutComponentTypeInPage) {
+  item.isFixed = !item.isFixed
 
-// }
+  editLayoutComponents({
+    id: item.id,
+    layoutName: item.layoutName,
+    x: item.x,
+    y: item.y,
+    width: item.width,
+    height: item.height,
+    isFixed: item.isFixed,
+    componentName: item.componentName,
+  })
+}
 function deleteComponent(item: ILayoutComponentTypeInPage) {
   const index = bentoCells.value.findIndex(cell => cell.id === item.id)
   if (index > -1) {
@@ -283,13 +298,14 @@ function deleteComponent(item: ILayoutComponentTypeInPage) {
           w-fit h-30px overflow-hidden
         "
       >
-        <!-- <div
+        <div
           class=" w-1/2 h-full flex justify-center items-center px-8px hover:bg-#646c89 "
-          title="隐藏"
-          @click="hideComponent(item)"
+          :title="item.isFixed ? '解锁' : '锁定'"
+          @click="lockComponent(item)"
         >
-          <svg class="w-20px h-20px " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M10.585 10.587a2 2 0 0 0 2.829 2.828" /><path d="M16.681 16.673A8.717 8.717 0 0 1 12 18c-3.6 0-6.6-2-9-6c1.272-2.12 2.712-3.678 4.32-4.674m2.86-1.146A9.055 9.055 0 0 1 12 6c3.6 0 6.6 2 9 6c-.666 1.11-1.379 2.067-2.138 2.87M3 3l18 18" /></g></svg>
-        </div> -->
+          <svg v-if="item.isFixed" class="w-20px h-20px " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M5 13a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 1 0-2 0m-3-5V6a4 4 0 0 1 8 0" /></g></svg>
+          <svg v-else class="w-20px h-20px " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M5 13a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0-2 0m-3-5V7a4 4 0 1 1 8 0v4" /></g></svg>
+        </div>
 
         <div
           class=" w-full h-full flex justify-center items-center px-8px hover:bg-#646c89 "
