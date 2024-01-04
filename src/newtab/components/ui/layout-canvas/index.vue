@@ -6,7 +6,7 @@ import CustomLayoutComponentsList from './CustomLayoutComponentsList.vue'
 import { appHomeShowMode, appIsEditCleanHome } from '~/logic/storage'
 import { getAllCustomLayoutComponentsRaw } from '~/utils/layout-components'
 import type { ILayoutComponentTypeInData, ILayoutComponentTypeInPage } from '~/typings/layout'
-import { editLayoutComponents, getComponentsById } from '~/logic/layoutComponentsData'
+import { deleteLayoutComponents, editLayoutComponents, getComponentsById } from '~/logic/layoutComponentsData'
 
 const customLayoutAllComponents = await getAllCustomLayoutComponentsRaw()
 
@@ -219,6 +219,19 @@ function handleCancelLayout() {
   handleSwitchCleanHomeMode(false)
 }
 // ------------------保存 end -----------------------------//
+
+// ------------------修改组件 end -----------------------------//
+// function hideComponent(_item: ILayoutComponentTypeInPage) {
+
+// }
+function deleteComponent(item: ILayoutComponentTypeInPage) {
+  const index = bentoCells.value.findIndex(cell => cell.id === item.id)
+  if (index > -1) {
+    bentoCells.value.splice(index, 1)
+    deleteLayoutComponents(item.id!)
+  }
+}
+// ------------------修改组件 end -----------------------------//
 </script>
 
 <template>
@@ -258,10 +271,32 @@ function handleCancelLayout() {
         class="w-fit h-fit"
       />
 
-      <div v-if="appIsEditCleanHome" class="absolute top-0 left-0 cursor-pointer">
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-          <path fill="currentColor" d="M7.615 20q-.67 0-1.143-.472Q6 19.056 6 18.385V6H5V5h4v-.77h6V5h4v1h-1v12.385q0 .69-.462 1.152q-.463.463-1.153.463zM17 6H7v12.385q0 .269.173.442t.442.173h8.77q.23 0 .423-.192q.192-.193.192-.423zM9.808 17h1V8h-1zm3.384 0h1V8h-1zM7 6v13z" />
-        </svg>
+      <div
+        v-if="appIsEditCleanHome"
+        class="
+          absolute top-[-34px] left-0
+          cursor-pointer
+          flex flex-row justify-center items-center
+          rounded-10px
+          bg-[#474d63]
+          w-fit h-30px overflow-hidden
+        "
+      >
+        <!-- <div
+          class=" w-1/2 h-full flex justify-center items-center px-8px hover:bg-#646c89 "
+          title="隐藏"
+          @click="hideComponent(item)"
+        >
+          <svg class="w-20px h-20px " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M10.585 10.587a2 2 0 0 0 2.829 2.828" /><path d="M16.681 16.673A8.717 8.717 0 0 1 12 18c-3.6 0-6.6-2-9-6c1.272-2.12 2.712-3.678 4.32-4.674m2.86-1.146A9.055 9.055 0 0 1 12 6c3.6 0 6.6 2 9 6c-.666 1.11-1.379 2.067-2.138 2.87M3 3l18 18" /></g></svg>
+        </div> -->
+
+        <div
+          class=" w-full h-full flex justify-center items-center px-8px hover:bg-#646c89 "
+          title="删除"
+          @click="deleteComponent(item)"
+        >
+          <svg class="w-20px h-20px " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16m-10 4v6m4-6v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" /></svg>
+        </div>
       </div>
     </div>
 
@@ -271,13 +306,13 @@ function handleCancelLayout() {
         title="编辑模式"
         draggable="false"
         class="
-        fixed bottom-2 right-50px z-99
-        h-32px w-32px p-0 min-w-32px
-        rounded-full bg-[#25283590]
-        grid place-items-center
-        cursor-pointer
-        text-[#ffffff90]
-      "
+          fixed bottom-2 right-50px z-99
+          h-32px w-32px p-0 min-w-32px
+          rounded-full bg-[#25283590]
+          grid place-items-center
+          cursor-pointer
+          text-[#ffffff90]
+        "
         @click="handleSwitchCleanHomeMode(!appIsEditCleanHome)"
       >
         <svg class="w-14px h-14px rounded-full hover:scale-110" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
