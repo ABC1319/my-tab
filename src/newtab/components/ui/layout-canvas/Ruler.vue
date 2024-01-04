@@ -26,46 +26,41 @@ const { x: xOriginalBaselinePosition } = useDraggable(xBaseline, {
 })
 
 const { y: yOriginalBaselinePosition } = useDraggable(yBaseline, {
-  initialValue: { x: 40, y: 0 },
+  initialValue: { x: 0, y: 40 },
 })
 
 const xBaselinePosition = computed(() => {
-  return calcXPosition(xOriginalBaselinePosition.value, props.layoutContainerScale) || 40
+  return calcXPosition(xOriginalBaselinePosition.value, props.layoutContainerScale)
 })
 
 const yBaselinePosition = computed(() => {
-  return calcYPosition(yOriginalBaselinePosition.value, props.layoutContainerScale) || 40
+  return calcYPosition(yOriginalBaselinePosition.value, props.layoutContainerScale)
 })
 
 function calcXPosition(x: number, scale: number) {
   const containerDom = document.querySelector('.layout-container')
-  if (containerDom) {
-    const originX = containerDom.getBoundingClientRect().left
-    const mouseX = (x - originX) / scale
-    return mouseX
-  }
+  const originX = containerDom?.getBoundingClientRect().left || 0
+  const mouseX = (x - originX) / scale
 
-  return 0
+  return Math.max(mouseX, 0)
 }
 
-function calcYPosition(x: number, scale: number) {
+function calcYPosition(y: number, scale: number) {
   const containerDom = document.querySelector('.layout-container')
-  if (containerDom) {
-    const originY = containerDom.getBoundingClientRect().top
-    const mouseY = (x - originY) / scale
-    return mouseY
-  }
 
-  return 0
+  const originY = containerDom?.getBoundingClientRect().top || 0
+  const mouseY = (y - originY) / scale
+
+  return Math.max(mouseY, 0)
 }
 </script>
 
 <template>
-  <div>
+  <div class="relative">
     <!-- x 轴 -->
     <div
       ref="xRuler"
-      class="fixed top-0 left-0 w-screen z-0 flex flex-row "
+      class="absolute top-0 left-0 w-screen z-0 flex flex-row "
     >
       <div
         v-for="i in (Math.ceil(width / 10))"
@@ -99,7 +94,7 @@ function calcYPosition(x: number, scale: number) {
     <!-- y 轴 -->
     <div
       ref="yRuler"
-      class="fixed top-0 left-0 h-screen z-0 flex flex-col "
+      class="absolute top-0 left-0 h-screen z-0 flex flex-col "
     >
       <div
         v-for="i in (Math.ceil(height / 10))"
@@ -135,14 +130,14 @@ function calcYPosition(x: number, scale: number) {
     <div
       ref="xBaseline"
       :style=" { transform: `translateX(${xBaselinePosition}px)` }"
-      class="fixed top-0 left-0 w-2px h-screen bg-[#ffffff1e] cursor-pointer select-none"
+      class="absolute top-0 left-0 w-2px h-screen bg-[#ffffff1e] cursor-pointer select-none"
     />
 
     <!-- y 轴可以移动的线 -->
     <div
       ref="yBaseline"
       :style=" { transform: `translateY(${yBaselinePosition}px)` }"
-      class="fixed top-0 left-0 h-2px w-screen bg-[#ffffff1e] cursor-pointer select-none"
+      class="absolute top-0 left-0 h-2px w-screen bg-[#ffffff1e] cursor-pointer select-none"
     />
   </div>
 </template>
