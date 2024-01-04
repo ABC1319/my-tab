@@ -341,6 +341,7 @@ function deleteComponent(item: ILayoutComponentTypeInPage) {
     >
       <Ruler
         v-if="appIsEditCleanHome"
+        :layout-container-scale="layoutContainerScale"
       />
     </Transition>
   </div>

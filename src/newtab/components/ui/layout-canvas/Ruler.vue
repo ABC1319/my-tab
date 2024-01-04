@@ -1,22 +1,68 @@
 <script setup lang="ts">
-import { useMouseInElement, useWindowSize } from '@vueuse/core'
+import { useDraggable, useMouseInElement, useWindowSize } from '@vueuse/core'
 
 /**
  * 1. 获取窗口的尺寸
  * 2. 每十个像素显示一条线
  */
 
+const props = defineProps<{
+  layoutContainerScale: number
+}>()
+
 const { width, height } = useWindowSize()
 
 const xRuler = ref(null)
 const yRuler = ref(null)
+const xBaseline = ref(null)
+const yBaseline = ref(null)
+
 const { isOutside: xIsOutside } = useMouseInElement(xRuler)
 
 const { isOutside: yIsOutside } = useMouseInElement(yRuler)
+
+const { x: xOriginalBaselinePosition } = useDraggable(xBaseline, {
+  initialValue: { x: 40, y: 0 },
+})
+
+const { y: yOriginalBaselinePosition } = useDraggable(yBaseline, {
+  initialValue: { x: 40, y: 0 },
+})
+
+const xBaselinePosition = computed(() => {
+  return calcXPosition(xOriginalBaselinePosition.value, props.layoutContainerScale) || 40
+})
+
+const yBaselinePosition = computed(() => {
+  return calcYPosition(yOriginalBaselinePosition.value, props.layoutContainerScale) || 40
+})
+
+function calcXPosition(x: number, scale: number) {
+  const containerDom = document.querySelector('.layout-container')
+  if (containerDom) {
+    const originX = containerDom.getBoundingClientRect().left
+    const mouseX = (x - originX) / scale
+    return mouseX
+  }
+
+  return 0
+}
+
+function calcYPosition(x: number, scale: number) {
+  const containerDom = document.querySelector('.layout-container')
+  if (containerDom) {
+    const originY = containerDom.getBoundingClientRect().top
+    const mouseY = (x - originY) / scale
+    return mouseY
+  }
+
+  return 0
+}
 </script>
 
 <template>
   <div>
+    <!-- x 轴 -->
     <div
       ref="xRuler"
       class="fixed top-0 left-0 w-screen z-0 flex flex-row "
@@ -27,7 +73,7 @@ const { isOutside: yIsOutside } = useMouseInElement(yRuler)
         class="w-10px relative"
       >
         <div
-          class="w-1px bg-[#ffffff5e] transition-all duration-200 ease-in-out"
+          class="w-1px bg-[#ffffff5e] select-none pointer-events-none transition-all duration-200 ease-in-out"
           :class="
             i % 10 !== 0
               ? 'h-4px'
@@ -37,7 +83,7 @@ const { isOutside: yIsOutside } = useMouseInElement(yRuler)
           "
         />
         <div
-          class="absolute top-5px left-5px text-[#ffffff5e] select-none transition-all duration-200 ease-in-out"
+          class="absolute top-5px left-5px text-[#ffffff5e] select-none pointer-events-none transition-all duration-200 ease-in-out"
           :class="
             xIsOutside
               ? 'opacity-0'
@@ -50,6 +96,7 @@ const { isOutside: yIsOutside } = useMouseInElement(yRuler)
         </div>
       </div>
     </div>
+    <!-- y 轴 -->
     <div
       ref="yRuler"
       class="fixed top-0 left-0 h-screen z-0 flex flex-col "
@@ -83,5 +130,19 @@ const { isOutside: yIsOutside } = useMouseInElement(yRuler)
         </div>
       </div>
     </div>
+
+    <!-- x 轴可以移动的线 -->
+    <div
+      ref="xBaseline"
+      :style=" { transform: `translateX(${xBaselinePosition}px)` }"
+      class="fixed top-0 left-0 w-2px h-screen bg-[#ffffff1e] cursor-pointer select-none"
+    />
+
+    <!-- y 轴可以移动的线 -->
+    <div
+      ref="yBaseline"
+      :style=" { transform: `translateY(${yBaselinePosition}px)` }"
+      class="fixed top-0 left-0 h-2px w-screen bg-[#ffffff1e] cursor-pointer select-none"
+    />
   </div>
 </template>
