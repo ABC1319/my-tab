@@ -4,6 +4,7 @@ const isDraggingElement = ref(false)
 const isDraggingCanvas = ref(false)
 const isPressingSpace = ref(false)
 const isPressingMouseLeft = ref(false)
+const isResizingElement = ref(false)
 let mouseFrom = { x: 0, y: 0 }
 let mouseTo = { x: 0, y: 0 }
 export function initGridContainer(
@@ -88,15 +89,14 @@ export function initGridContainer(
     if (currentClickedElement.value && currentClickedElement.value.isFixed)
       return
 
-    // 移动画布三
-    // 1. 鼠标左键按下的状态为 true
-    // 2. 如果这时候空格也是按下的，那么就是移动画布
+    // 移动画布三。鼠标左键按下的状态为 true，如果这时候空格也是按下的，那么就是移动画布
     isPressingMouseLeft.value = true
     if (isPressingSpace.value) {
       isDraggingCanvas.value = true
       return
     }
 
+    // 移动元素
     if (currentClickedElement.value) {
       isDraggingElement.value = true
 
@@ -129,6 +129,21 @@ export function initGridContainer(
       currentClickedElement.value.y += (disY / scale.value)
       mouseFrom = { x: e.clientX, y: e.clientY }
     }
+
+    // 缩放元素
+    if (isResizingElement.value && currentClickedElement.value) {
+      // 初始的宽度
+      const initWidth = currentClickedElement.value.width * scale.value
+      // 偏移的距离
+      const offsetX = disX / scale.value
+
+      if (offsetX !== 0) {
+        const offsetScaleX = offsetX / initWidth
+        currentClickedElement.value.scale += offsetScaleX
+      }
+
+      mouseFrom = { x: e.clientX, y: e.clientY }
+    }
   }
   function mouseup(_e: MouseEvent) {
     // 只有空格松开就是取消拖拽了
@@ -143,8 +158,10 @@ export function initGridContainer(
     isDraggingElement.value = false
     isDraggingCanvas.value = false
     isPressingMouseLeft.value = false
+    isResizingElement.value = false
   }
 
+  // 从点击的位置获取组件
   function getCellObjectInStoreFromPosition(position: { x: number, y: number }) {
     let result: ILayoutComponentTypeInData | null = null
     const point = { x: position.x, y: position.y }
@@ -169,4 +186,24 @@ export function initGridContainer(
 
     return result
   }
+
+  // 从点击的位置获取组件的控制点
+  // function getControlPointInStoreFromPosition(position: { x: number, y: number }) {
+  //   let result: any = null
+  //   const point = { x: position.x, y: position.y }
+  //   const initElement = document.elementFromPoint(point.x, point.y)
+  //   if (initElement) {
+  //     const domIdToNumber = Number(initElement.id.match(/component-control-dot-(\S*)/)?.[1] || -1)
+  //     result = bentoCells.value?.find(ele => ele.id === domIdToNumber)
+
+  //     const currentElement = document.querySelector(`#layout-component-${domIdToNumber}`)
+  //     if (result && currentElement) {
+  //       const { width, height } = currentElement.getBoundingClientRect()
+  //       result.width = width
+  //       result.height = height
+  //     }
+  //   }
+
+  //   return result || null
+  // }
 }

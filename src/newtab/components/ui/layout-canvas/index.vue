@@ -69,6 +69,8 @@ async function getList() {
           isFixed: item.isFixed,
           componentName: item.componentName,
           component: markRaw(component.raw.default),
+          scale: item.scale,
+          rotate: item.rotate,
         }
       }
       else {
@@ -157,6 +159,8 @@ function handleDrop(e: DragEvent) {
       isFixed: false,
       componentName: component.name,
       component: markRaw(component.raw.default),
+      scale: 1,
+      rotate: 0,
     })
   }
 
@@ -192,6 +196,8 @@ function handleSaveLayoutAndClose() {
         height: item.height,
         isFixed: item.isFixed,
         componentName: item.componentName,
+        scale: item.scale,
+        rotate: item.rotate,
       }).then(resolve)
     })
   })
@@ -213,6 +219,8 @@ function handleOnlySaveLayout() {
         height: item.height,
         isFixed: item.isFixed,
         componentName: item.componentName,
+        scale: item.scale,
+        rotate: item.rotate,
       }).then(resolve)
     })
   })
@@ -238,6 +246,8 @@ function lockComponent(item: ILayoutComponentTypeInPage) {
     height: item.height,
     isFixed: item.isFixed,
     componentName: item.componentName,
+    scale: item.scale,
+    rotate: item.rotate,
   })
 }
 function deleteComponent(item: ILayoutComponentTypeInPage) {
@@ -277,8 +287,11 @@ function deleteComponent(item: ILayoutComponentTypeInPage) {
           translate3d(
             ${item.x}px,
             ${item.y}px,
-          0)`,
+          0)
+          scale(${item.scale})
+        `,
         willChange: 'transform',
+        transformOrigin: 'left top',
       }"
     >
       <component
@@ -292,11 +305,11 @@ function deleteComponent(item: ILayoutComponentTypeInPage) {
         v-if="appIsEditCleanHome"
         class="absolute top-0 left-0 w-full h-full pointer-events-none "
       >
-        <span class="pointer-events-none absolute inset-0 border-2 border-[#474d63] border-dashed opacity-100 ">
-          <!-- <span class="absolute -left-0.5 -top-0.5 h-1.5 w-1.5 border border-[#474d63] bg-zinc-50 " />
-          <span class="absolute -right-0.5 -top-0.5 h-1.5 w-1.5 border border-[#474d63] bg-zinc-50 " />
-          <span class="absolute -bottom-0.5 -left-0.5 h-1.5 w-1.5 border border-[#474d63] bg-zinc-50 " /> -->
-          <span class="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 border border-[#474d63] bg-[#ffffffc0] cursor-nwse-resize pointer-events-auto" />
+        <span class="pointer-events-none select-none absolute inset-0 border-2 border-[#474d63] border-dashed opacity-100 ">
+          <span class="absolute -left-0.5 -top-0.5 h-1.5 w-1.5 border border-[#5021ff] bg-[#5021ff] " />
+          <span class="absolute -right-0.5 -top-0.5 h-1.5 w-1.5 border border-[#5021ff] bg-[#5021ff] " />
+          <span class="absolute -bottom-0.5 -left-0.5 h-1.5 w-1.5 border border-[#5021ff] bg-[#5021ff] " />
+          <span class="absolute -bottom-0.5 -right-0.5 h-1.5 w-1.5 select-none border border-[#5021ff] bg-[#5021ff] " />
         </span>
       </div>
 

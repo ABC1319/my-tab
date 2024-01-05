@@ -7,6 +7,8 @@ export interface ILayoutComponentTypeInData {
   componentName: string
   isFixed: boolean
   layoutName: number
+  scale: number
+  rotate: number
 }
 
 export interface ILayoutComponentTypeInPage extends ILayoutComponentTypeInData {
