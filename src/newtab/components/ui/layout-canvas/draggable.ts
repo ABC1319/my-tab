@@ -159,6 +159,12 @@ export function initGridContainer(
     if (currentElement && currentElement.id.includes('layout-component')) {
       const domIdToNumber = Number(currentElement.id.match(/layout-component-(\S*)/)?.[1] || -1)
       result = bentoCells.value?.find(ele => ele.id === domIdToNumber) || null
+
+      // if (result) {
+      //   const { width, height } = currentElement.getBoundingClientRect()
+      //   result.width = width
+      //   result.height = height
+      // }
     }
 
     return result

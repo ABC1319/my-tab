@@ -13,7 +13,7 @@ const customLayoutAllComponents = await getAllCustomLayoutComponentsRaw()
 
 const bentoCells = ref<ILayoutComponentTypeInPage[]>([])
 const layoutContainerRef = ref()
-const currentClickedElement: Ref<any> = ref()
+const currentClickedElement: Ref<ILayoutComponentTypeInData | null> = ref(null)
 const disabledDraggable = ref(!appIsEditCleanHome.value)
 
 /**
@@ -287,6 +287,20 @@ function deleteComponent(item: ILayoutComponentTypeInPage) {
         class="w-fit h-fit"
       />
 
+      <!-- 边界 -->
+      <div
+        v-if="appIsEditCleanHome"
+        class="absolute top-0 left-0 w-full h-full pointer-events-none "
+      >
+        <span class="pointer-events-none absolute inset-0 border-2 border-[#474d63] border-dashed opacity-100 ">
+          <!-- <span class="absolute -left-0.5 -top-0.5 h-1.5 w-1.5 border border-[#474d63] bg-zinc-50 " />
+          <span class="absolute -right-0.5 -top-0.5 h-1.5 w-1.5 border border-[#474d63] bg-zinc-50 " />
+          <span class="absolute -bottom-0.5 -left-0.5 h-1.5 w-1.5 border border-[#474d63] bg-zinc-50 " /> -->
+          <span class="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 border border-[#474d63] bg-[#ffffffc0] cursor-nwse-resize pointer-events-auto" />
+        </span>
+      </div>
+
+      <!-- 操作按钮控制条 -->
       <div
         v-if="appIsEditCleanHome"
         class="
