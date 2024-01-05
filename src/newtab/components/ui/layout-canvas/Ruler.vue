@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useDraggable, useMouseInElement, useWindowSize } from '@vueuse/core'
+import { isShrinkSidebar } from '~/logic'
 
 /**
  * 1. 获取窗口的尺寸
@@ -22,7 +23,7 @@ const { isOutside: xIsOutside } = useMouseInElement(xRuler)
 const { isOutside: yIsOutside } = useMouseInElement(yRuler)
 
 const { x: xOriginalBaselinePosition } = useDraggable(xBaseline, {
-  initialValue: { x: 40, y: 0 },
+  initialValue: { x: isShrinkSidebar.value ? 40 : 98, y: 0 },
 })
 
 const { y: yOriginalBaselinePosition } = useDraggable(yBaseline, {
