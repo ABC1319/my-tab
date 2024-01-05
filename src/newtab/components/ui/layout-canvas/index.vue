@@ -234,6 +234,7 @@ function handleCancelLayout() {
 // ------------------保存 end -----------------------------//
 
 // ------------------修改组件 end -----------------------------//
+
 function lockComponent(item: ILayoutComponentTypeInPage) {
   item.isFixed = !item.isFixed
 
@@ -256,6 +257,11 @@ function deleteComponent(item: ILayoutComponentTypeInPage) {
     bentoCells.value.splice(index, 1)
     deleteLayoutComponents(item.id!)
   }
+}
+
+function resizingComponent(_item: ILayoutComponentTypeInPage) {
+}
+function rotateComponent(_item: ILayoutComponentTypeInPage) {
 }
 // ------------------修改组件 end -----------------------------//
 </script>
@@ -288,22 +294,36 @@ function deleteComponent(item: ILayoutComponentTypeInPage) {
             ${item.x}px,
             ${item.y}px,
           0)
-          scale(${item.scale})
         `,
         willChange: 'transform',
-        transformOrigin: 'left top',
       }"
     >
       <component
         :is="item.component"
         :id="`layout-component-${item.id}`"
         class="w-fit h-fit"
+        :style="{
+          transform: `
+            scale(${item.scale})
+            rotate(${item.rotate}deg)
+          `,
+          willChange: 'transform',
+          transformOrigin: 'bottom center',
+        }"
       />
 
-      <!-- 边界 -->
+      <!-- 边界，这个要和上面的 <component /> 保持一致 -->
       <div
-        v-if="appIsEditCleanHome"
+        v-if="appIsEditCleanHome && !item.isFixed "
         class="absolute top-0 left-0 w-full h-full pointer-events-none "
+        :style="{
+          transform: `
+            scale(${item.scale})
+            rotate(${item.rotate}deg)
+          `,
+          willChange: 'transform',
+          transformOrigin: 'bottom center',
+        }"
       >
         <span class="pointer-events-none select-none absolute inset-0 border-2 border-[#474d63] border-dashed opacity-100 ">
           <span class="absolute -left-0.5 -top-0.5 h-1.5 w-1.5 border border-[#5021ff] bg-[#5021ff] " />
@@ -317,16 +337,16 @@ function deleteComponent(item: ILayoutComponentTypeInPage) {
       <div
         v-if="appIsEditCleanHome"
         class="
-          absolute top-[-34px] left-0
+          absolute left-1/2 top-full -translate-x-1/2 translate-y-1/2
           cursor-pointer
           flex flex-row justify-center items-center
           rounded-10px
           bg-[#474d63]
-          w-fit h-30px overflow-hidden
+          w-fit h-30px
         "
       >
         <div
-          class=" w-1/2 h-full flex justify-center items-center px-8px hover:bg-#646c89 "
+          class="rounded-l-10px w-1/2 h-full flex justify-center items-center px-8px hover:bg-#646c89 "
           :title="item.isFixed ? '解锁' : '锁定'"
           @click="lockComponent(item)"
         >
@@ -334,13 +354,75 @@ function deleteComponent(item: ILayoutComponentTypeInPage) {
           <svg v-else class="w-20px h-20px " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M5 13a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 1 0-2 0m-3-5V6a4 4 0 0 1 8 0" /></g></svg>
         </div>
 
-        <div
+        <button
+          :class="item.isFixed ? 'text-gray cursor-not-allowed' : ''"
+          :disabled="item.isFixed"
           class=" w-full h-full flex justify-center items-center px-8px hover:bg-#646c89 "
           title="删除"
           @click="deleteComponent(item)"
         >
-          <svg class="w-20px h-20px " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16m-10 4v6m4-6v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" /></svg>
-        </div>
+          <svg class="w-20px h-20px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16m-10 4v6m4-6v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" /></svg>
+        </button>
+
+        <!-- <button
+          :class="item.isFixed ? 'text-gray cursor-not-allowed' : ''"
+          :disabled="item.isFixed"
+          class="dropdown select-none rounded-r-10px w-full h-full flex justify-center items-center px-8px hover:bg-#646c89 "
+          title="缩放"
+          @click="resizingComponent(item)"
+        >
+          <svg
+            class="w-20px h-20px "
+            tabindex="0"
+            role="button"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+          >
+            <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0-14 0m4 0h6m-3-3v6m11 8l-6-6" />
+          </svg>
+
+          <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+            <li><a>Item 1</a></li>
+            <li><a>Item 2</a></li>
+          </ul>
+        </button> -->
+
+        <button
+          :class="item.isFixed ? 'text-gray cursor-not-allowed' : ''"
+          :disabled="item.isFixed"
+          class=" select-none rounded-r-10px w-full h-full flex justify-center items-center px-8px hover:bg-#646c89 "
+          title="缩放"
+          @click="resizingComponent(item)"
+        >
+          <svg class="w-20px h-20px " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0-14 0m4 0h6m-3-3v6m11 8l-6-6" /></svg>
+
+          <CustomRange
+            v-model:value="item.scale"
+            class=" absolute top-46px left-0 w-200% h-28px transition-opacity duration-300 ease-in-out "
+            :min="0.3"
+            :max="4"
+            :step="0.1"
+          />
+        </button>
+
+        <button
+          v-show="false"
+          :class="item.isFixed ? 'text-gray cursor-not-allowed' : ''"
+          :disabled="item.isFixed"
+          class="w-full h-full flex justify-center items-center px-8px hover:bg-#646c89 "
+          title="旋转"
+          @click="rotateComponent(item)"
+        >
+          <svg class="w-20px h-20px " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M19.95 11a8 8 0 1 0-.5 4m.5 5v-5h-5" /><path d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0-2 0" /></g></svg>
+
+          <CustomRange
+            v-model:value="item.rotate"
+            class="absolute top-86px left-0 w-full h-full"
+            :min="0"
+            :max="360"
+            :step="1"
+          />
+        </button>
       </div>
     </div>
 
