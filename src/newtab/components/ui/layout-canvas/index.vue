@@ -298,8 +298,7 @@ function rotateComponent(_item: ILayoutComponentTypeInPage) {
         willChange: 'transform',
       }"
     >
-      <component
-        :is="item.component"
+      <div
         :id="`layout-component-${item.id}`"
         class="w-fit h-fit"
         :style="{
@@ -310,7 +309,13 @@ function rotateComponent(_item: ILayoutComponentTypeInPage) {
           willChange: 'transform',
           transformOrigin: 'bottom center',
         }"
-      />
+      >
+        <component
+          :is="item.component"
+          :id="`single-component-${item.id}`"
+          class="pointer-events-none"
+        />
+      </div>
 
       <!-- 边界，这个要和上面的 <component /> 保持一致 -->
       <div
