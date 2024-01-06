@@ -396,24 +396,6 @@ function rotateComponent(_item: ILayoutComponentTypeInPage) {
           </APopoverContent>
         </APopover>
 
-        <!-- <button
-          :class="item.isFixed ? 'text-gray cursor-not-allowed' : ''"
-          :disabled="item.isFixed"
-          class=" select-none rounded-r-10px w-full h-full flex justify-center items-center px-8px hover:bg-#646c89 "
-          title="缩放"
-          @click="resizingComponent(item)"
-        >
-          <svg class="w-20px h-20px " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0-14 0m4 0h6m-3-3v6m11 8l-6-6" /></svg>
-
-          <CustomRange
-            v-model:value="item.scale"
-            class=" absolute top-46px left-0 w-200% h-28px transition-opacity duration-300 ease-in-out "
-            :min="0.3"
-            :max="4"
-            :step="0.1"
-          />
-        </button> -->
-
         <button
           v-show="false"
           :class="item.isFixed ? 'text-gray cursor-not-allowed' : ''"

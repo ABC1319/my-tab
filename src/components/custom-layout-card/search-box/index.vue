@@ -35,7 +35,7 @@ function isOpenSearchEngineList() {
 
 <template>
   <div
-    class="search-box w-[676px] h-60px rounded-12px overflow-hidden flex items-center rounded-[30px] transition-colors duration-100 focus-within:bg-opacity-80 dark:focus-within:bg-opacity-70 "
+    class="search-box w-[676px]! h-60px! rounded-12px overflow-hidden flex items-center rounded-[30px] transition-colors duration-100 focus-within:bg-opacity-80 dark:focus-within:bg-opacity-70 "
   >
     <!-- icon -->
     <div
