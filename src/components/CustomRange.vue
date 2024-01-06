@@ -43,7 +43,7 @@ watch(value, (val) => {
 
     <input
       v-model="value"
-      class="w-36px h-full bg-[#474d63] rounded-10px text-16px outline-none text-center grid items-center"
+      class="w-36px h-full bg-[#474d63] text-white rounded-10px text-12px outline-none text-center grid items-center"
       type="number"
       :min="min"
       :max="max"
@@ -82,7 +82,7 @@ input[type='number'] {
 input[type='range'] {
   -webkit-appearance: none; /* 隐藏默认样式（Chrome 和 Safari）*/
   width: 100%; /* 设置宽度为100% */
-  height: 10px; /* 设置高度 */
+  height: 4px; /* 设置高度 */
   background-color: #e5e1da; /* 设置背景颜色 */
   border: none; /* 移除边框 */
   border-radius: 5px; /* 设置边框圆角 */
@@ -92,8 +92,8 @@ input[type='range'] {
 
 /* 滑块样式 */
 input[type='range']::-webkit-slider-thumb {
-  width: 14px;
-  height: 14px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background-color: #f6b17a;
   box-shadow:

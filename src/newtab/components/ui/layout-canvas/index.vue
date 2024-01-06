@@ -364,30 +364,34 @@ function rotateComponent(_item: ILayoutComponentTypeInPage) {
           <svg class="w-20px h-20px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16m-10 4v6m4-6v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" /></svg>
         </button>
 
-        <!-- <button
-          :class="item.isFixed ? 'text-gray cursor-not-allowed' : ''"
-          :disabled="item.isFixed"
-          class="dropdown select-none rounded-r-10px w-full h-full flex justify-center items-center px-8px hover:bg-#646c89 "
-          title="缩放"
-          @click="resizingComponent(item)"
-        >
-          <svg
-            class="w-20px h-20px "
-            tabindex="0"
-            role="button"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
+        <APopover>
+          <APopoverTrigger as-child>
+            <button
+              :class="item.isFixed ? 'text-gray cursor-not-allowed' : ''"
+              :disabled="item.isFixed"
+              class=" select-none rounded-r-10px w-full h-full flex justify-center items-center px-8px hover:bg-#646c89 "
+              title="缩放"
+              @click="resizingComponent(item)"
+            >
+              <svg class="w-20px h-20px " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0-14 0m4 0h6m-3-3v6m11 8l-6-6" /></svg>
+            </button>
+          </APopoverTrigger>
+          <APopoverContent
+            :side-offset="8"
+            align="center"
+            class="w-180px! h-24px z-1 border-0 !p-0 flex flex"
           >
-            <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0-14 0m4 0h6m-3-3v6m11 8l-6-6" />
-          </svg>
+            <CustomRange
+              v-model:value="item.scale"
+              class="w-full h-full "
+              :min="0.3"
+              :max="4"
+              :step="0.1"
+            />
+          </APopoverContent>
+        </APopover>
 
-          <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-            <li><a>Item 1</a></li>
-            <li><a>Item 2</a></li>
-          </ul>
-        </button> -->
-
-        <button
+        <!-- <button
           :class="item.isFixed ? 'text-gray cursor-not-allowed' : ''"
           :disabled="item.isFixed"
           class=" select-none rounded-r-10px w-full h-full flex justify-center items-center px-8px hover:bg-#646c89 "
@@ -403,7 +407,7 @@ function rotateComponent(_item: ILayoutComponentTypeInPage) {
             :max="4"
             :step="0.1"
           />
-        </button>
+        </button> -->
 
         <button
           v-show="false"
