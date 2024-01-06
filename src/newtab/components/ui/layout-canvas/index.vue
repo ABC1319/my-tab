@@ -313,7 +313,7 @@ function rotateComponent(_item: ILayoutComponentTypeInPage) {
         <component
           :is="item.component"
           :id="`single-component-${item.id}`"
-          class="pointer-events-none"
+          :class="appIsEditCleanHome ? 'pointer-events-none' : 'pointer-events-auto'"
         />
       </div>
 
