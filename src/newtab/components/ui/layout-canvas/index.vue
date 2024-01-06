@@ -40,7 +40,7 @@ watch(appIsEditCleanHome, async () => {
 const intervalID = setInterval(() => {
   if (appIsEditCleanHome.value)
     handleOnlySaveLayout()
-}, 1000 * 30)
+}, 1000 * 3)
 onUnmounted(() => {
   clearInterval(intervalID && intervalID)
 })
