@@ -1,7 +1,13 @@
-# Data
+# 参考组件库
 
-- storage
-- sidebar status
+> https://github.com/radix-vue/shadcn-vue
 
-- indexDB
-- site URL1. 数据在 indexDB 中存储，窗口的信息状态联动，是通过 Broadcast Channel()
+> https://github.com/jd-solanki/anu/
+
+TODO
+
+- 更换背景（侧边栏设置，右键设置）
+- 每个组件有自己自定义的设置
+- 自定义布局
+  - 规定格子大小，每个组件占用格子大小
+  - 随意位置布局
