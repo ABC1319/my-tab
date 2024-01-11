@@ -103,6 +103,32 @@
   }
 }
 
+/****** 组件库所用的 keyframes *******/
+@keyframes enter {
+  0% {
+    opacity: 0.95;
+    transform: translate3d(0, 0.5rem, 0) scale3d(0.95, 0.95, 1) rotate(0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1) rotate(0);
+  }
+}
+
+@keyframes out {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1) rotate(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, 0.5rem, 0) scale3d(0.95, 0.95, 1) rotate(0);
+  }
+}
+
+/****** 组件库所用的 keyframes *******/
+
 @keyframes scale-in-keyframes-from-left-top {
   0% {
     transform-origin: left top;

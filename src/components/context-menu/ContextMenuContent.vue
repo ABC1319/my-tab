@@ -19,17 +19,17 @@ const forwarded = useForwardPropsEmits(props, emits)
       class="
         z-50 bg-[#252835] text-white
         min-w-[8rem] overflow-hidden
-        rounded-md p-1 shadow-md
-        animate-in fade-in-80
+        rounded-10px shadow-md
+        py-6px px-4px
+        animate-in
 
         data-[state=open]:animate-in data-[state=closed]:animate-out
-        data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0
-        data-[state=open]:zoom-in-95 data-[state=closed]:zoom-out-95
 
-        data-[side=left]:scale-in-from-right-top
-        data-[side=right]:scale-in-from-left-top
-        data-[side=bottom]:scale-in-from-right-bottom
-        data-[side=top]:scale-in-from-right-top
+        data-[side=left]:mr-10px
+        data-[side=right]:ml-10px
+        data-[side=bottom]:mt-10px
+        data-[side=top]:mb-10px
+
       "
       :class="props.class"
       v-bind="forwarded"
