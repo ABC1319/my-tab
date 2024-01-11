@@ -4,6 +4,8 @@
 
 > https://github.com/jd-solanki/anu/
 
+使用的 icon 是 [Lucide](https://icones.netlify.app/collection/lucide)
+
 TODO
 
 - 更换背景（侧边栏设置，右键设置）

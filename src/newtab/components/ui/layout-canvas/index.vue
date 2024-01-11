@@ -267,81 +267,84 @@ function rotateComponent(_item: ILayoutComponentTypeInPage) {
 </script>
 
 <template>
-  <div
-    ref="layoutContainerRef"
-    class="
-      layout-container
-      w-full h-full
-      absolute top-0 left-0 overflow-hidden z-50
-      transition-all duration-300 ease-in-out
-      outline-10px outline-solid outline-[#474d63]
-      origin-[10%_50%]
-    "
-    :class="appIsEditCleanHome ? 'rounded-[10px]' : ''"
-    :style="{
-      transform: appIsEditCleanHome ? `scale(${layoutContainerScale})` : '',
-    }"
-    @drop="handleDrop"
-    @dragover="handleDragover"
-  >
-    <div
-      v-for="item in bentoCells"
-      :key="item.id"
-      :style="{
-        position: 'absolute',
-        transform: `
+  <ContextMenu>
+    <ContextMenuTrigger>
+      <div
+        ref="layoutContainerRef"
+        class="
+          layout-container
+          w-full h-full
+          absolute top-0 left-0 overflow-hidden z-50
+          transition-all duration-300 ease-in-out
+          outline-10px outline-solid outline-[#474d63]
+          origin-[10%_50%]
+        "
+        :class="appIsEditCleanHome ? 'rounded-[10px]' : ''"
+        :style="{
+          transform: appIsEditCleanHome ? `scale(${layoutContainerScale})` : '',
+        }"
+        @drop="handleDrop"
+        @dragover="handleDragover"
+      >
+        <div
+          v-for="item in bentoCells"
+          :key="item.id"
+          :style="{
+            position: 'absolute',
+            transform: `
           translate3d(
             ${item.x}px,
             ${item.y}px,
           0)
         `,
-        willChange: 'transform',
-      }"
-    >
-      <div
-        :id="`layout-component-${item.id}`"
-        class="w-fit h-fit"
-        :style="{
-          transform: `
+            willChange: 'transform',
+          }"
+          @contextmenu.stop
+        >
+          <div
+            :id="`layout-component-${item.id}`"
+            class="w-fit h-fit"
+            :style="{
+              transform: `
             scale(${item.scale})
             rotate(${item.rotate}deg)
           `,
-          willChange: 'transform',
-          transformOrigin: 'bottom center',
-        }"
-      >
-        <component
-          :is="item.component"
-          :id="`single-component-${item.id}`"
-          :class="appIsEditCleanHome ? 'pointer-events-none' : 'pointer-events-auto'"
-        />
-      </div>
+              willChange: 'transform',
+              transformOrigin: 'bottom center',
+            }"
+          >
+            <component
+              :is="item.component"
+              :id="`single-component-${item.id}`"
+              :class="appIsEditCleanHome ? 'pointer-events-none' : 'pointer-events-auto'"
+            />
+          </div>
 
-      <!-- 边界，这个要和上面的 <component /> 保持一致 -->
-      <div
-        v-if="appIsEditCleanHome && !item.isFixed "
-        class="absolute top-0 left-0 w-full h-full pointer-events-none "
-        :style="{
-          transform: `
+          <!-- 边界，这个要和上面的 <component /> 保持一致 -->
+          <div
+            v-if="appIsEditCleanHome && !item.isFixed "
+            class="absolute top-0 left-0 w-full h-full pointer-events-none "
+            :style="{
+              transform: `
             scale(${item.scale})
             rotate(${item.rotate}deg)
           `,
-          willChange: 'transform',
-          transformOrigin: 'bottom center',
-        }"
-      >
-        <span class="pointer-events-none select-none absolute inset-0 border-2 border-[#474d63] border-dashed opacity-100 ">
-          <span class="absolute -left-0.5 -top-0.5 h-1.5 w-1.5 border border-[#5021ff] bg-[#5021ff] " />
-          <span class="absolute -right-0.5 -top-0.5 h-1.5 w-1.5 border border-[#5021ff] bg-[#5021ff] " />
-          <span class="absolute -bottom-0.5 -left-0.5 h-1.5 w-1.5 border border-[#5021ff] bg-[#5021ff] " />
-          <span class="absolute -bottom-0.5 -right-0.5 h-1.5 w-1.5 select-none border border-[#5021ff] bg-[#5021ff] " />
-        </span>
-      </div>
+              willChange: 'transform',
+              transformOrigin: 'bottom center',
+            }"
+          >
+            <span class="pointer-events-none select-none absolute inset-0 border-2 border-[#474d63] border-dashed opacity-100 ">
+              <span class="absolute -left-0.5 -top-0.5 h-1.5 w-1.5 border border-[#5021ff] bg-[#5021ff] " />
+              <span class="absolute -right-0.5 -top-0.5 h-1.5 w-1.5 border border-[#5021ff] bg-[#5021ff] " />
+              <span class="absolute -bottom-0.5 -left-0.5 h-1.5 w-1.5 border border-[#5021ff] bg-[#5021ff] " />
+              <span class="absolute -bottom-0.5 -right-0.5 h-1.5 w-1.5 select-none border border-[#5021ff] bg-[#5021ff] " />
+            </span>
+          </div>
 
-      <!-- 操作按钮控制条 -->
-      <div
-        v-if="appIsEditCleanHome"
-        class="
+          <!-- 操作按钮控制条 -->
+          <div
+            v-if="appIsEditCleanHome"
+            class="
           absolute left-1/2 top-full -translate-x-1/2 translate-y-1/2
           cursor-pointer
           flex flex-row justify-center items-center
@@ -349,80 +352,80 @@ function rotateComponent(_item: ILayoutComponentTypeInPage) {
           bg-[#474d63]
           w-fit h-30px
         "
-      >
-        <div
-          class="rounded-l-10px w-1/2 h-full flex justify-center items-center px-8px hover:bg-#646c89 "
-          :title="item.isFixed ? '解锁' : '锁定'"
-          @click="lockComponent(item)"
-        >
-          <svg v-if="item.isFixed" class="w-20px h-20px " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M5 13a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0-2 0m-3-5V7a4 4 0 1 1 8 0v4" /></g></svg>
-          <svg v-else class="w-20px h-20px " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M5 13a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 1 0-2 0m-3-5V6a4 4 0 0 1 8 0" /></g></svg>
-        </div>
+          >
+            <div
+              class="rounded-l-10px w-1/2 h-full flex justify-center items-center px-8px hover:bg-#646c89 "
+              :title="item.isFixed ? '解锁' : '锁定'"
+              @click="lockComponent(item)"
+            >
+              <svg v-if="item.isFixed" class="w-20px h-20px " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M5 13a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0-2 0m-3-5V7a4 4 0 1 1 8 0v4" /></g></svg>
+              <svg v-else class="w-20px h-20px " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M5 13a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 1 0-2 0m-3-5V6a4 4 0 0 1 8 0" /></g></svg>
+            </div>
 
-        <button
-          :class="item.isFixed ? 'text-gray cursor-not-allowed' : ''"
-          :disabled="item.isFixed"
-          class=" w-full h-full flex justify-center items-center px-8px hover:bg-#646c89 "
-          title="删除"
-          @click="deleteComponent(item)"
-        >
-          <svg class="w-20px h-20px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16m-10 4v6m4-6v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" /></svg>
-        </button>
-
-        <APopover>
-          <APopoverTrigger as-child>
             <button
               :class="item.isFixed ? 'text-gray cursor-not-allowed' : ''"
               :disabled="item.isFixed"
-              class=" select-none rounded-r-10px w-full h-full flex justify-center items-center px-8px hover:bg-#646c89 "
-              title="缩放"
-              @click="resizingComponent(item)"
+              class=" w-full h-full flex justify-center items-center px-8px hover:bg-#646c89 "
+              title="删除"
+              @click="deleteComponent(item)"
             >
-              <svg class="w-20px h-20px " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0-14 0m4 0h6m-3-3v6m11 8l-6-6" /></svg>
+              <svg class="w-20px h-20px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16m-10 4v6m4-6v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" /></svg>
             </button>
-          </APopoverTrigger>
-          <APopoverContent
-            :side-offset="8"
-            align="center"
-            class="w-180px! h-24px z-1 border-0 !p-0 flex flex"
-          >
-            <CustomRange
-              v-model:value="item.scale"
-              class="w-full h-full "
-              :min="0.3"
-              :max="4"
-              :step="0.1"
-            />
-          </APopoverContent>
-        </APopover>
 
-        <button
-          v-show="false"
-          :class="item.isFixed ? 'text-gray cursor-not-allowed' : ''"
-          :disabled="item.isFixed"
-          class="w-full h-full flex justify-center items-center px-8px hover:bg-#646c89 "
-          title="旋转"
-          @click="rotateComponent(item)"
-        >
-          <svg class="w-20px h-20px " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M19.95 11a8 8 0 1 0-.5 4m.5 5v-5h-5" /><path d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0-2 0" /></g></svg>
+            <APopover>
+              <APopoverTrigger as-child>
+                <button
+                  :class="item.isFixed ? 'text-gray cursor-not-allowed' : ''"
+                  :disabled="item.isFixed"
+                  class=" select-none rounded-r-10px w-full h-full flex justify-center items-center px-8px hover:bg-#646c89 "
+                  title="缩放"
+                  @click="resizingComponent(item)"
+                >
+                  <svg class="w-20px h-20px " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0-14 0m4 0h6m-3-3v6m11 8l-6-6" /></svg>
+                </button>
+              </APopoverTrigger>
+              <APopoverContent
+                :side-offset="8"
+                align="center"
+                class="w-180px! h-24px z-1 border-0 !p-0 flex flex"
+              >
+                <CustomRange
+                  v-model:value="item.scale"
+                  class="w-full h-full "
+                  :min="0.3"
+                  :max="4"
+                  :step="0.1"
+                />
+              </APopoverContent>
+            </APopover>
 
-          <CustomRange
-            v-model:value="item.rotate"
-            class="absolute top-86px left-0 w-full h-full"
-            :min="0"
-            :max="360"
-            :step="1"
-          />
-        </button>
-      </div>
-    </div>
+            <button
+              v-show="false"
+              :class="item.isFixed ? 'text-gray cursor-not-allowed' : ''"
+              :disabled="item.isFixed"
+              class="w-full h-full flex justify-center items-center px-8px hover:bg-#646c89 "
+              title="旋转"
+              @click="rotateComponent(item)"
+            >
+              <svg class="w-20px h-20px " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M19.95 11a8 8 0 1 0-.5 4m.5 5v-5h-5" /><path d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0-2 0" /></g></svg>
 
-    <!-- 编辑模式 -->
-    <Teleport to="body">
-      <button
-        title="编辑模式"
-        draggable="false"
-        class="
+              <CustomRange
+                v-model:value="item.rotate"
+                class="absolute top-86px left-0 w-full h-full"
+                :min="0"
+                :max="360"
+                :step="1"
+              />
+            </button>
+          </div>
+        </div>
+
+        <!-- 编辑模式 -->
+        <Teleport to="body" @contextmenu.stop>
+          <button
+            title="编辑模式"
+            draggable="false"
+            class="
           fixed bottom-2 right-50px z-99
           h-32px w-32px p-0 min-w-32px
           rounded-full bg-[#25283590]
@@ -430,37 +433,70 @@ function rotateComponent(_item: ILayoutComponentTypeInPage) {
           cursor-pointer
           text-[#ffffff90]
         "
-        @click="handleSwitchCleanHomeMode(!appIsEditCleanHome)"
-      >
-        <svg class="w-14px h-14px rounded-full hover:scale-110" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-          <path fill="currentColor" fill-rule="evenodd" d="M11.943 1.25H13.5a.75.75 0 0 1 0 1.5H12c-2.378 0-4.086.002-5.386.176c-1.279.172-2.05.5-2.62 1.069c-.569.57-.896 1.34-1.068 2.619c-.174 1.3-.176 3.008-.176 5.386s.002 4.086.176 5.386c.172 1.279.5 2.05 1.069 2.62c.57.569 1.34.896 2.619 1.068c1.3.174 3.008.176 5.386.176s4.086-.002 5.386-.176c1.279-.172 2.05-.5 2.62-1.069c.569-.57.896-1.34 1.068-2.619c.174-1.3.176-3.008.176-5.386v-1.5a.75.75 0 0 1 1.5 0v1.557c0 2.309 0 4.118-.19 5.53c-.194 1.444-.6 2.584-1.494 3.479c-.895.895-2.035 1.3-3.48 1.494c-1.411.19-3.22.19-5.529.19h-.114c-2.309 0-4.118 0-5.53-.19c-1.444-.194-2.584-.6-3.479-1.494c-.895-.895-1.3-2.035-1.494-3.48c-.19-1.411-.19-3.22-.19-5.529v-.114c0-2.309 0-4.118.19-5.53c.194-1.444.6-2.584 1.494-3.479c.895-.895 2.035-1.3 3.48-1.494c1.411-.19 3.22-.19 5.529-.19m4.827 1.026a3.503 3.503 0 0 1 4.954 4.953l-6.648 6.649c-.371.37-.604.604-.863.806a5.34 5.34 0 0 1-.987.61c-.297.141-.61.245-1.107.411l-2.905.968a1.492 1.492 0 0 1-1.887-1.887l.968-2.905c.166-.498.27-.81.411-1.107c.167-.35.372-.68.61-.987c.202-.26.435-.492.806-.863zm3.893 1.06a2.003 2.003 0 0 0-2.832 0l-.376.377c.022.096.054.21.098.338c.143.413.415.957.927 1.469a3.875 3.875 0 0 0 1.807 1.025l.376-.376a2.003 2.003 0 0 0 0-2.832m-1.558 4.391a5.397 5.397 0 0 1-1.686-1.146a5.395 5.395 0 0 1-1.146-1.686L11.218 9.95c-.417.417-.58.582-.72.76a3.84 3.84 0 0 0-.437.71c-.098.203-.172.423-.359.982l-.431 1.295l1.032 1.033l1.295-.432c.56-.187.779-.261.983-.358c.251-.12.49-.267.71-.439c.177-.139.342-.302.759-.718z" clip-rule="evenodd" />
-        </svg>
-      </button>
-    </Teleport>
+            @click="handleSwitchCleanHomeMode(!appIsEditCleanHome)"
+          >
+            <svg class="w-14px h-14px rounded-full hover:scale-110" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path fill="currentColor" fill-rule="evenodd" d="M11.943 1.25H13.5a.75.75 0 0 1 0 1.5H12c-2.378 0-4.086.002-5.386.176c-1.279.172-2.05.5-2.62 1.069c-.569.57-.896 1.34-1.068 2.619c-.174 1.3-.176 3.008-.176 5.386s.002 4.086.176 5.386c.172 1.279.5 2.05 1.069 2.62c.57.569 1.34.896 2.619 1.068c1.3.174 3.008.176 5.386.176s4.086-.002 5.386-.176c1.279-.172 2.05-.5 2.62-1.069c.569-.57.896-1.34 1.068-2.619c.174-1.3.176-3.008.176-5.386v-1.5a.75.75 0 0 1 1.5 0v1.557c0 2.309 0 4.118-.19 5.53c-.194 1.444-.6 2.584-1.494 3.479c-.895.895-2.035 1.3-3.48 1.494c-1.411.19-3.22.19-5.529.19h-.114c-2.309 0-4.118 0-5.53-.19c-1.444-.194-2.584-.6-3.479-1.494c-.895-.895-1.3-2.035-1.494-3.48c-.19-1.411-.19-3.22-.19-5.529v-.114c0-2.309 0-4.118.19-5.53c.194-1.444.6-2.584 1.494-3.479c.895-.895 2.035-1.3 3.48-1.494c1.411-.19 3.22-.19 5.529-.19m4.827 1.026a3.503 3.503 0 0 1 4.954 4.953l-6.648 6.649c-.371.37-.604.604-.863.806a5.34 5.34 0 0 1-.987.61c-.297.141-.61.245-1.107.411l-2.905.968a1.492 1.492 0 0 1-1.887-1.887l.968-2.905c.166-.498.27-.81.411-1.107c.167-.35.372-.68.61-.987c.202-.26.435-.492.806-.863zm3.893 1.06a2.003 2.003 0 0 0-2.832 0l-.376.377c.022.096.054.21.098.338c.143.413.415.957.927 1.469a3.875 3.875 0 0 0 1.807 1.025l.376-.376a2.003 2.003 0 0 0 0-2.832m-1.558 4.391a5.397 5.397 0 0 1-1.686-1.146a5.395 5.395 0 0 1-1.146-1.686L11.218 9.95c-.417.417-.58.582-.72.76a3.84 3.84 0 0 0-.437.71c-.098.203-.172.423-.359.982l-.431 1.295l1.032 1.033l1.295-.432c.56-.187.779-.261.983-.358c.251-.12.49-.267.71-.439c.177-.139.342-.302.759-.718z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        </Teleport>
 
-    <!-- 缩略图 -->
-    <Transition
-      name="scale"
-      @after-leave="$emit('destroy')"
-    >
-      <div v-if="false" class="absolute bottom-5px left-0 w-172px h-140px bg-[#252835] rounded-10px p-10px ">
-        <div class="w-full h-full bg-[#484e64] grid place-items-center rounded-5px cursor-default">
-          缩略图
-        </div>
+        <!-- 缩略图 -->
+        <Transition
+          name="scale"
+          @after-leave="$emit('destroy')"
+          @contextmenu.stop
+        >
+          <div v-if="false" class="absolute bottom-5px left-0 w-172px h-140px bg-[#252835] rounded-10px p-10px ">
+            <div class="w-full h-full bg-[#484e64] grid place-items-center rounded-5px cursor-default">
+              缩略图
+            </div>
+          </div>
+        </Transition>
+
+        <!-- 坐标系刻度尺 -->
+        <Transition
+          name="blur"
+          @after-leave="$emit('destroy')"
+          @contextmenu.stop
+        >
+          <Ruler
+            v-if="appIsEditCleanHome"
+            :layout-container-scale="layoutContainerScale"
+          />
+        </Transition>
       </div>
-    </Transition>
+    </ContextMenuTrigger>
+    <ContextMenuContent>
+      <ContextMenuItem class="gap-10px">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="8" cy="9" r="2" /><path d="m9 17l6.1-6.1a2 2 0 0 1 2.81.01L22 15V5a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2M8 21h8m-4-4v4" /></g></svg>
+        <span>
+          更改墙纸
+        </span>
+      </ContextMenuItem>
 
-    <!-- 坐标系刻度尺 -->
-    <Transition
-      name="blur"
-      @after-leave="$emit('destroy')"
-    >
-      <Ruler
-        v-if="appIsEditCleanHome"
-        :layout-container-scale="layoutContainerScale"
-      />
-    </Transition>
-  </div>
+      <ContextMenuSeparator class="h-[1px] bg-[#bcbbc130] m-[5px]" />
+
+      <ContextMenuItem class="gap-10px">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9a9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5m4-1v5l4 2" /></g></svg>
+        <span>
+          历史记录
+        </span>
+      </ContextMenuItem>
+      <ContextMenuItem class="gap-10px">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5l5 5l5-5m-5 5V3" /></svg>
+        <span>
+          下载
+        </span>
+      </ContextMenuItem>
+      <ContextMenuItem class="gap-10px">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M20 7h-9m3 10H5" /><circle cx="17" cy="17" r="3" /><circle cx="7" cy="7" r="3" /></g></svg>
+        <span>
+          设置
+        </span>
+      </ContextMenuItem>
+    </ContextMenuContent>
+  </ContextMenu>
 
   <!-- 右侧布局组件列表 -->
   <Transition
