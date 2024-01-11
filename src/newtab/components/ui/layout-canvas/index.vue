@@ -15,6 +15,7 @@ const bentoCells = ref<ILayoutComponentTypeInPage[]>([])
 const layoutContainerRef = ref()
 const currentClickedElement: Ref<ILayoutComponentTypeInData | null> = ref(null)
 const disabledDraggable = ref(!appIsEditCleanHome.value)
+const isShowWallpaperPanel = ref(false)
 
 /**
  * 全部逻辑：
@@ -264,11 +265,20 @@ function resizingComponent(_item: ILayoutComponentTypeInPage) {
 function rotateComponent(_item: ILayoutComponentTypeInPage) {
 }
 // ------------------修改组件 end -----------------------------//
+
+// ------------------更改墙纸 start -----------------------------//
+function handleOpenWallpaperPanel() {
+  isShowWallpaperPanel.value = true
+}
+function handleCloseWallpaperPanel() {
+  isShowWallpaperPanel.value = false
+}
+// ------------------更改墙纸 end -------------------------------//
 </script>
 
 <template>
   <ContextMenu>
-    <ContextMenuTrigger>
+    <ContextMenuTrigger :disabled="appIsEditCleanHome">
       <div
         ref="layoutContainerRef"
         class="
@@ -468,7 +478,7 @@ function rotateComponent(_item: ILayoutComponentTypeInPage) {
       </div>
     </ContextMenuTrigger>
     <ContextMenuContent>
-      <ContextMenuItem class="gap-10px">
+      <ContextMenuItem class="gap-10px" @click="handleOpenWallpaperPanel">
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="8" cy="9" r="2" /><path d="m9 17l6.1-6.1a2 2 0 0 1 2.81.01L22 15V5a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2M8 21h8m-4-4v4" /></g></svg>
         <span>
           更改墙纸
@@ -507,6 +517,17 @@ function rotateComponent(_item: ILayoutComponentTypeInPage) {
       v-if="appIsEditCleanHome"
       @save="handleSaveLayoutAndClose"
       @cancel="handleCancelLayout"
+    />
+  </Transition>
+
+  <!-- 右侧壁纸组件 -->
+  <Transition
+    name="slide-x"
+    @after-leave="$emit('destroy')"
+  >
+    <WallpaperPanel
+      v-if="isShowWallpaperPanel"
+      @close="handleCloseWallpaperPanel"
     />
   </Transition>
 </template>
