@@ -12,6 +12,12 @@ export const appHomeShowMode = useStorageLocal('appHomeShowMode', 1) as Ref<IApp
 export const appSearchEngine = useStorageLocal('appSearchEngine', searchEngine[0]) as Ref<ISearchEngine>
 export const appIsEditCleanHome = useStorageLocal('appIsEditCleanHome', false) as Ref<IAppStatus['appIsEditCleanHome']>
 
+export const appBackgroundImage = useStorageLocal('appBackgroundImage', {
+  url: '/assets/app-background-images/main_1.png',
+  blur: 0,
+  mask: 0,
+}) as Ref<IAppStatus['appBackgroundImage']>
+
 export const storageWebsiteDB = useStorageIndexDB('website_db', '++id, webName, url, icon, type, index, remark')
 export const storageSearchEngineDB = useStorageIndexDB('search_engine_db', '++id, webName, url, icon, type, index, remark')
 export const storageLayoutComponentsDB = useStorageIndexDB('layout_components_db', '++id, layoutName, componentName, x, y, width, height, isFixed, scale, rotate, remark')

@@ -3,6 +3,11 @@ export interface IAppStatus {
   appSidebarMode: 'shrink' | 'grow'
   isShrinkSidebar: boolean
   appIsEditCleanHome: boolean
+  appBackgroundImage: {
+    url: string
+    blur: number
+    mask: number
+  }
 }
 
 export interface ISearchEngine {

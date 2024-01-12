@@ -534,7 +534,7 @@ function handleCloseWallpaperPanel() {
 
 <style scoped>
 .layout-container {
-  background-image: url(/assets/main_resource.png);
+  background-image: url(/assets/app-background-images/main_1.png);
   background-size: cover;
   background-position: center;
 }

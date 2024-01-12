@@ -11,6 +11,14 @@ const targetRef = ref<HTMLElement | null>(null)
 onClickOutside(targetRef, () => {
   emit('close')
 })
+
+/**
+ * 总有一个设置：图片地址 遮罩浓度 模糊度
+ * 当前组件有三个变量： 默认图片 6 张 ，自定义上传图片最大 6 张，遮罩浓度和模糊度
+ */
+const defaultBackgrounds = Array(6).fill(0).map((_item, index) => `/assets/app-background-images/main_${index + 1}.png`)
+// eslint-disable-next-line no-console
+console.log(defaultBackgrounds)
 </script>
 
 <template>
@@ -45,16 +53,17 @@ onClickOutside(targetRef, () => {
         </div>
         <div class="grid grid-rows-2 grid-cols-3 gap-20px">
           <div
-            v-for="item in 2"
+            v-for="item in defaultBackgrounds"
             :key="item"
             class="
               w-100px h-80px
               bg-[#ffffff1a]
-              rounded-10px object-contain
+              rounded-10px
               flex items-center justify-center
               group
             "
           >
+            <img class="w-full h-full object-contain" :src="item" alt="">
             <!-- 选中按钮 -->
             <div class="group-hover-opacity-100 grid place-items-center w-24px h-24px bg-[#ffffff1a] rounded-full opacity-0 transition-opacity duration-100 ease-in-out">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 6L9 17l-5-5" /></svg>
