@@ -280,7 +280,6 @@ function rotateComponent(_item: ILayoutComponentTypeInPage) {
 //     dom.style.transitionDuration = '300ms'
 //   })
 // })
-const wallpaperPanelRef = ref<typeof import('~/components/WallpaperPanel.vue').default | null>(null)
 const currentWallpaper = ref<string>('')
 
 watch(() => appWallPaper.value.wallpaperId, async () => {
@@ -599,7 +598,6 @@ function handleCloseWallpaperPanel() {
   >
     <WallpaperPanel
       v-show="isShowWallpaperPanel"
-      ref="wallpaperPanelRef"
       @close="handleCloseWallpaperPanel"
     />
   </Transition>
