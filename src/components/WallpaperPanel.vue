@@ -226,6 +226,7 @@ function handleSetWallpaper(item: typeof defaultWallpapers[number] | typeof cust
           模糊度
         </div>
         <CustomRange
+          v-model:value="appWallPaper.blur"
           class="w-full h-30px"
           :min="0"
           :max="40"
