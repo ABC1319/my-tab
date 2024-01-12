@@ -267,6 +267,16 @@ function rotateComponent(_item: ILayoutComponentTypeInPage) {
 // ------------------修改组件 end -----------------------------//
 
 // ------------------更改墙纸 start -----------------------------//
+onMounted(() => {
+  // 因为这里需从 indexDB 中查询，然后 filter ，会慢一步。
+  // 避免从默认墙纸到实际当前墙纸的闪烁，这里不添加 duration 。等第一次加载好后，再次添加
+  setTimeout(() => {
+    const dom = document.querySelector('.layout-container') as HTMLElement
+    dom.style.transitionProperty = 'all'
+    dom.style.transitionTimingFunction = 'cubic-bezier(0.4, 0, 0.2, 1)'
+    dom.style.transitionDuration = '300ms'
+  })
+})
 const wallpaperPanelRef = ref<typeof import('~/components/WallpaperPanel.vue').default | null>(null)
 const currentWallpaper = ref<string>('')
 watchEffect(() => {
@@ -306,7 +316,7 @@ function handleCloseWallpaperPanel() {
           layout-container
           w-full h-full
           absolute top-0 left-0 overflow-hidden z-50
-          transition-all duration-300 ease-in-out
+
           outline-10px outline-solid outline-[#474d63]
           origin-[10%_50%]
         "
@@ -458,13 +468,13 @@ function handleCloseWallpaperPanel() {
             title="编辑模式"
             draggable="false"
             class="
-          fixed bottom-2 right-50px z-99
-          h-32px w-32px p-0 min-w-32px
-          rounded-full bg-[#25283590]
-          grid place-items-center
-          cursor-pointer
-          text-[#ffffff90]
-        "
+              fixed bottom-2 right-50px z-99
+              h-32px w-32px p-0 min-w-32px
+              rounded-full bg-[#25283590]
+              grid place-items-center
+              cursor-pointer
+              text-[#ffffff90]
+            "
             @click="handleSwitchCleanHomeMode(!appIsEditCleanHome)"
           >
             <svg class="w-14px h-14px rounded-full hover:scale-110" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
