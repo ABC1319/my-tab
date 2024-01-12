@@ -278,7 +278,7 @@ function handleCloseWallpaperPanel() {
 
 <template>
   <ContextMenu>
-    <ContextMenuTrigger :disabled="appIsEditCleanHome">
+    <ContextMenuTrigger :disabled="appIsEditCleanHome || isShowWallpaperPanel">
       <div
         ref="layoutContainerRef"
         class="
@@ -526,7 +526,7 @@ function handleCloseWallpaperPanel() {
     @after-leave="$emit('destroy')"
   >
     <WallpaperPanel
-      v-if="isShowWallpaperPanel"
+      v-show="isShowWallpaperPanel"
       @close="handleCloseWallpaperPanel"
     />
   </Transition>
