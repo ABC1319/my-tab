@@ -2,6 +2,7 @@
 import { onClickOutside } from '@vueuse/core'
 import { appWallPaper } from '~/logic'
 import { addCustomWallPaper, deleteCustomWallPaper, getAllCustomWallPaper } from '~/logic/customWallpaperData'
+import { renderBlobToImage } from '~/utils/wallpaper'
 
 const emit = defineEmits(['close'])
 
@@ -37,6 +38,11 @@ interface ICustomWallpaper {
   renderImage: string
 }
 const customWallpapers = ref<ICustomWallpaper[]>([])
+
+defineExpose({
+  defaultWallpapers,
+  customWallpapers,
+})
 
 /**
  * 1. 触发添加自定义墙纸
@@ -91,7 +97,7 @@ function handleDeleteWallpaper(item: typeof customWallpapers.value[number]) {
   deleteCustomWallPaper(item.id)
 
   // 如果删除的是当前应用的，那么删除成功后，使用默认第一个为墙纸
-  if (item.id === appWallPaper.value.wallpaper.id)
+  if (item.id === appWallPaper.value.wallpaperId)
     handleSetWallpaper(defaultWallpapers.value[0])
 
   getAllCustomWallPaperFromDB()
@@ -101,22 +107,7 @@ function handleDeleteWallpaper(item: typeof customWallpapers.value[number]) {
  * 5. 设置墙纸
  */
 function handleSetWallpaper(item: typeof defaultWallpapers.value[number] | typeof customWallpapers.value[number]) {
-  appWallPaper.value.wallpaper = item
-}
-
-/**
- * 将 blob 转成图片
- * @param file
- */
-function renderBlobToImage(file: Blob) {
-  return new Promise((resolve) => {
-    const reader = new FileReader()
-    reader.readAsDataURL(file)
-    reader.onload = async function () {
-      const iconUrl = URL.createObjectURL(file)
-      resolve(iconUrl)
-    }
-  })
+  appWallPaper.value.wallpaperId = item.id
 }
 </script>
 
@@ -166,9 +157,9 @@ function renderBlobToImage(file: Blob) {
             "
             @click="handleSetWallpaper(item)"
           >
-            <img class="w-full h-full rounded-10px" :src="item.image" alt="">
+            <img class="w-full h-full rounded-10px object-cover" :src="item.image" alt="">
             <!-- 选中按钮 -->
-            <div v-if="appWallPaper.wallpaper.id === item.id" class="absolute top-1/2 left-1/2 -translate-1/2 grid place-items-center w-24px h-24px bg-[#ffffffa1] text-black rounded-full transition-opacity duration-100 ease-in-out">
+            <div v-if="appWallPaper.wallpaperId === item.id" class="absolute top-1/2 left-1/2 -translate-1/2 grid place-items-center w-24px h-24px bg-[#ffffffa1] text-black rounded-full transition-opacity duration-100 ease-in-out">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 6L9 17l-5-5" /></svg>
             </div>
           </div>
@@ -197,10 +188,10 @@ function renderBlobToImage(file: Blob) {
             "
             @click="handleSetWallpaper(item)"
           >
-            <img class="w-full h-full rounded-10px" :src="item.renderImage" alt="">
+            <img class="w-full h-full rounded-10px object-cover" :src="item.renderImage" alt="">
 
             <!-- 选中按钮 -->
-            <div v-if="appWallPaper.wallpaper.id === item.id" class="absolute top-1/2 left-1/2 -translate-1/2 grid place-items-center w-24px h-24px bg-[#ffffffa1] text-black rounded-full transition-opacity duration-100 ease-in-out">
+            <div v-if="appWallPaper.wallpaperId === item.id" class="absolute top-1/2 left-1/2 -translate-1/2 grid place-items-center w-24px h-24px bg-[#ffffffa1] text-black rounded-full transition-opacity duration-100 ease-in-out">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 6L9 17l-5-5" /></svg>
             </div>
 

@@ -4,10 +4,7 @@ export interface IAppStatus {
   isShrinkSidebar: boolean
   appIsEditCleanHome: boolean
   appWallpaper: {
-    wallpaper: {
-      id: string | number
-      image: string | Blob
-    }
+    wallpaperId: string | number
     blur: number
     mask: number
   }

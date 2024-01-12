@@ -4,7 +4,7 @@ import { useWindowSize } from '@vueuse/core'
 import { initGridContainer } from './draggable'
 import CustomLayoutComponentsList from './CustomLayoutComponentsList.vue'
 import Ruler from './Ruler.vue'
-import { appHomeShowMode, appIsEditCleanHome } from '~/logic/storage'
+import { appHomeShowMode, appIsEditCleanHome, appWallPaper } from '~/logic/storage'
 import { getAllCustomLayoutComponentsRaw } from '~/utils/layout-components'
 import type { ILayoutComponentTypeInData, ILayoutComponentTypeInPage } from '~/typings/layout'
 import { deleteLayoutComponents, editLayoutComponents, getComponentsById } from '~/logic/layoutComponentsData'
@@ -267,6 +267,27 @@ function rotateComponent(_item: ILayoutComponentTypeInPage) {
 // ------------------修改组件 end -----------------------------//
 
 // ------------------更改墙纸 start -----------------------------//
+const wallpaperPanelRef = ref<typeof import('~/components/WallpaperPanel.vue').default | null>(null)
+const currentWallpaper = ref<string>('')
+watchEffect(() => {
+  if (!appWallPaper.value) {
+    appWallPaper.value = { wallpaperId: 'default-1', blur: 0, mask: 0 }
+    return
+  }
+  if (!wallpaperPanelRef.value)
+    return
+  if (typeof appWallPaper.value.wallpaperId === 'string') {
+    // 默认
+    const wallpaper = wallpaperPanelRef.value.defaultWallpapers?.find((item: any) => item.id === appWallPaper.value.wallpaperId)
+    currentWallpaper.value = wallpaper.image
+  }
+  if (typeof appWallPaper.value.wallpaperId === 'number') {
+    // 自定义墙纸
+    const wallpaper = wallpaperPanelRef.value.customWallpapers?.find((item: any) => item.id === appWallPaper.value.wallpaperId)
+    currentWallpaper.value = wallpaper.renderImage
+  }
+})
+
 function handleOpenWallpaperPanel() {
   isShowWallpaperPanel.value = true
 }
@@ -292,6 +313,7 @@ function handleCloseWallpaperPanel() {
         :class="appIsEditCleanHome ? 'rounded-[10px]' : ''"
         :style="{
           transform: appIsEditCleanHome ? `scale(${layoutContainerScale})` : '',
+          backgroundImage: `url(${currentWallpaper || '/assets/app-background-images/main_1.png'}  )`,
         }"
         @drop="handleDrop"
         @dragover="handleDragover"
@@ -527,6 +549,7 @@ function handleCloseWallpaperPanel() {
   >
     <WallpaperPanel
       v-show="isShowWallpaperPanel"
+      ref="wallpaperPanelRef"
       @close="handleCloseWallpaperPanel"
     />
   </Transition>
@@ -534,7 +557,7 @@ function handleCloseWallpaperPanel() {
 
 <style scoped>
 .layout-container {
-  background-image: url(/assets/app-background-images/main_1.png);
+  /* background-image: url(/assets/app-background-images/main_1.png); */
   background-size: cover;
   background-position: center;
 }
