@@ -2,6 +2,7 @@
 import { onClickOutside } from '@vueuse/core'
 import { appWallPaper } from '~/logic'
 import { addCustomWallPaper, deleteCustomWallPaper, getAllCustomWallPaper } from '~/logic/customWallpaperData'
+import { defaultWallpapers } from '~/params/wallpaper'
 import { renderBlobToImage } from '~/utils/wallpaper'
 
 const emit = defineEmits(['close'])
@@ -25,24 +26,12 @@ onClickOutside(targetRef, () => {
 
 const wallpaperInputRef = ref<HTMLInputElement | null>(null)
 
-const defaultWallpapers = ref(Array(6).fill(0).map((_item, index) => {
-  return {
-    id: `default-${index}`,
-    image: `/assets/app-background-images/main_${index + 1}.png`,
-  }
-}))
-
 interface ICustomWallpaper {
   id: number
   image: Blob
   renderImage: string
 }
 const customWallpapers = ref<ICustomWallpaper[]>([])
-
-defineExpose({
-  defaultWallpapers,
-  customWallpapers,
-})
 
 /**
  * 1. 触发添加自定义墙纸
@@ -98,7 +87,7 @@ function handleDeleteWallpaper(item: typeof customWallpapers.value[number]) {
 
   // 如果删除的是当前应用的，那么删除成功后，使用默认第一个为墙纸
   if (item.id === appWallPaper.value.wallpaperId)
-    handleSetWallpaper(defaultWallpapers.value[0])
+    handleSetWallpaper(defaultWallpapers[0])
 
   getAllCustomWallPaperFromDB()
 }
@@ -106,7 +95,7 @@ function handleDeleteWallpaper(item: typeof customWallpapers.value[number]) {
 /**
  * 5. 设置墙纸
  */
-function handleSetWallpaper(item: typeof defaultWallpapers.value[number] | typeof customWallpapers.value[number]) {
+function handleSetWallpaper(item: typeof defaultWallpapers[number] | typeof customWallpapers.value[number]) {
   appWallPaper.value.wallpaperId = item.id
 }
 </script>
@@ -236,10 +225,11 @@ function handleSetWallpaper(item: typeof defaultWallpapers.value[number] | typeo
           模糊度
         </div>
         <CustomRange
+          v-model:value="appWallPaper.blur"
           class="w-full h-30px"
-          :min="0.3"
-          :max="4"
-          :step="0.1"
+          :min="0"
+          :max="40"
+          :step="0.5"
         />
       </div>
     </div>

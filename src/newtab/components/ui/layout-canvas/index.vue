@@ -8,6 +8,9 @@ import { appHomeShowMode, appIsEditCleanHome, appWallPaper } from '~/logic/stora
 import { getAllCustomLayoutComponentsRaw } from '~/utils/layout-components'
 import type { ILayoutComponentTypeInData, ILayoutComponentTypeInPage } from '~/typings/layout'
 import { deleteLayoutComponents, editLayoutComponents, getComponentsById } from '~/logic/layoutComponentsData'
+import { defaultWallpapers } from '~/params/wallpaper'
+import { getAllCustomWallPaper } from '~/logic/customWallpaperData'
+import { renderBlobToImage } from '~/utils/wallpaper'
 
 const customLayoutAllComponents = await getAllCustomLayoutComponentsRaw()
 
@@ -267,36 +270,63 @@ function rotateComponent(_item: ILayoutComponentTypeInPage) {
 // ------------------修改组件 end -----------------------------//
 
 // ------------------更改墙纸 start -----------------------------//
-onMounted(() => {
-  // 因为这里需从 indexDB 中查询，然后 filter ，会慢一步。
-  // 避免从默认墙纸到实际当前墙纸的闪烁，这里不添加 duration 。等第一次加载好后，再次添加
-  setTimeout(() => {
-    const dom = document.querySelector('.layout-container') as HTMLElement
-    dom.style.transitionProperty = 'all'
-    dom.style.transitionTimingFunction = 'cubic-bezier(0.4, 0, 0.2, 1)'
-    dom.style.transitionDuration = '300ms'
-  })
-})
+// onMounted(() => {
+//   // 因为这里需从 indexDB 中查询，然后 filter ，会慢一步。
+//   // 避免从默认墙纸到实际当前墙纸的闪烁，这里不添加 duration 。等第一次加载好后，再次添加
+//   setTimeout(() => {
+//     const dom = document.querySelector('.background-wallpaper') as HTMLElement
+//     dom.style.transitionProperty = 'all'
+//     dom.style.transitionTimingFunction = 'cubic-bezier(0.4, 0, 0.2, 1)'
+//     dom.style.transitionDuration = '300ms'
+//   })
+// })
 const wallpaperPanelRef = ref<typeof import('~/components/WallpaperPanel.vue').default | null>(null)
 const currentWallpaper = ref<string>('')
-watchEffect(() => {
+
+watch(() => appWallPaper.value.wallpaperId, async () => {
   if (!appWallPaper.value) {
     appWallPaper.value = { wallpaperId: 'default-1', blur: 0, mask: 0 }
     return
   }
-  if (!wallpaperPanelRef.value)
-    return
+  const wallpapers = await getAllWallpaper()
   if (typeof appWallPaper.value.wallpaperId === 'string') {
     // 默认
-    const wallpaper = wallpaperPanelRef.value.defaultWallpapers?.find((item: any) => item.id === appWallPaper.value.wallpaperId)
-    currentWallpaper.value = wallpaper.image
+    const wallpaper = wallpapers.default?.find((item: any) => item.id === appWallPaper.value.wallpaperId)
+    currentWallpaper.value = wallpaper?.image || defaultWallpapers[0].image
   }
   if (typeof appWallPaper.value.wallpaperId === 'number') {
     // 自定义墙纸
-    const wallpaper = wallpaperPanelRef.value.customWallpapers?.find((item: any) => item.id === appWallPaper.value.wallpaperId)
-    currentWallpaper.value = wallpaper.renderImage
+    const wallpaper = wallpapers.custom?.find((item: any) => item.id === appWallPaper.value.wallpaperId)
+    currentWallpaper.value = wallpaper.renderImage || defaultWallpapers[0].image
   }
+}, {
+  immediate: true,
 })
+
+async function getAllWallpaper() {
+  // 1. 从 indexDB 获取所有自定义壁纸 blob
+  // 2. 将 blob 转成图片赋值给变量
+  const originData = await getAllCustomWallPaper()
+
+  const wallpapers_processing = await Promise.all(originData.map(async (item) => {
+    if (item.image instanceof Blob) {
+      const imageUrl = await renderBlobToImage(item.image) as string
+      return {
+        id: item.id,
+        image: item.image,
+        renderImage: imageUrl,
+      }
+    }
+    else {
+      return null
+    }
+  }))
+
+  return {
+    default: defaultWallpapers,
+    custom: wallpapers_processing.filter(item => item?.image) as any,
+  }
+}
 
 function handleOpenWallpaperPanel() {
   isShowWallpaperPanel.value = true
@@ -316,18 +346,28 @@ function handleCloseWallpaperPanel() {
           layout-container
           w-full h-full
           absolute top-0 left-0 overflow-hidden z-50
-
+          transition-transform duration-300 ease-in-out
           outline-10px outline-solid outline-[#474d63]
           origin-[10%_50%]
         "
         :class="appIsEditCleanHome ? 'rounded-[10px]' : ''"
         :style="{
           transform: appIsEditCleanHome ? `scale(${layoutContainerScale})` : '',
-          backgroundImage: `url(${currentWallpaper || '/assets/app-background-images/main_1.png'}  )`,
         }"
         @drop="handleDrop"
         @dragover="handleDragover"
       >
+        <img
+          class="background-wallpaper pointer-events-none select-none w-full h-full absolute top-0 left-0 -z-1"
+          :src="currentWallpaper || defaultWallpapers[0].image"
+        >
+        <div
+          class="background-overlay pointer-events-none select-none w-full h-full absolute top-0 left-0 -z-1"
+          :style="{
+            backdropFilter: `blur(${appWallPaper.blur}px)`,
+          }"
+        />
+
         <div
           v-for="item in bentoCells"
           :key="item.id"
