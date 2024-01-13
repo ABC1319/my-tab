@@ -2,7 +2,7 @@
 /**
  * 只是个盛放布局的容器
  */
-import LayoutCanvas from '../ui/layout-canvas/index.vue'
+import LayoutCanvas from './layout-canvas/index.vue'
 </script>
 
 <template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Sidebar from './components/layout/Sidebar.vue'
+import Sidebar from './components/layout/sidebar/index.vue'
 import AppTip from './components/layout/AppTip.vue'
 import CustomHome from './components/layout/CustomHome.vue'
 </script>

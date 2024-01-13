@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import SearchBox from '../ui/search-box/index.vue'
-import UsefulSite from './UsefulSite.vue'
+import UsefulSite from '../ui/UsefulSite.vue'
 
 const containerRef = ref<HTMLElement | null>(null)
 
