@@ -334,6 +334,17 @@ function handleCloseWallpaperPanel() {
   isShowWallpaperPanel.value = false
 }
 // ------------------更改墙纸 end -------------------------------//
+
+async function handleGoToBrowserPage(page: 'history' | 'settings' | 'downloads') {
+  const pageUrl = `chrome://${page}/`
+
+  browser.tabs.query({ url: pageUrl }).then((res) => {
+    if (res.length > 0)
+      browser.tabs.update(res[0].id, { active: true })
+    else
+      browser.tabs.create({ url: pageUrl })
+  })
+}
 </script>
 
 <template>
@@ -557,21 +568,28 @@ function handleCloseWallpaperPanel() {
         </span>
       </ContextMenuItem>
 
+      <ContextMenuItem class="gap-10px" @click="handleSwitchCleanHomeMode(true)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="7" height="9" x="3" y="3" rx="1" /><rect width="7" height="5" x="14" y="3" rx="1" /><rect width="7" height="9" x="14" y="12" rx="1" /><rect width="7" height="5" x="3" y="16" rx="1" /></g></svg>
+        <span>
+          自定义布局
+        </span>
+      </ContextMenuItem>
+
       <ContextMenuSeparator class="h-[1px] bg-[#bcbbc130] m-[5px]" />
 
-      <ContextMenuItem class="gap-10px">
+      <ContextMenuItem class="gap-10px" @click="handleGoToBrowserPage('history')">
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9a9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5m4-1v5l4 2" /></g></svg>
         <span>
           历史记录
         </span>
       </ContextMenuItem>
-      <ContextMenuItem class="gap-10px">
+      <ContextMenuItem class="gap-10px" @click="handleGoToBrowserPage('downloads')">
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5l5 5l5-5m-5 5V3" /></svg>
         <span>
           下载
         </span>
       </ContextMenuItem>
-      <ContextMenuItem class="gap-10px">
+      <ContextMenuItem class="gap-10px" @click="handleGoToBrowserPage('settings')">
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M20 7h-9m3 10H5" /><circle cx="17" cy="17" r="3" /><circle cx="7" cy="7" r="3" /></g></svg>
         <span>
           设置
