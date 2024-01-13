@@ -364,6 +364,7 @@ function handleCloseWallpaperPanel() {
           class="background-overlay pointer-events-none select-none w-full h-full absolute top-0 left-0 -z-1"
           :style="{
             backdropFilter: `blur(${appWallPaper.blur}px)`,
+            backgroundImage: `radial-gradient(rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, ${appWallPaper.mask}) 100%), radial-gradient(rgba(0, 0, 0, 0) 33%, rgba(0, 0, 0, 0.3) 166%)`,
           }"
         />
 

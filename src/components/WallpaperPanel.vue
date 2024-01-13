@@ -213,10 +213,11 @@ function handleSetWallpaper(item: typeof defaultWallpapers[number] | typeof cust
         </div>
 
         <CustomRange
+          v-model:value="appWallPaper.mask"
           class="w-full h-30px"
-          :min="0.3"
-          :max="4"
-          :step="0.1"
+          :min="0"
+          :max="1"
+          :step="0.01"
         />
       </div>
 
