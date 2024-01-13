@@ -357,11 +357,11 @@ function handleCloseWallpaperPanel() {
         @dragover="handleDragover"
       >
         <img
-          class="background-wallpaper pointer-events-none select-none w-full h-full absolute top-0 left-0 -z-1"
+          class="background-wallpaper object-cover pointer-events-none select-none w-full h-full absolute top-0 left-0 bottom-0 -z-1"
           :src="currentWallpaper || defaultWallpapers[0].image"
         >
         <div
-          class="background-overlay pointer-events-none select-none w-full h-full absolute top-0 left-0 -z-1"
+          class="background-overlay pointer-events-none select-none w-full h-full absolute top-0 left-0 bottom-0 -z-1"
           :style="{
             backdropFilter: `blur(${appWallPaper.blur}px)`,
             backgroundImage: `radial-gradient(rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, ${appWallPaper.mask}) 100%), radial-gradient(rgba(0, 0, 0, 0) 33%, rgba(0, 0, 0, 0.3) 166%)`,

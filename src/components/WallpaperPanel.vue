@@ -113,19 +113,19 @@ function handleSetWallpaper(item: typeof defaultWallpapers[number] | typeof cust
   >
     <div
       class="
-        w-full h-625px
+        w-full h-645px
         bg-[#252835]
         rounded-10px py-20px px-20px
-        flex flex-col gap-20px flex-shrink-0
+        flex flex-col flex-shrink-0
         overflow-auto select-none
-        relative
+        relative gap-20px
       "
     >
       <!-- close -->
       <div class="absolute right-10px top-10px w-16px h-16px cursor-pointer" i-carbon-close @click="close" />
 
       <!-- 默认墙纸 -->
-      <div class="w-full">
+      <div class="w-full ">
         <!-- title -->
         <div class="w-full h-4 font-bold mb-10px">
           默认墙纸
@@ -156,7 +156,7 @@ function handleSetWallpaper(item: typeof defaultWallpapers[number] | typeof cust
       </div>
 
       <!-- 自定义墙纸 -->
-      <div class="w-full">
+      <div class="w-full ">
         <!-- title -->
         <div class="w-full h-4 font-bold mb-10px">
           自定义墙纸
@@ -204,10 +204,12 @@ function handleSetWallpaper(item: typeof defaultWallpapers[number] | typeof cust
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10" /><path d="M8 12h8m-4-4v8" /></g></svg>
           </div>
         </div>
+
+        <div class="mt-20px w-full h-1px border-b border-dashed border-[#3c3e49]" />
       </div>
 
       <!-- 墙纸的遮罩浓度 -->
-      <div class="w-full">
+      <div class="w-full ">
         <div class="w-full h-4 font-bold mb-10px">
           遮罩浓度
         </div>
