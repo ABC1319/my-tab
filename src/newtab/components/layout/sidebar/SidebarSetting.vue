@@ -203,12 +203,13 @@ onClickOutside(sideBarSettingRef, () => {
         grid place-items-center cursor-pointer
         relative
         hover:bg-[#484E64]
+        group
       "
       :class="visible ? 'bg-[#484E64]' : ''"
       @click="handleShowSidebarSetting"
     >
       <div
-        class="w-5 h-5 "
+        class="w-5 h-5 group-hover-scale-120 transition-transform ease-in-out"
         i-carbon:settings
       />
 

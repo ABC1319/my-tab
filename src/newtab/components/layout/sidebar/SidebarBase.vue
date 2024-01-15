@@ -20,9 +20,9 @@ const customSettings = ref<any>([
     <div
       v-for="(item) in customSettings"
       :key="item.label"
-      class="hover:bg-[#484E64] w-32px h-32px bg-[transparent] rounded-6px grid place-items-center cursor-pointer [&>*:hover]:scale-120"
+      class="hover:bg-[#484E64] w-32px h-32px bg-[transparent] rounded-6px grid place-items-center cursor-pointer group"
     >
-      <div class="transition-transform ease-in-out" v-html="item.icon" />
+      <div class="group-hover-scale-120 transition-transform ease-in-out" v-html="item.icon" />
     </div>
   </div>
 </template>
