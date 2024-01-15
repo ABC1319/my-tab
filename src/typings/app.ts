@@ -14,7 +14,7 @@ export interface IAppStatus {
 export interface ISidebarBase {
   label: string
   icon: string
-  status: boolean
+  status: Ref<boolean>
   isChecked: boolean
   remark?: any
   onClick: () => void

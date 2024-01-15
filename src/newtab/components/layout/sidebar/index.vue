@@ -192,6 +192,7 @@ onMounted(() => {
   appBaseCustomSettings.value.forEach((item) => {
     switch (item.label) {
       case '更改墙纸':
+        item.status = appIsEditWallpaper
         item.onClick = () => {
           appIsEditCleanHome.value = false
 
@@ -199,6 +200,7 @@ onMounted(() => {
         }
         break
       case '自定义布局':
+        item.status = appIsEditCleanHome
         item.onClick = () => {
           appIsEditWallpaper.value = false
 
