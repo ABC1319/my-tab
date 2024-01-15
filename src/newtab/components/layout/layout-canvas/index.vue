@@ -335,7 +335,7 @@ function handleCloseWallpaperPanel() {
 }
 // ------------------更改墙纸 end -------------------------------//
 
-async function handleGoToBrowserPage(page: 'history' | 'settings' | 'downloads') {
+async function handleGoToBrowserPage(page: 'history' | 'settings' | 'downloads' | 'extensions') {
   const pageUrl = `chrome://${page}/`
 
   browser.tabs.query({ url: pageUrl }).then((res) => {
@@ -581,6 +581,12 @@ async function handleGoToBrowserPage(page: 'history' | 'settings' | 'downloads')
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9a9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5m4-1v5l4 2" /></g></svg>
         <span>
           历史记录
+        </span>
+      </ContextMenuItem>
+      <ContextMenuItem class="gap-10px" @click="handleGoToBrowserPage('extensions')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="m7.5 4.27l9 5.15M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" /><path d="m3.3 7l8.7 5l8.7-5M12 22V12" /></g></svg>
+        <span>
+          扩展
         </span>
       </ContextMenuItem>
       <ContextMenuItem class="gap-10px" @click="handleGoToBrowserPage('downloads')">
