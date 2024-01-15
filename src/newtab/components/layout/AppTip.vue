@@ -71,7 +71,11 @@ function addWidgets() {
         grid place-items-center
         cursor-pointer
         text-[#ffffff90]
+        opacity-0
+        transition-all duration-300
+        hover:opacity-100
       "
+      :class="contextMenuRef?.visible ? 'opacity-100!' : ''"
       @click="openContextmenu"
     >
       <svg class="w-26px h-26px rounded-full hover:bg-[#25283590]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
