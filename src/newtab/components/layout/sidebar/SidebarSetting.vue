@@ -2,12 +2,11 @@
 import { onClickOutside } from '@vueuse/core'
 import { deleteWorkArea, editWorkArea } from '~/logic/workAreaData'
 import { workAreaIcon } from '~/params/workAreaIcon'
-import type { ISidebarBase } from '~/typings/app'
 import type { WorkAreaParams } from '~/typings/website'
+import { appBaseCustomSettings } from '~/logic/storage'
 
 const props = defineProps<{
   workAreas: WorkAreaParams[]
-  baseCustomSettings: ISidebarBase[]
 }>()
 const emits = defineEmits(['getWorkAreasList', 'destroy'])
 
@@ -195,7 +194,7 @@ onClickOutside(sideBarSettingRef, () => {
 })
 
 // -------------------------------SidebarBase 设置 start------------------------------------//
-function changeBaseCustomCheckbox(_item: typeof props.baseCustomSettings[number]) {
+function changeBaseCustomCheckbox(_item: typeof appBaseCustomSettings.value[number]) {
 
 }
 // -------------------------------SidebarBase 设置 end------------------------------------//
@@ -369,7 +368,7 @@ function changeBaseCustomCheckbox(_item: typeof props.baseCustomSettings[number]
               <div>
                 <!-- 列表 -->
                 <div
-                  v-for="item in baseCustomSettings"
+                  v-for="item in appBaseCustomSettings"
                   :key="item.label"
                 >
                   <div

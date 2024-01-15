@@ -1,20 +1,17 @@
 <script setup lang="ts">
-import type { ISidebarBase } from '~/typings/app'
+import { appBaseCustomSettings } from '~/logic/storage'
 
 /**
  * 这里几种状态都是互斥的
  * 举例：修改墙纸的时候，再点击自定义布局的话，需要将修改墙纸的状态取消
  */
-defineProps<{
-  baseCustomSettings: ISidebarBase[]
-}>()
 </script>
 
 <template>
   <div class="w-full h-fit flex flex-col justify-center items-center gap-10px">
     <TooltipProvider>
       <Tooltip
-        v-for="(item) in baseCustomSettings"
+        v-for="(item) in appBaseCustomSettings"
         :key="item.label"
       >
         <TooltipTrigger as-child>

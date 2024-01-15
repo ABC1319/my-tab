@@ -14,10 +14,10 @@ export interface IAppStatus {
 export interface ISidebarBase {
   label: string
   icon: string
-  status: Ref<boolean>
+  status: boolean
   isChecked: boolean
   remark?: any
-  onClick: Function
+  onClick: () => void
 }
 
 export interface ISearchEngine {
