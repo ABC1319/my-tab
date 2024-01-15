@@ -201,25 +201,31 @@ function handleSelectContextMenu(item: typeof contextMenuOptions.value[number]) 
     <div class="w-full h-full bg-[#252835] rounded-10px py-10px flex flex-col flex-shrink-0">
       <div class="sidebar-item-box w-full flex-1 flex flex-col pb-10px">
         <!-- top -->
-        <div class="w-full h-fit flex flex-col flex-shrink-0 justify-start items-center ">
-          <div
-            v-for="item in workAreas"
-            :key="item.id"
-          >
-            <div
-              v-if="item.isChecked"
-              :title="item.layoutName"
-              @contextmenu="e => openContextmenuToEdit(item, e)"
+        <div class="w-full h-fit flex flex-col flex-shrink-0 justify-start items-center gap-10px">
+          <TooltipProvider>
+            <Tooltip
+              v-for="item in workAreas"
+              :key="item.id"
             >
-              <div
-                :class="appHomeShowMode === item.id ? 'bg-[#5021FF]!' : ''"
-                class="w-32px h-32px hover:bg-[#484E64] rounded-6px grid place-items-center cursor-pointer group mb-10px"
-                @click="toggleAppHomeShowMode(item.id || 0)"
-              >
-                <div class="group-hover-scale-120 transition-transform ease-in-out w-5 h-5" v-html="item.icon" />
-              </div>
-            </div>
-          </div>
+              <TooltipTrigger as-child>
+                <div
+                  v-if="item.isChecked"
+                  @contextmenu="e => openContextmenuToEdit(item, e)"
+                >
+                  <div
+                    :class="appHomeShowMode === item.id ? 'bg-[#5021FF]!' : ''"
+                    class="w-32px h-32px hover:bg-[#484E64] rounded-6px grid place-items-center cursor-pointer group "
+                    @click="toggleAppHomeShowMode(item.id || 0)"
+                  >
+                    <div class="group-hover-scale-120 transition-transform ease-in-out w-5 h-5" v-html="item.icon" />
+                  </div>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="right">
+                <p>{{ item.layoutName }}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
         <div class="w-full flex-1" />
         <!-- bottom -->
@@ -231,12 +237,10 @@ function handleSelectContextMenu(item: typeof contextMenuOptions.value[number]) 
         class="w-full h-fit flex flex-col justify-start items-center flex-shrink-0 gap-10px pt-10px
           border-t-1px border-#83838450 "
       >
-        <!-- <div class="tooltip tooltip-right before:text-12px before:ml-10px before:bg-[#252835]" data-tip="侧边栏设置"> -->
         <SidebarSetting
           :work-areas="workAreas"
           @get-work-areas-list="getWorkAreasList"
         />
-        <!-- </div> -->
       </div>
 
       <div
