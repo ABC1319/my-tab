@@ -132,10 +132,11 @@ export function initGridContainer(
       // 这里的移动元素，新增了吸附线的功能，误差默认设置为 5  start //
       currentClickedElement.value.x += (disX / scale.value)
       currentClickedElement.value.y += (disY / scale.value)
+      // mouseFrom = { x: e.clientX, y: e.clientY } // 不需要吸附的话，直接放开这行，注释下面的 switch
+
       // 1. 针对于竖线有左右两条边
       // 2. 针对于h横线有上下两条边
       // 3. 同时针对两条线（就是排列组合，暂时不做）
-
       switch (true) {
         // ----------------------------------------------x--------------------------------------------------//
         case
