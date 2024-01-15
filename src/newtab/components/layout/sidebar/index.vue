@@ -110,7 +110,7 @@ const toggleAppHomeShowMode = useThrottleFn ((item: number) => {
 const contextMenuOptions = computed(() => {
   return ([
     { label: `隐藏`, key: 'hide' },
-    { label: `编辑`, key: 'edit' },
+    // { label: `编辑`, key: 'edit' },
     { label: `删除`, key: 'delete' },
   ])
 })
