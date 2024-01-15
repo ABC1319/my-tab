@@ -9,6 +9,13 @@ import { isShrinkSidebar } from '~/logic'
 
 const props = defineProps<{
   layoutContainerScale: number
+  xRulerPosition: number
+  yRulerPosition: number
+}>()
+
+const emit = defineEmits<{
+  (e: 'update:xRulerPosition', value: number): void
+  (e: 'update:yRulerPosition', value: number): void
 }>()
 
 const { width, height } = useWindowSize()
@@ -36,6 +43,14 @@ const xBaselinePosition = computed(() => {
 
 const yBaselinePosition = computed(() => {
   return calcYPosition(yOriginalBaselinePosition.value, props.layoutContainerScale)
+})
+
+watch(xBaselinePosition, (x, _prevX) => {
+  emit('update:xRulerPosition', x)
+})
+
+watch(yBaselinePosition, (_y, prevY) => {
+  emit('update:yRulerPosition', prevY)
 })
 
 function calcXPosition(x: number, scale: number) {

@@ -7,12 +7,16 @@ const isPressingMouseLeft = ref(false)
 const isResizingElement = ref(false)
 let mouseFrom = { x: 0, y: 0 }
 let mouseTo = { x: 0, y: 0 }
+const DEVIATION = 10
+
 export function initGridContainer(
   bentoCells: Ref<ILayoutComponentTypeInData[]>,
   currentClickedElement: Ref<ILayoutComponentTypeInData | null>,
   disabled: Ref<boolean>,
   containerDom: HTMLElement,
   scale: Ref<number>,
+  xRulerPosition: Ref<number>,
+  yRulerPosition: Ref<number>,
 ) {
   bindMouseEvent()
 
@@ -125,9 +129,74 @@ export function initGridContainer(
 
     // 移动元素
     if (isDraggingElement.value && currentClickedElement.value) {
+      // 这里的移动元素，新增了吸附线的功能，误差默认设置为 5  start //
       currentClickedElement.value.x += (disX / scale.value)
       currentClickedElement.value.y += (disY / scale.value)
-      mouseFrom = { x: e.clientX, y: e.clientY }
+      // 1. 针对于竖线有左右两条边
+      // 2. 针对于h横线有上下两条边
+      // 3. 同时针对两条线（就是排列组合，暂时不做）
+
+      switch (true) {
+        // ----------------------------------------------x--------------------------------------------------//
+        case
+          (xRulerPosition.value - DEVIATION) < currentClickedElement.value.x
+          && currentClickedElement.value.x < (xRulerPosition.value + DEVIATION):
+
+          // 因为获取的 width 是已经 scale 的像素尺寸，而坐标点位跟 scale 无关，所以尺寸的值需要 / scale
+          currentClickedElement.value.x = xRulerPosition.value
+
+          // 这里因为 x 的值被吸附到辅助线了，所以坐标只更新 y 的就行了
+          // x 的坐标应该是辅助线的坐标，[左往右/右往左] 移动，上一个值[加/减]误差值
+          if (mouseTo.x > mouseFrom.x)
+            mouseFrom = { x: mouseFrom.x + DEVIATION * scale.value, y: e.clientY }
+          else
+            mouseFrom = { x: mouseFrom.x - DEVIATION * scale.value, y: e.clientY }
+          break
+
+        case
+          (xRulerPosition.value - DEVIATION) < (currentClickedElement.value.x + currentClickedElement.value.width / scale.value)
+          && (currentClickedElement.value.x + currentClickedElement.value.width / scale.value) < (xRulerPosition.value + DEVIATION):
+
+          currentClickedElement.value.x = xRulerPosition.value - currentClickedElement.value.width / scale.value
+          if (mouseTo.x > mouseFrom.x)
+            mouseFrom = { x: mouseFrom.x + DEVIATION * scale.value, y: e.clientY }
+          else
+            mouseFrom = { x: mouseFrom.x - DEVIATION * scale.value, y: e.clientY }
+          break
+
+        // ----------------------------------------------y--------------------------------------------------//
+        case
+          (yRulerPosition.value - DEVIATION) < currentClickedElement.value.y
+          && currentClickedElement.value.y < (yRulerPosition.value + DEVIATION):
+
+          // 因为获取的 width 是已经 scale 的像素尺寸，而坐标点位跟 scale 无关，所以尺寸的值需要 / scale
+          currentClickedElement.value.y = yRulerPosition.value
+
+          // 这里因为 x 的值被吸附到辅助线了，所以坐标只更新 y 的就行了
+          // x 的坐标应该是辅助线的坐标，[左往右/右往左] 移动，上一个值[加/减]误差值
+          if (mouseTo.y > mouseFrom.y)
+            mouseFrom = { x: e.clientX, y: mouseFrom.y + DEVIATION * scale.value }
+          else
+            mouseFrom = { x: e.clientX, y: mouseFrom.y - DEVIATION * scale.value }
+          break
+
+        case
+          (yRulerPosition.value - DEVIATION) < (currentClickedElement.value.y + currentClickedElement.value.height / scale.value)
+          && (currentClickedElement.value.y + currentClickedElement.value.height / scale.value) < (yRulerPosition.value + DEVIATION):
+
+          currentClickedElement.value.y = yRulerPosition.value - currentClickedElement.value.height / scale.value
+          if (mouseTo.y > mouseFrom.y)
+            mouseFrom = { x: e.clientX, y: mouseFrom.y + DEVIATION * scale.value }
+          else
+            mouseFrom = { x: e.clientX, y: mouseFrom.y - DEVIATION * scale.value }
+          break
+
+        default:
+          mouseFrom = { x: e.clientX, y: e.clientY }
+          break
+      }
+
+      // 这里的移动元素，新增了吸附线的功能，误差默认设置为 5  end  //
     }
 
     // 缩放元素
@@ -177,11 +246,11 @@ export function initGridContainer(
       const domIdToNumber = Number(currentElement.id.match(/layout-component-(\S*)/)?.[1] || -1)
       result = bentoCells.value?.find(ele => ele.id === domIdToNumber) || null
 
-      // if (result) {
-      //   const { width, height } = currentElement.getBoundingClientRect()
-      //   result.width = width
-      //   result.height = height
-      // }
+      if (result) {
+        const { width, height } = currentElement.getBoundingClientRect()
+        result.width = width
+        result.height = height
+      }
     }
 
     return result

@@ -53,6 +53,11 @@ onUnmounted(() => {
 })
 // ------------------保存 end -------------------------//
 
+// ------------------ruler start -------------------------------//
+const xRulerPosition = ref(0)
+const yRulerPosition = ref(0)
+// ------------------ruler end -------------------------------//
+
 await getList()
 
 async function getList() {
@@ -123,6 +128,8 @@ onMounted(async () => {
     disabledDraggable,
     layoutContainerRef.value,
     layoutContainerScale,
+    xRulerPosition,
+    yRulerPosition,
   )
 })
 
@@ -321,6 +328,7 @@ function handleCloseWallpaperPanel() {
 }
 // ------------------更改墙纸 end -------------------------------//
 
+// ------------------右键菜单跳转 start -------------------------------//
 async function handleGoToBrowserPage(page: 'history' | 'settings' | 'downloads' | 'extensions') {
   const pageUrl = `chrome://${page}/`
 
@@ -331,6 +339,7 @@ async function handleGoToBrowserPage(page: 'history' | 'settings' | 'downloads' 
       browser.tabs.create({ url: pageUrl })
   })
 }
+// ------------------右键菜单跳转 end -------------------------------//
 </script>
 
 <template>
@@ -402,6 +411,7 @@ async function handleGoToBrowserPage(page: 'history' | 'settings' | 'downloads' 
           <!-- 边界，这个要和上面的 <component /> 保持一致 -->
           <div
             v-if="appIsEditCleanHome && !item.isFixed "
+            :id="`single-component-bound-${item.id}`"
             class="absolute top-0 left-0 w-full h-full pointer-events-none "
             :style="{
               transform: `
@@ -520,6 +530,8 @@ async function handleGoToBrowserPage(page: 'history' | 'settings' | 'downloads' 
         >
           <Ruler
             v-if="appIsEditCleanHome"
+            v-model:xRulerPosition="xRulerPosition"
+            v-model:yRulerPosition="yRulerPosition"
             :layout-container-scale="layoutContainerScale"
           />
         </Transition>
