@@ -214,7 +214,7 @@ function handleSelectContextMenu(item: typeof contextMenuOptions.value[number]) 
                 >
                   <div
                     :class="appHomeShowMode === item.id ? 'bg-[#5021FF]!' : ''"
-                    class="w-32px h-32px hover:bg-[#484E64] rounded-6px grid place-items-center cursor-pointer group "
+                    class="w-32px h-32px hover:bg-[#484E6490] rounded-6px grid place-items-center cursor-pointer group "
                     @click="toggleAppHomeShowMode(item.id || 0)"
                   >
                     <div class="group-hover-scale-120 transition-transform ease-in-out w-5 h-5" v-html="item.icon" />

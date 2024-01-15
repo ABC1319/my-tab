@@ -3,6 +3,7 @@ export interface IAppStatus {
   appSidebarMode: 'shrink' | 'grow'
   isShrinkSidebar: boolean
   appIsEditCleanHome: boolean
+  appIsEditWallpaper: boolean
   appWallpaper: {
     wallpaperId: string | number
     blur: number

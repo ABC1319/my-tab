@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { onClickOutside } from '@vueuse/core'
 import { appWallPaper } from '~/logic'
 import { addCustomWallPaper, deleteCustomWallPaper, getAllCustomWallPaper } from '~/logic/customWallpaperData'
 import { defaultWallpapers } from '~/params/wallpaper'
@@ -10,11 +9,6 @@ const emit = defineEmits(['close'])
 function close() {
   emit('close')
 }
-
-const targetRef = ref<HTMLElement | null>(null)
-onClickOutside(targetRef, () => {
-  emit('close')
-})
 
 /**
  * 总有一个设置：图片地址 遮罩浓度 模糊度
@@ -102,7 +96,6 @@ function handleSetWallpaper(item: typeof defaultWallpapers[number] | typeof cust
 
 <template>
   <div
-    ref="targetRef"
     class="
       absolute top-0px right-8px z-999
       w-370px h-screen

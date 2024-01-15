@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { getAllCustomLayoutComponentsRaw } from '~/utils/layout-components'
+import { appIsEditCleanHome } from '~/logic'
 
 const customLayoutAllComponents = await getAllCustomLayoutComponentsRaw()
 const allComponents = customLayoutAllComponents.map((components) => {
@@ -73,12 +74,11 @@ function handleDragstart(e: DragEvent, title: string) {
             duration-200 ease-in-out transition-all
             hover:border-#767fa2a1
           "
+          @click="() => appIsEditCleanHome = false"
         >
-          <svg class="w-18px h-18px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h6v8H4zm0 12h6v4H4zm10-4h6v8h-6zm0-8h6v4h-6z" />
-          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2" /><path d="M17 21v-8H7v8M7 3v5h8" /></g></svg>
           <div>
-            预设布局
+            退出编辑
           </div>
         </div>
       </div>
