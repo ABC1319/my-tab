@@ -35,11 +35,25 @@ function handleDragstart(e: DragEvent, title: string) {
         rounded-10px py-10px px-10px
         flex flex-col gap-10px flex-shrink-0
         overflow-auto select-none
+        relative
       "
     >
+      <div
+        class="
+          absolute top-10px right-10px
+          cursor-pointer
+          text-white
+          rounded-full
+          w-4 h-4
+        "
+        @click="() => appIsEditCleanHome = false"
+      >
+        <div class="w-full h-full" i-carbon-close />
+      </div>
       <div class="w-full h-4 font-bold">
         拖拽布局组件
       </div>
+
       <div class="flex flex-col flex-1 gap-10px ">
         <div
           v-for="item in allComponents"

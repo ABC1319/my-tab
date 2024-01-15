@@ -2,19 +2,21 @@
 import { onClickOutside } from '@vueuse/core'
 import { deleteWorkArea, editWorkArea } from '~/logic/workAreaData'
 import { workAreaIcon } from '~/params/workAreaIcon'
+import type { ISidebarBase } from '~/typings/app'
 import type { WorkAreaParams } from '~/typings/website'
 
 const props = defineProps<{
   workAreas: WorkAreaParams[]
+  baseCustomSettings: ISidebarBase[]
 }>()
 const emits = defineEmits(['getWorkAreasList', 'destroy'])
 
 const sideBarSettingRef = ref<HTMLElement | null>(null)
 
-const visible = ref(false)
+const panelVisible = ref(false)
 
 function handleShowSidebarSetting() {
-  visible.value = !visible.value
+  panelVisible.value = !panelVisible.value
 }
 
 // --------------------------添加新的工作区------------------------------//
@@ -106,7 +108,7 @@ function handleAddWorkArea() {
   }
 }
 
-function changeCheckbox(item: WorkAreaParams) {
+function changeWorkAreaCheckbox(item: WorkAreaParams) {
   const { id, layoutName, isChecked, index, icon } = item
 
   const isCheckedAreas = props.workAreas.filter(item => item.isChecked === true)
@@ -182,23 +184,29 @@ function handleSelectContextMenu(item: typeof contextMenuOptions[number]) {
 onClickOutside(sideBarSettingRef, () => {
   // 要是修改或者新增弹窗并没有打开的话，鼠标点到其他地方，当前设置面板关闭
   if (
-    (operateMenuRef.value && operateMenuRef.value.visible)
-    || (modalRef.value && modalRef.value.visible)
+    (operateMenuRef.value && operateMenuRef.value.panelVisible)
+    || (modalRef.value && modalRef.value.panelVisible)
   ) {
     // 小弹窗或者大弹窗打开的话，不关闭
   }
   else {
-    visible.value = false
+    panelVisible.value = false
   }
 })
+
+// -------------------------------SidebarBase 设置 start------------------------------------//
+function changeBaseCustomCheckbox(_item: typeof props.baseCustomSettings[number]) {
+
+}
+// -------------------------------SidebarBase 设置 end------------------------------------//
 </script>
 
 <template>
   <div>
     <div
       ref="sideBarSettingRef"
-      class=" relative "
-      :class="visible ? 'bg-[#484E64]' : ''"
+      class="relative rounded-6px"
+      :class="panelVisible ? 'bg-[#484E64]' : ''"
       @click="handleShowSidebarSetting"
     >
       <!-- 图标 -->
@@ -221,7 +229,7 @@ onClickOutside(sideBarSettingRef, () => {
         @after-leave="$emit('destroy')"
       >
         <div
-          v-if="visible"
+          v-if="panelVisible"
           class="
             w-320px h-80vh min-h-300px
             absolute z-999
@@ -249,12 +257,12 @@ onClickOutside(sideBarSettingRef, () => {
                 w-4 h-4
               "
             >
-              <div class="w-full h-full" i-carbon-close @click="visible = !visible" />
+              <div class="w-full h-full" i-carbon-close @click="panelVisible = !panelVisible" />
             </div>
           </div>
 
-          <!-- 工作区 -->
           <div class="w-full h-fit overflow-x-hidden overflow-y-auto ">
+            <!-- 工作区 -->
             <div
               class="
                 p-4 m-10px
@@ -313,7 +321,7 @@ onClickOutside(sideBarSettingRef, () => {
                             checkbox checkbox-xs [--chkbg:#45B0E6]
                           border-#45B0E6 checked:border-#45B0E6
                           "
-                          @change="changeCheckbox(item)"
+                          @change="changeWorkAreaCheckbox(item)"
                         >
                       </div>
                     </div>
@@ -352,14 +360,46 @@ onClickOutside(sideBarSettingRef, () => {
                 bg-[#484e6438]
               "
             >
-              <div class="w-full h-14px flex flex-row justify-between items-center text-12px ">
+              <div class="w-full h-14px flex flex-row justify-between items-center text-12px mb-10px">
                 <div class="font-bold">
-                  设置
+                  自定义
                 </div>
               </div>
 
               <div>
-              <!-- 列表 -->
+                <!-- 列表 -->
+                <div
+                  v-for="item in baseCustomSettings"
+                  :key="item.label"
+                >
+                  <div
+                    class="
+                    rounded-md
+                    flex flex-row justify-between items-center
+                    h-36px
+                    text-12px
+                  "
+                  >
+                    <div class="flex flex-row justify-start items-center gap-10px ">
+                      <div
+                        v-if="item.icon"
+                        class="w-18px h-18px"
+                        v-html="item.icon"
+                      />
+                      <div>
+                        {{ item.label }}
+                      </div>
+                    </div>
+
+                    <input
+                      v-model="item.isChecked"
+                      type="checkbox"
+                      title="隐藏/显示"
+                      class=" checkbox checkbox-xs [--chkbg:#45B0E6] border-#45B0E6 checked:border-#45B0E6 "
+                      @change="changeBaseCustomCheckbox(item)"
+                    >
+                  </div>
+                </div>
               </div>
             </div>
           </div>

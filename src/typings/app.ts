@@ -11,6 +11,15 @@ export interface IAppStatus {
   }
 }
 
+export interface ISidebarBase {
+  label: string
+  icon: string
+  status: Ref<boolean>
+  isChecked: boolean
+  remark?: any
+  onClick: Function
+}
+
 export interface ISearchEngine {
   id?: number
   webName: string
