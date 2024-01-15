@@ -107,26 +107,15 @@ const toggleAppHomeShowMode = useThrottleFn ((item: number) => {
 }, 400)
 
 // -----------------右键菜单 start-------------------------//
-const operateMenuRef = ref<typeof import('~/components/CustomContextMenu.vue').default | null>(null)
 const contextMenuOptions = computed(() => {
   return ([
-    { label: `${currentWorkAreaCfg.value.layoutName}`, key: 'hide', disabled: true },
-    { label: 'Divider', key: 'Divider' },
     { label: `隐藏`, key: 'hide' },
     { label: `编辑`, key: 'edit' },
     { label: `删除`, key: 'delete' },
   ])
 })
-const contextMenuPosition = ref({ x: 0, y: 0 })
-function openContextmenuToEdit(item: WorkAreaParams, e: MouseEvent) {
-  e.preventDefault()
 
-  contextMenuPosition.value = {
-    x: e.clientX + 20,
-    y: e.clientY + 5,
-  }
-  operateMenuRef.value?.open()
-
+function openContextmenuToEdit(item: WorkAreaParams, _e: MouseEvent) {
   currentWorkAreaCfg.value = { ...item }
 }
 
@@ -231,30 +220,51 @@ onMounted(() => {
       <div class="sidebar-item-box w-full flex-1 flex flex-col pb-10px">
         <!-- top -->
         <div class="w-full h-fit flex flex-col flex-shrink-0 justify-start items-center gap-10px">
-          <TooltipProvider>
-            <Tooltip
-              v-for="item in workAreas"
-              :key="item.id"
-            >
-              <TooltipTrigger as-child>
-                <div
-                  v-show="item.isChecked"
-                  @contextmenu="e => openContextmenuToEdit(item, e)"
+          <ContextMenu>
+            <ContextMenuTrigger>
+              <TooltipProvider>
+                <Tooltip
+                  v-for="item in workAreas"
+                  :key="item.id"
                 >
-                  <div
-                    :class="appHomeShowMode === item.id ? 'bg-[#5021FF]!' : ''"
-                    class="w-32px h-32px hover:bg-[#484E6490] rounded-6px grid place-items-center cursor-pointer group "
-                    @click="toggleAppHomeShowMode(item.id || 0)"
-                  >
-                    <div class="group-hover-scale-120 transition-transform ease-in-out w-5 h-5" v-html="item.icon" />
-                  </div>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="right">
-                <p>{{ item.layoutName }}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+                  <TooltipTrigger as-child>
+                    <div
+                      v-show="item.isChecked"
+                      @contextmenu="e => openContextmenuToEdit(item, e)"
+                    >
+                      <div
+                        :class="appHomeShowMode === item.id ? 'bg-[#5021FF]!' : ''"
+                        class="w-32px h-32px hover:bg-[#484E6490] rounded-6px grid place-items-center cursor-pointer group "
+                        @click="toggleAppHomeShowMode(item.id || 0)"
+                      >
+                        <div class="group-hover-scale-120 transition-transform ease-in-out w-5 h-5" v-html="item.icon" />
+                      </div>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">
+                    <p>{{ item.layoutName }}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </ContextMenuTrigger>
+
+            <ContextMenuContent>
+              <div class="px-2 text-12px h-20px ">
+                {{ currentWorkAreaCfg.layoutName }}
+              </div>
+              <ContextMenuSeparator class="h-[1px] bg-[#bcbbc130] m-[5px]" />
+              <ContextMenuItem
+                v-for="item in contextMenuOptions"
+                :key="item.label"
+                class="gap-10px"
+                @click="handleSelectContextMenu(item)"
+              >
+                <span>
+                  {{ item.label }}
+                </span>
+              </ContextMenuItem>
+            </ContextMenuContent>
+          </ContextMenu>
         </div>
         <div class="w-full flex-1" />
         <!-- bottom -->
@@ -305,14 +315,6 @@ onMounted(() => {
         </div>
       </div>
     </div>
-
-    <CustomContextMenu
-      ref="operateMenuRef"
-      :x="contextMenuPosition.x"
-      :y="contextMenuPosition.y"
-      :options="contextMenuOptions"
-      @select="handleSelectContextMenu"
-    />
   </div>
 </template>
 

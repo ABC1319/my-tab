@@ -78,6 +78,7 @@ defineExpose({
         opacity-0 origin-right-bottom
         rounded-10px
         bg-[#252835] text-white
+        border border-solid border-[#41434f]
         select-none py-1
         flex flex-col justify-around
       "

@@ -20,6 +20,7 @@ const forwarded = useForwardPropsEmits(props, emits)
         z-50 bg-[#252835] text-white
         min-w-[8rem] overflow-hidden
         rounded-10px shadow-md
+        border border-solid border-[#41434f]
         py-6px px-4px
         animate-in
 
