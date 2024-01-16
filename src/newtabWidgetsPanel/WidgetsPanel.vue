@@ -3,7 +3,6 @@
  * 跟 `src/newtab/components/layout=layout-canvas/WidgetsPanel.vue` 保持一致
  * 除了样式不同外，其余要一模一样
  */
-import { widgetsPopupWindow } from '~/logic'
 import { getAllCustomLayoutComponentsRaw } from '~/utils/layout-components'
 
 const customLayoutAllComponents = await getAllCustomLayoutComponentsRaw()
@@ -18,10 +17,6 @@ function handleDragstart(e: DragEvent, title: string) {
   e.dataTransfer!.setData('text/plain', title)
   e.dataTransfer!.dropEffect = 'move'
 }
-
-onUnmounted(() => {
-  widgetsPopupWindow.value = undefined
-})
 </script>
 
 <template>

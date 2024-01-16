@@ -1,6 +1,7 @@
+<!-- eslint-disable eqeqeq -->
 <script setup lang="ts">
 import { getAllCustomLayoutComponentsRaw } from '~/utils/layout-components'
-import { appIsEditCleanHome, widgetsPopupWindow } from '~/logic'
+import { appIsEditCleanHome, widgetsPopupWindowId } from '~/logic'
 
 const customLayoutAllComponents = await getAllCustomLayoutComponentsRaw()
 const allComponents = customLayoutAllComponents.map((components) => {
@@ -16,12 +17,12 @@ function handleDragstart(e: DragEvent, title: string) {
 }
 // -------------------------------弹出 start--------------------------------------//
 // 1. 需要知道 popup 窗口的状态（打开/关闭）
+// 2. popup 关闭后，需要将 widgetsPopupWindowId 的值清空
 function handleOpenPopup() {
   const widgetsPanelUrl = './dist/newtabWidgetsPanel/index.html'
 
   browser.windows.getAll().then((windows) => {
-    const popup = windows.find(window => window.id === widgetsPopupWindow.value?.id)
-
+    const popup = windows.find(window => window.id == widgetsPopupWindowId.value)
     if (popup && popup.id) {
       // 说明已经打开了popup窗口，直接激活
       browser.windows.update(popup.id, {
@@ -38,11 +39,17 @@ function handleOpenPopup() {
         focused: true,
         incognito: false,
       }).then((res) => {
-        widgetsPopupWindow.value = res
+        widgetsPopupWindowId.value = res.id
+
+        browser.windows.onRemoved.addListener((windowId) => {
+          if (windowId === widgetsPopupWindowId.value)
+            widgetsPopupWindowId.value = -1
+        })
       })
     }
   })
 }
+
 // -------------------------------弹出 end--------------------------------------//
 </script>
 
@@ -57,6 +64,7 @@ function handleOpenPopup() {
     "
   >
     <div
+      v-show="widgetsPopupWindowId === -1"
       class="
         w-full h-[calc(100vh_-_100px)]
         bg-[#252835]
@@ -138,10 +146,49 @@ function handleOpenPopup() {
         </div>
       </div>
     </div>
+
+    <!-- toggle button -->
+    <div
+      v-show="widgetsPopupWindowId !== -1"
+    >
+      <div class="relative">
+        <div
+          class="
+            flex flex-row justify-center items-center gap-10px
+            h-40px w-full text-12px
+            cursor-pointer rounded-8px
+            bg-#404459
+            border-2 border-transparent
+            duration-200 ease-in-out transition-all
+            hover:border-#767fa2a1
+            px-10px
+            peer
+          "
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2" /><path d="M10 4v4M2 8h20M6 4v4" /></g></svg>
+          <span>置顶 Popup</span>
+        </div>
+        <div class="peer-hover:opacity-100 button-glowing opacity-0" />
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
+.button-glowing {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 160px;
+  height: 160px;
+  transform: translate(-50%, -50%);
+  transition: all 1s ease;
+  pointer-events: none;
+  z-index: -1;
+  border-radius: 9999px;
+  background-image: linear-gradient(45deg, #5021ff, #36e4da, #0047e1);
+  filter: blur(60px);
+}
 ::-webkit-scrollbar {
   width: 4px;
   height: 3px;

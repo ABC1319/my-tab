@@ -1,4 +1,3 @@
-import type { Windows } from 'webextension-polyfill'
 import { useStorageIndexDB } from '~/composables/useStorageIndexDB'
 import { useStorageLocal } from '~/composables/useStorageLocal'
 import { useBroadcast } from '~/composables/useBroadcast'
@@ -16,7 +15,7 @@ export const appIsEditCleanHome = useStorageLocal('appIsEditCleanHome', false) a
 export const appIsEditWallpaper = useStorageLocal('appIsEditWallpaper', false) as Ref<IAppStatus['appIsEditCleanHome']>
 export const appWallPaper = useStorageLocal('appWallPaper', { wallpaperId: 'default-1', blur: 0, mask: 0 }) as Ref<IAppStatus['appWallpaper']>
 export const appBaseCustomSettings = useStorageLocal('appBaseCustomSettings', baseCustomSettings) as Ref<ISidebarBase[]>
-export const widgetsPopupWindow = useStorageLocal('widgetsPopupWindow', undefined) as Ref<Windows.Window | undefined>
+export const widgetsPopupWindowId = useStorageLocal('widgetsPopupWindowId', -1) as Ref<number | undefined>
 
 export const storageWebsiteDB = useStorageIndexDB('website_db', '++id, webName, url, icon, type, index, remark')
 export const storageSearchEngineDB = useStorageIndexDB('search_engine_db', '++id, webName, url, icon, type, index, remark')
