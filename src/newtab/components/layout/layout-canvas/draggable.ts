@@ -7,7 +7,7 @@ const isPressingMouseLeft = ref(false)
 const isResizingElement = ref(false)
 let mouseFrom = { x: 0, y: 0 }
 let mouseTo = { x: 0, y: 0 }
-const DEVIATION = 10
+const DEVIATION = 5
 
 export function initGridContainer(
   bentoCells: Ref<ILayoutComponentTypeInData[]>,
