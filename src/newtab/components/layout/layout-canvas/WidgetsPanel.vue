@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { getAllCustomLayoutComponentsRaw } from '~/utils/layout-components'
-import { appIsEditCleanHome } from '~/logic'
+import { appIsEditCleanHome, widgetsPopupWindow } from '~/logic'
 
 const customLayoutAllComponents = await getAllCustomLayoutComponentsRaw()
 const allComponents = customLayoutAllComponents.map((components) => {
@@ -13,9 +13,37 @@ const allComponents = customLayoutAllComponents.map((components) => {
 function handleDragstart(e: DragEvent, title: string) {
   e.dataTransfer!.setData('text/plain', title)
   e.dataTransfer!.dropEffect = 'move'
-  // eslint-disable-next-line no-console
-  console.log('开始拖拽')
 }
+// -------------------------------弹出 start--------------------------------------//
+// 1. 需要知道 popup 窗口的状态（打开/关闭）
+function handleOpenPopup() {
+  const widgetsPanelUrl = './dist/newtabWidgetsPanel/index.html'
+
+  browser.windows.getAll().then((windows) => {
+    const popup = windows.find(window => window.id === widgetsPopupWindow.value?.id)
+
+    if (popup && popup.id) {
+      // 说明已经打开了popup窗口，直接激活
+      browser.windows.update(popup.id, {
+        focused: true,
+      })
+    }
+    else {
+      browser.windows.create({
+        url: browser.runtime.getURL(widgetsPanelUrl),
+        width: 800,
+        height: 600,
+        left: 600,
+        type: 'popup',
+        focused: true,
+        incognito: false,
+      }).then((res) => {
+        widgetsPopupWindow.value = res
+      })
+    }
+  })
+}
+// -------------------------------弹出 end--------------------------------------//
 </script>
 
 <template>
@@ -49,6 +77,19 @@ function handleDragstart(e: DragEvent, title: string) {
         @click="() => appIsEditCleanHome = false"
       >
         <div class="w-full h-full" i-carbon-close />
+      </div>
+
+      <div
+        class="
+          absolute top-10px right-40px
+          cursor-pointer
+          text-white
+          rounded-full
+          w-4 h-4
+        "
+        @click="handleOpenPopup"
+      >
+        <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M22 12A10 10 0 1 1 12 2m10 0L12 12m4-10h6v6" /></svg>
       </div>
       <div class="w-full h-4 font-bold">
         拖拽布局组件

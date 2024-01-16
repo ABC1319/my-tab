@@ -13,6 +13,7 @@ async function stubIndexHtml() {
     'popup',
     'background',
     'newtab',
+    'newtabWidgetsPanel', // newtab 物料面板
   ]
 
   for (const view of views) {

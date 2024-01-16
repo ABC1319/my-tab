@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useWindowSize } from '@vueuse/core'
 import { initGridContainer } from './draggable'
-import CustomLayoutComponentsList from './CustomLayoutComponentsList.vue'
+import WidgetsPanel from './WidgetsPanel.vue'
 import Ruler from './Ruler.vue'
 import WallpaperPanel from './WallpaperPanel.vue'
 import { appHomeShowMode, appIsEditCleanHome, appIsEditWallpaper, appWallPaper } from '~/logic/storage'
@@ -586,7 +586,7 @@ async function handleGoToBrowserPage(page: 'history' | 'settings' | 'downloads' 
     name="slide-x"
     @after-leave="$emit('destroy')"
   >
-    <CustomLayoutComponentsList
+    <WidgetsPanel
       v-if="appIsEditCleanHome"
       @save="handleSaveLayoutAndClose"
       @cancel="handleCancelLayout"
