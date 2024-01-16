@@ -136,8 +136,91 @@ export function initGridContainer(
 
       // 1. 针对于竖线有左右两条边
       // 2. 针对于h横线有上下两条边
-      // 3. 同时针对两条线（就是排列组合，暂时不做）
+      // 3. 同时针对两条线
       switch (true) {
+        // ----------------------------------------------xy--------------------------------------------------//
+        // 左上，同时触发两条边的都是单个边的排列组合
+        case
+          (xRulerPosition.value - DEVIATION) < currentClickedElement.value.x
+          && currentClickedElement.value.x < (xRulerPosition.value + DEVIATION)
+          && (yRulerPosition.value - DEVIATION) < currentClickedElement.value.y
+          && currentClickedElement.value.y < (yRulerPosition.value + DEVIATION):
+
+          currentClickedElement.value.x = xRulerPosition.value
+          currentClickedElement.value.y = yRulerPosition.value
+
+          if (mouseTo.x > mouseFrom.x)
+            mouseFrom.x = mouseFrom.x + DEVIATION * scale.value
+          else
+            mouseFrom.x = mouseFrom.x - DEVIATION * scale.value
+
+          if (mouseTo.y > mouseFrom.y)
+            mouseFrom.y = mouseFrom.y + DEVIATION * scale.value
+          else
+            mouseFrom.y = mouseFrom.y - DEVIATION * scale.value
+
+          break
+
+        // 左下
+        case
+          (xRulerPosition.value - DEVIATION) < currentClickedElement.value.x
+          && currentClickedElement.value.x < (xRulerPosition.value + DEVIATION)
+          && (yRulerPosition.value - DEVIATION) < (currentClickedElement.value.y + currentClickedElement.value.height / scale.value)
+          && (currentClickedElement.value.y + currentClickedElement.value.height / scale.value) < (yRulerPosition.value + DEVIATION):
+
+          currentClickedElement.value.x = xRulerPosition.value
+          currentClickedElement.value.y = yRulerPosition.value - currentClickedElement.value.height / scale.value
+
+          if (mouseTo.x > mouseFrom.x)
+            mouseFrom.x = mouseFrom.x + DEVIATION * scale.value
+          else
+            mouseFrom.x = mouseFrom.x - DEVIATION * scale.value
+
+          if (mouseTo.y > mouseFrom.y)
+            mouseFrom.y = mouseFrom.y + DEVIATION * scale.value
+          else
+            mouseFrom.y = mouseFrom.y - DEVIATION * scale.value
+
+          break
+        // 右上
+        case
+          (xRulerPosition.value - DEVIATION) < (currentClickedElement.value.x + currentClickedElement.value.width / scale.value)
+          && (currentClickedElement.value.x + currentClickedElement.value.width / scale.value) < (xRulerPosition.value + DEVIATION)
+          && (yRulerPosition.value - DEVIATION) < currentClickedElement.value.y
+          && currentClickedElement.value.y < (yRulerPosition.value + DEVIATION):
+
+          currentClickedElement.value.x = xRulerPosition.value - currentClickedElement.value.width / scale.value
+          currentClickedElement.value.y = yRulerPosition.value
+          if (mouseTo.x > mouseFrom.x)
+            mouseFrom.x = mouseFrom.x + DEVIATION * scale.value
+          else
+            mouseFrom.x = mouseFrom.x - DEVIATION * scale.value
+
+          if (mouseTo.y > mouseFrom.y)
+            mouseFrom.y = mouseFrom.y + DEVIATION * scale.value
+          else
+            mouseFrom.y = mouseFrom.y - DEVIATION * scale.value
+          break
+
+        // 右下
+        case
+          (xRulerPosition.value - DEVIATION) < (currentClickedElement.value.x + currentClickedElement.value.width / scale.value)
+          && (currentClickedElement.value.x + currentClickedElement.value.width / scale.value) < (xRulerPosition.value + DEVIATION)
+          && (yRulerPosition.value - DEVIATION) < (currentClickedElement.value.y + currentClickedElement.value.height / scale.value)
+          && (currentClickedElement.value.y + currentClickedElement.value.height / scale.value) < (yRulerPosition.value + DEVIATION):
+
+          currentClickedElement.value.x = xRulerPosition.value - currentClickedElement.value.width / scale.value
+          currentClickedElement.value.y = yRulerPosition.value - currentClickedElement.value.height / scale.value
+          if (mouseTo.x > mouseFrom.x)
+            mouseFrom.x = mouseFrom.x + DEVIATION * scale.value
+          else
+            mouseFrom.x = mouseFrom.x - DEVIATION * scale.value
+
+          if (mouseTo.y > mouseFrom.y)
+            mouseFrom.y = mouseFrom.y + DEVIATION * scale.value
+          else
+            mouseFrom.y = mouseFrom.y - DEVIATION * scale.value
+          break
         // ----------------------------------------------x--------------------------------------------------//
         case
           (xRulerPosition.value - DEVIATION) < currentClickedElement.value.x

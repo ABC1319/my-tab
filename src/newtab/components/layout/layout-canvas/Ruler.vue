@@ -29,12 +29,12 @@ const { isOutside: xIsOutside } = useMouseInElement(xRuler)
 
 const { isOutside: yIsOutside } = useMouseInElement(yRuler)
 
-const { x: xOriginalBaselinePosition } = useDraggable(xBaseline, {
-  initialValue: { x: isShrinkSidebar.value ? 40 : 98, y: 0 },
+const { x: xOriginalBaselinePosition, isDragging: isDraggingX } = useDraggable(xBaseline, {
+  initialValue: { x: isShrinkSidebar.value ? 20 : 78, y: 0 },
 })
 
-const { y: yOriginalBaselinePosition } = useDraggable(yBaseline, {
-  initialValue: { x: 0, y: 40 },
+const { y: yOriginalBaselinePosition, isDragging: isDraggingY } = useDraggable(yBaseline, {
+  initialValue: { x: 0, y: 20 },
 })
 
 const xBaselinePosition = computed(() => {
@@ -49,12 +49,13 @@ watch(xBaselinePosition, (x, _prevX) => {
   emit('update:xRulerPosition', x)
 })
 
-watch(yBaselinePosition, (_y, prevY) => {
-  emit('update:yRulerPosition', prevY)
+watch(yBaselinePosition, (y, _prevY) => {
+  emit('update:yRulerPosition', y)
 })
 
 function calcXPosition(x: number, scale: number) {
   const containerDom = document.querySelector('.layout-container')
+
   const originX = containerDom?.getBoundingClientRect().left || 0
   const mouseX = (x - originX) / scale
 
@@ -145,15 +146,17 @@ function calcYPosition(y: number, scale: number) {
     <!-- x 轴可以移动的线 -->
     <div
       ref="xBaseline"
+      class="absolute top-0 left-0 w-2px h-screen hover:bg-[#5021ff] bg-[#ffffff1e] cursor-pointer select-none"
       :style=" { transform: `translateX(${xBaselinePosition}px)` }"
-      class="absolute top-0 left-0 w-2px h-screen bg-[#ffffff1e] cursor-pointer select-none"
+      :class="isDraggingX ? 'bg-[#5021ff]!' : ''"
     />
 
     <!-- y 轴可以移动的线 -->
     <div
       ref="yBaseline"
+      class="absolute top-0 left-0 h-2px w-screen hover:bg-[#5021ff] bg-[#ffffff1e] cursor-pointer select-none"
       :style=" { transform: `translateY(${yBaselinePosition}px)` }"
-      class="absolute top-0 left-0 h-2px w-screen bg-[#ffffff1e] cursor-pointer select-none"
+      :class="isDraggingY ? 'bg-[#5021ff]!' : ''"
     />
   </div>
 </template>
