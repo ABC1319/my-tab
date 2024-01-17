@@ -19,6 +19,6 @@ export const widgetsPopupWindowId = useStorageLocal('widgetsPopupWindowId', -1) 
 
 export const storageWebsiteDB = useStorageIndexDB('website_db', '++id, webName, url, icon, type, index, remark')
 export const storageSearchEngineDB = useStorageIndexDB('search_engine_db', '++id, webName, url, icon, type, index, remark')
-export const storageLayoutComponentsDB = useStorageIndexDB('layout_components_db', '++id, layoutName, componentName, x, y, width, height, isFixed, scale, rotate, remark')
+export const storageLayoutComponentsDB = useStorageIndexDB('layout_components_db', '++id, layoutName, componentName, x, y, width, height, isFixed, scale, rotate,isVerticalCenter, remark')
 export const storageLayoutListDB = useStorageIndexDB('layout_list_db', '++id, layoutName, icon, index, isChecked, remark')
 export const storageCustomWallpaperDB = useStorageIndexDB('app_custom_wallpaper_db', '++id, image')

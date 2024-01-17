@@ -9,6 +9,7 @@ export interface ILayoutComponentTypeInData {
   layoutName: number
   scale: number
   rotate: number
+  isVerticalCenter: boolean
 }
 
 export interface ILayoutComponentTypeInPage extends ILayoutComponentTypeInData {

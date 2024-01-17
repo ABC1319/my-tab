@@ -83,6 +83,7 @@ async function getList() {
           component: markRaw(component.raw.default),
           scale: item.scale,
           rotate: item.rotate,
+          isVerticalCenter: item.isVerticalCenter,
         }
       }
       else {
@@ -161,6 +162,7 @@ function handleDrop(e: DragEvent) {
       component: markRaw(component.raw.default),
       scale: 1,
       rotate: 0,
+      isVerticalCenter: false,
     })
   }
 
@@ -198,6 +200,7 @@ function handleSaveLayoutAndClose() {
         componentName: item.componentName,
         scale: item.scale,
         rotate: item.rotate,
+        isVerticalCenter: item.isVerticalCenter,
       }).then(resolve)
     })
   })
@@ -221,6 +224,7 @@ function handleOnlySaveLayout() {
         componentName: item.componentName,
         scale: item.scale,
         rotate: item.rotate,
+        isVerticalCenter: item.isVerticalCenter,
       }).then(resolve)
     })
   })
@@ -249,6 +253,7 @@ function lockComponent(item: ILayoutComponentTypeInPage) {
     componentName: item.componentName,
     scale: item.scale,
     rotate: item.rotate,
+    isVerticalCenter: item.isVerticalCenter,
   })
 }
 function deleteComponent(item: ILayoutComponentTypeInPage) {
@@ -262,6 +267,25 @@ function deleteComponent(item: ILayoutComponentTypeInPage) {
 function resizingComponent(_item: ILayoutComponentTypeInPage) {
 }
 function rotateComponent(_item: ILayoutComponentTypeInPage) {
+}
+
+function verticalCenterComponent(item: ILayoutComponentTypeInPage) {
+  // 让这个组件的状态变成居中
+  // 设置其位置
+  item.isVerticalCenter = !item.isVerticalCenter
+  editLayoutComponents({
+    id: item.id,
+    layoutName: item.layoutName,
+    x: item.x,
+    y: item.y,
+    width: item.width,
+    height: item.height,
+    isFixed: item.isFixed,
+    componentName: item.componentName,
+    scale: item.scale,
+    rotate: item.rotate,
+    isVerticalCenter: item.isVerticalCenter,
+  })
 }
 // ------------------修改组件 end -----------------------------//
 
@@ -383,12 +407,12 @@ async function handleGoToBrowserPage(page: 'history' | 'settings' | 'downloads' 
           :key="item.id"
           :style="{
             position: 'absolute',
-            transform: `
-          translate3d(
-            ${item.x}px,
-            ${item.y}px,
-          0)
-        `,
+            transform: item.isVerticalCenter
+              ? ` translate3d( -50%, ${item.y}px, 0) `
+              : ` translate3d( ${item.x}px, ${item.y}px, 0) `,
+            left: item.isVerticalCenter
+              ? ` 50% `
+              : ` 0 `,
             willChange: 'transform',
           }"
           @contextmenu.stop
@@ -397,10 +421,7 @@ async function handleGoToBrowserPage(page: 'history' | 'settings' | 'downloads' 
             :id="`layout-component-${item.id}`"
             class="w-fit h-fit"
             :style="{
-              transform: `
-            scale(${item.scale})
-            rotate(${item.rotate}deg)
-          `,
+              transform: ` scale(${item.scale}) rotate(${item.rotate}deg) `,
               willChange: 'transform',
               transformOrigin: 'bottom center',
             }"
@@ -463,6 +484,17 @@ async function handleGoToBrowserPage(page: 'history' | 'settings' | 'downloads' 
               @click="deleteComponent(item)"
             >
               <svg class="w-20px h-20px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16m-10 4v6m4-6v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" /></svg>
+            </button>
+
+            <button
+              :class="item.isFixed ? 'text-gray cursor-not-allowed' : ''"
+              :disabled="item.isFixed"
+              :style="{ color: item.isVerticalCenter ? '#6eff35' : '' }"
+              class=" w-full h-full flex justify-center items-center px-8px hover:bg-#646c89 "
+              title="垂直居中"
+              @click="verticalCenterComponent(item)"
+            >
+              <svg class="w-20px h-20px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2v20M8 10H4a2 2 0 0 1-2-2V6c0-1.1.9-2 2-2h4m8 6h4a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-4M8 20H7a2 2 0 0 1-2-2v-2c0-1.1.9-2 2-2h1m8 0h1a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-1" /></svg>
             </button>
 
             <APopover>
