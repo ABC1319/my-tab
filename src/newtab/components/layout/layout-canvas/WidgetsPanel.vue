@@ -58,17 +58,17 @@ function handleOpenPopup() {
 /**
  * 激活已经存在的popup 窗口
  */
-function handleSetPopupTop() {
-  browser.windows.getAll().then((windows) => {
-    const popup = windows.find(window => window.id == widgetsPopupWindowId.value)
-    if (popup && popup.id) {
-      // 说明已经打开了popup窗口，直接激活
-      browser.windows.update(popup.id, {
-        focused: true,
-      })
-    }
-  })
-}
+// function handleSetPopupTop() {
+//   browser.windows.getAll().then((windows) => {
+//     const popup = windows.find(window => window.id == widgetsPopupWindowId.value)
+//     if (popup && popup.id) {
+//       // 说明已经打开了popup窗口，直接激活
+//       browser.windows.update(popup.id, {
+//         focused: true,
+//       })
+//     }
+//   })
+// }
 
 /**
  * 关闭 popup 窗口
@@ -200,7 +200,7 @@ function handleCloseAndSave() {
       v-show="widgetsPopupWindowId !== -1"
       class="w-fit h-fit flex flex-col gap-20px"
     >
-      <div class="relative">
+      <!-- <div class="relative">
         <div
           class="
             flex flex-col justify-center items-center gap-10px
@@ -219,7 +219,7 @@ function handleCloseAndSave() {
           <span style="writing-mode:vertical-lr">找到弹窗</span>
         </div>
         <div class="button-glowing find-popup-btn peer-hover:opacity-100 opacity-0" />
-      </div>
+      </div> -->
       <div class="relative">
         <div
           class="
