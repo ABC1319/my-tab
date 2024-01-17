@@ -5,7 +5,7 @@ import { initGridContainer } from './draggable'
 import WidgetsPanel from './WidgetsPanel.vue'
 import Ruler from './Ruler.vue'
 import WallpaperPanel from './WallpaperPanel.vue'
-import { appHomeShowMode, appIsEditCleanHome, appIsEditWallpaper, appWallPaper } from '~/logic/storage'
+import { appHomeShowMode, appIsEditCleanHome, appIsEditWallpaper, appWallPaper, widgetsPopupWindowId } from '~/logic/storage'
 import { getAllCustomLayoutComponentsRaw } from '~/utils/layout-components'
 import type { ILayoutComponentTypeInData, ILayoutComponentTypeInPage } from '~/typings/layout'
 import { deleteLayoutComponents, editLayoutComponents, getComponentsById } from '~/logic/layoutComponentsData'
@@ -103,14 +103,17 @@ onMounted(() => {
 watch([width, height], () => {
   layoutContainerScale.value = calculateMainScale()
 })
+watch(widgetsPopupWindowId, () => {
+  layoutContainerScale.value = calculateMainScale()
+})
 
 function calculateMainScale() {
   // 距离间隔
-  const g = 80
+  const g = widgetsPopupWindowId.value === -1 ? 80 : 36
+  // 获取抽屉的宽度
+  const w = widgetsPopupWindowId.value === -1 ? 200 : 50
   // 获取初始页面的宽度
   const ow = layoutContainerRef.value.offsetWidth
-  // 获取抽屉的宽度
-  const w = 200
   // 页面的宽度减去抽屉的宽度再减去Gap的值，就是main缩放后的值
   const d = ow - w - g
   // 缩放后的宽度除以初始宽度，得到要缩放的比例
@@ -355,9 +358,10 @@ async function handleGoToBrowserPage(page: 'history' | 'settings' | 'downloads' 
           outline-10px outline-solid outline-[#474d63]
           origin-[10%_50%]
         "
-        :class="appIsEditCleanHome ? 'rounded-[10px]' : ''"
         :style="{
           transform: appIsEditCleanHome ? `scale(${layoutContainerScale})` : '',
+          borderRadius: appIsEditCleanHome ? '10px' : '',
+          transformOrigin: widgetsPopupWindowId === -1 ? '10% 50%' : ' 20% 50%',
         }"
         @drop="handleDrop"
         @dragover="handleDragover"

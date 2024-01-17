@@ -16,8 +16,18 @@ function handleDragstart(e: DragEvent, title: string) {
   e.dataTransfer!.dropEffect = 'move'
 }
 // -------------------------------弹出 start--------------------------------------//
-// 1. 需要知道 popup 窗口的状态（打开/关闭）
-// 2. popup 关闭后，需要将 widgetsPopupWindowId 的值清空
+/**
+ * 监听 popup 窗口的关闭事件
+ */
+onMounted(() => {
+  browser.windows.onRemoved.addListener((windowId) => {
+    if (windowId === widgetsPopupWindowId.value)
+      widgetsPopupWindowId.value = -1
+  })
+})
+/**
+ * 打开 popup 窗口
+ */
 function handleOpenPopup() {
   const widgetsPanelUrl = './dist/newtabWidgetsPanel/index.html'
 
@@ -40,16 +50,14 @@ function handleOpenPopup() {
         incognito: false,
       }).then((res) => {
         widgetsPopupWindowId.value = res.id
-
-        browser.windows.onRemoved.addListener((windowId) => {
-          if (windowId === widgetsPopupWindowId.value)
-            widgetsPopupWindowId.value = -1
-        })
       })
     }
   })
 }
 
+/**
+ * 激活已经存在的popup 窗口
+ */
 function handleSetPopupTop() {
   browser.windows.getAll().then((windows) => {
     const popup = windows.find(window => window.id == widgetsPopupWindowId.value)
@@ -60,6 +68,25 @@ function handleSetPopupTop() {
       })
     }
   })
+}
+
+/**
+ * 关闭 popup 窗口
+ */
+function handleClosePopup() {
+  browser.windows.getAll().then((windows) => {
+    const popup = windows.find(window => window.id == widgetsPopupWindowId.value)
+    if (popup && popup.id)
+      browser.windows.remove(popup.id)
+  })
+}
+
+/**
+ * 退出编辑
+ */
+function handleCloseAndSave() {
+  appIsEditCleanHome.value = false
+  handleClosePopup()
 }
 // -------------------------------弹出 end--------------------------------------//
 </script>
@@ -95,23 +122,11 @@ function handleSetPopupTop() {
           rounded-full
           w-4 h-4
         "
-        @click="() => appIsEditCleanHome = false"
+        @click="handleCloseAndSave"
       >
         <div class="w-full h-full" i-carbon-close />
       </div>
 
-      <div
-        class="
-          absolute top-10px right-40px
-          cursor-pointer
-          text-white
-          rounded-full
-          w-4 h-4
-        "
-        @click="handleOpenPopup"
-      >
-        <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M22 12A10 10 0 1 1 12 2m10 0L12 12m4-10h6v6" /></svg>
-      </div>
       <div class="w-full h-4 font-bold">
         拖拽布局组件
       </div>
@@ -150,7 +165,27 @@ function handleSetPopupTop() {
             duration-200 ease-in-out transition-all
             hover:border-#767fa2a1
           "
-          @click="() => appIsEditCleanHome = false"
+          @click="handleOpenPopup"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2" /><path d="M10 4v4M2 8h20M6 4v4" /></g></svg>
+          <div>
+            打开弹窗
+          </div>
+        </div>
+      </div>
+      <div class="w-full h-40px flex flex-row justify-around items-center gap-10px">
+        <div
+          class="
+            flex flex-row justify-center items-center gap-10px
+            h-36px w-full text-12px
+            cursor-pointer rounded-8px
+            bg-#404459
+            mt-2
+            border-2 border-transparent
+            duration-200 ease-in-out transition-all
+            hover:border-#767fa2a1
+          "
+          @click="handleCloseAndSave"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2" /><path d="M17 21v-8H7v8M7 3v5h8" /></g></svg>
           <div>
@@ -163,28 +198,8 @@ function handleSetPopupTop() {
     <!-- toggle button -->
     <div
       v-show="widgetsPopupWindowId !== -1"
-      class="w-fit h-fit p-5"
+      class="w-fit h-fit flex flex-col gap-20px"
     >
-      <div class="relative">
-        <div
-          class="
-            flex flex-col justify-center items-center gap-10px
-            h-full w-40px text-12px
-            cursor-pointer rounded-8px
-            bg-#404459
-            border-2 border-transparent
-            duration-200 ease-in-out transition-all
-            hover:border-#767fa2a1
-            py-10px tracking-6px mb-20px
-            peer
-          "
-          @click="() => appIsEditCleanHome = false"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2" /><path d="M17 21v-8H7v8M7 3v5h8" /></g></svg>
-          <span style="writing-mode:vertical-lr">退出编辑</span>
-        </div>
-        <div class="button-glowing save-exit-btn peer-hover:opacity-100 opacity-0" />
-      </div>
       <div class="relative">
         <div
           class="
@@ -204,6 +219,46 @@ function handleSetPopupTop() {
           <span style="writing-mode:vertical-lr">找到弹窗</span>
         </div>
         <div class="button-glowing find-popup-btn peer-hover:opacity-100 opacity-0" />
+      </div>
+      <div class="relative">
+        <div
+          class="
+            flex flex-col justify-center items-center gap-10px
+            h-full w-40px text-12px
+            cursor-pointer rounded-8px
+            bg-#404459
+            border-2 border-transparent
+            duration-200 ease-in-out transition-all
+            hover:border-#767fa2a1
+            py-10px tracking-6px
+            peer
+          "
+          @click="handleClosePopup"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2" /><path d="M10 4v4M2 8h20M6 4v4" /></g></svg>
+          <span style="writing-mode:vertical-lr">关闭弹窗</span>
+        </div>
+        <div class="button-glowing find-popup-btn peer-hover:opacity-100 opacity-0" />
+      </div>
+      <div class="relative">
+        <div
+          class="
+            flex flex-col justify-center items-center gap-10px
+            h-full w-40px text-12px
+            cursor-pointer rounded-8px
+            bg-#404459
+            border-2 border-transparent
+            duration-200 ease-in-out transition-all
+            hover:border-#767fa2a1
+            py-10px tracking-6px mb-20px
+            peer
+          "
+          @click="handleCloseAndSave"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2" /><path d="M17 21v-8H7v8M7 3v5h8" /></g></svg>
+          <span style="writing-mode:vertical-lr">退出编辑</span>
+        </div>
+        <div class="button-glowing save-exit-btn peer-hover:opacity-100 opacity-0" />
       </div>
     </div>
   </div>
