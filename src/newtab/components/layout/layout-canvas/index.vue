@@ -264,8 +264,6 @@ function deleteComponent(item: ILayoutComponentTypeInPage) {
   }
 }
 
-function resizingComponent(_item: ILayoutComponentTypeInPage) {
-}
 function rotateComponent(_item: ILayoutComponentTypeInPage) {
 }
 
@@ -469,6 +467,7 @@ async function handleGoToBrowserPage(page: 'history' | 'settings' | 'downloads' 
           >
             <div
               class="rounded-l-10px w-1/2 h-full flex justify-center items-center px-8px hover:bg-#646c89 "
+              :style="{ color: item.isFixed ? '#6eff35' : '' }"
               :title="item.isFixed ? '解锁' : '锁定'"
               @click="lockComponent(item)"
             >
@@ -490,21 +489,20 @@ async function handleGoToBrowserPage(page: 'history' | 'settings' | 'downloads' 
               :class="item.isFixed ? 'text-gray cursor-not-allowed' : ''"
               :disabled="item.isFixed"
               :style="{ color: item.isVerticalCenter ? '#6eff35' : '' }"
-              class=" w-full h-full flex justify-center items-center px-8px hover:bg-#646c89 "
+              class=" w-full h-full rounded-r-10px flex justify-center items-center px-8px hover:bg-#646c89 "
               title="垂直居中"
               @click="verticalCenterComponent(item)"
             >
               <svg class="w-20px h-20px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2v20M8 10H4a2 2 0 0 1-2-2V6c0-1.1.9-2 2-2h4m8 6h4a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-4M8 20H7a2 2 0 0 1-2-2v-2c0-1.1.9-2 2-2h1m8 0h1a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-1" /></svg>
             </button>
 
-            <APopover>
+            <!-- <APopover>
               <APopoverTrigger as-child>
                 <button
                   :class="item.isFixed ? 'text-gray cursor-not-allowed' : ''"
                   :disabled="item.isFixed"
                   class=" select-none rounded-r-10px w-full h-full flex justify-center items-center px-8px hover:bg-#646c89 "
                   title="缩放"
-                  @click="resizingComponent(item)"
                 >
                   <svg class="w-20px h-20px " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0-14 0m4 0h6m-3-3v6m11 8l-6-6" /></svg>
                 </button>
@@ -522,7 +520,7 @@ async function handleGoToBrowserPage(page: 'history' | 'settings' | 'downloads' 
                   :step="0.1"
                 />
               </APopoverContent>
-            </APopover>
+            </APopover> -->
 
             <button
               v-show="false"
