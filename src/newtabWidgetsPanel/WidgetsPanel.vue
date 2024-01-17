@@ -38,19 +38,17 @@ function handleDragstart(e: DragEvent, title: string) {
         :key="item.name"
         :draggable="true"
         class="
-            w-200px h-140px bg-[#484E64] rounded-10px
+            w-fit h-100px bg-[#484E64] rounded-10px px-10px
             flex-shrink-0 grid place-items-center
             hover:cursor-grab active:cursor-grabbing
             overflow-hidden
           "
         @dragstart="(e) => handleDragstart(e, item.name)"
       >
-        <div>
-          <component
-            :is="item.components"
-            :id="`${item.name}`"
-          />
-        </div>
+        <component
+          :is="item.components"
+          :id="`${item.name}`"
+        />
       </div>
     </div>
   </div>
