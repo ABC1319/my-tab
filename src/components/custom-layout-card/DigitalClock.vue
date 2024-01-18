@@ -31,7 +31,7 @@ function formatDateTime(timestamp: number) {
 
 <template>
   <div
-    class="text-18 opacity-80 select-none"
+    class="text-18 opacity-80 select-none w-165px h-fit text-center"
     style="font-family: Digital;"
   >
     <span class="text-white mix-blend-difference">

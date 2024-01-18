@@ -89,6 +89,45 @@ function handleCloseAndSave() {
   handleClosePopup()
 }
 // -------------------------------弹出 end--------------------------------------//
+
+// -----------------------------------设置宽度 start-------------------------------------------------//
+const allRef = ref<HTMLDivElement[]>([])
+const cellSize = { w: 180, h: 120 }
+
+onMounted(() => {
+  nextTick(() => {
+    if (widgetsPopupWindowId.value === -1)
+      initComponentsSize()
+  })
+})
+
+watch(widgetsPopupWindowId, (val) => {
+  nextTick(() => {
+    if (val === -1)
+      initComponentsSize()
+  })
+})
+
+function initComponentsSize() {
+  allRef.value.forEach((el: HTMLElement) => {
+    const firstChild = el.firstElementChild as HTMLDivElement
+    const scale = calculateMainScale(firstChild.clientWidth, firstChild.clientHeight)
+    firstChild.style.transform = `scale(${scale})`
+    firstChild.style.marginTop = `-${firstChild.clientHeight / 2}px`
+    firstChild.style.marginLeft = `-${firstChild.clientWidth / 2}px`
+  })
+}
+
+function calculateMainScale(cw: number, ch: number) {
+  const ow = cellSize.w - 20 // 减去 padding 宽度
+  const oh = cellSize.h
+
+  const sw = (ow / cw).toFixed(6)
+  const sh = (oh / ch).toFixed(6)
+
+  return Math.min(Number(sw), Number(sh))
+}
+// -----------------------------------设置宽度 start-------------------------------------------------//
 </script>
 
 <template>
@@ -135,21 +174,25 @@ function handleCloseAndSave() {
         <div
           v-for="item in allComponents"
           :key="item.name"
+          ref="allRef"
           :draggable="true"
+          :style="{
+            width: `${cellSize.w}px`,
+            height: `${cellSize.h}px`,
+          }"
           class="
-            w-full h-140px bg-[#484E64] rounded-10px
-            flex-shrink-0 grid place-items-center
+             bg-[#484E64] rounded-10px
+            flex-shrink-0
             hover:cursor-grab active:cursor-grabbing
-            overflow-hidden
+            overflow-hidden relative
           "
           @dragstart="(e) => handleDragstart(e, item.name)"
         >
-          <div>
-            <component
-              :is="item.components"
-              :id="`${item.name}`"
-            />
-          </div>
+          <component
+            :is="item.components"
+            :id="`${item.name}`"
+            class="origin-center absolute top-1/2 left-1/2"
+          />
         </div>
       </div>
 
