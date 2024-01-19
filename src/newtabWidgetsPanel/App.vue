@@ -6,9 +6,7 @@ import WidgetsPanel from './WidgetsPanel.vue'
   <Suspense>
     <!-- 背景 -->
     <div
-      id="app-container"
       class="
-        app-container
         w-screen h-screen overflow-hidden
         bg-#0a0a12
         flex flex-row

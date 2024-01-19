@@ -105,6 +105,7 @@ export default defineConfig(({ command }) => ({
         popup: r('src/popup/index.html'),
         newtab: r('src/newtab/index.html'),
         newtabWidgetsPanel: r('src/newtabWidgetsPanel/index.html'),
+        newtabWidgetsManage: r('src/newtabWidgetsManage/index.html'),
       },
     },
   },

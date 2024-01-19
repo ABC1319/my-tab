@@ -2,7 +2,7 @@
 <script setup lang="ts">
 import WidgetSetting from './WidgetSetting.vue'
 import { getAllCustomLayoutComponentsRaw } from '~/utils/layout-components'
-import { appIsEditCleanHome, widgetsPopupWindowId } from '~/logic'
+import { appIsEditCleanHome, widgetsManageTabId, widgetsPopupWindowId } from '~/logic'
 
 const customLayoutAllComponents = await getAllCustomLayoutComponentsRaw()
 const allComponents = customLayoutAllComponents.map((components) => {
@@ -21,9 +21,13 @@ function handleDragstart(e: DragEvent, title: string) {
  * 监听 popup 窗口的关闭事件
  */
 onMounted(() => {
-  browser.windows.onRemoved.addListener((windowId) => {
+  browser?.windows?.onRemoved?.addListener((windowId) => {
     if (windowId === widgetsPopupWindowId.value)
       widgetsPopupWindowId.value = -1
+  })
+  browser?.tabs?.onRemoved?.addListener((tabId) => {
+    if (tabId === widgetsManageTabId.value)
+      widgetsManageTabId.value = 0
   })
 })
 /**
@@ -91,10 +95,20 @@ function handleCloseAndSave() {
 }
 
 /**
- * 退出编辑
+ * 管理我的小组件
  */
-function handleOpenFindWidgets() {
-
+const widgetsPanelRoute = './dist/newtabWidgetsManage/index.html'
+const widgetsPanelUrl = browser.runtime.getURL(widgetsPanelRoute)
+function handleManageWidgets() {
+  browser.tabs.get(widgetsManageTabId.value || 0).then((res) => {
+    browser.tabs.update(res.id, { active: true })
+  }).catch((_res) => {
+    browser.tabs.create({
+      url: widgetsPanelUrl,
+    }).then((res) => {
+      widgetsManageTabId.value = res.id
+    })
+  })
 }
 // -------------------------------弹出 end--------------------------------------//
 
@@ -259,7 +273,7 @@ function calculateMainScale(cw: number, ch: number) {
             duration-200 ease-in-out transition-all
             hover:border-#767fa2a1
           "
-          @click="handleOpenFindWidgets"
+          @click="handleManageWidgets"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2" /><path d="M17 21v-8H7v8M7 3v5h8" /></g></svg>
           <div>

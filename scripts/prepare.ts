@@ -13,7 +13,8 @@ async function stubIndexHtml() {
     'popup',
     'background',
     'newtab',
-    'newtabWidgetsPanel', // newtab 物料面板
+    'newtabWidgetsPanel', // newtab 我的小组件
+    'newtabWidgetsManage', // 管理 newtab 物料面板
   ]
 
   for (const view of views) {
