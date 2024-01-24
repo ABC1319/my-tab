@@ -13,6 +13,7 @@ const allComponents = customLayoutAllComponents.map((components) => {
 })
 
 function handleDragstart(e: DragEvent, title: string) {
+  e.dataTransfer!.effectAllowed = 'move'
   e.dataTransfer!.setData('text/plain', title)
   e.dataTransfer!.dropEffect = 'move'
 }
