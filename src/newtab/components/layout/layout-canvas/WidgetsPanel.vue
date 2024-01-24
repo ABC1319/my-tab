@@ -170,9 +170,9 @@ function calculateMainScale(cw: number, ch: number) {
       class="
         w-200px h-[calc(100vh_-_100px)]
         bg-[#252835]
-        rounded-10px py-10px px-10px
+        rounded-10px
         flex flex-col gap-10px flex-shrink-0
-        overflow-auto select-none
+        overflow-hidden select-none
         relative
       "
     >
@@ -189,11 +189,11 @@ function calculateMainScale(cw: number, ch: number) {
         <div class="w-full h-full" i-carbon-close />
       </div>
 
-      <div class="w-full h-4 font-bold">
-        拖拽布局组件
+      <div class="select-none w-full h-36px border-b border-dashed border-[#41434f] leading-36px px-4">
+        我的组件
       </div>
 
-      <div class="flex flex-col flex-1 gap-10px ">
+      <div class="flex flex-col flex-1 gap-10px p-10px ">
         <div
           v-for="item in allComponents"
           :key="item.name"
