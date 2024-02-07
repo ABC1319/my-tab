@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {
-  DialogClose,
   DialogContent,
   type DialogContentEmits,
   type DialogContentProps,
@@ -44,12 +43,12 @@ const emitsAsProps = useEmitAsProps(emits)
       >
         <slot />
 
-        <DialogClose
+        <!-- <DialogClose
           class="absolute top-3 right-3 p-0.5 transition-colors rounded-md hover:bg-secondary"
         >
           <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12" /></svg>
           <span class="sr-only">Close</span>
-        </DialogClose>
+        </DialogClose> -->
       </DialogContent>
     </Teleport>
   </DialogPortal>

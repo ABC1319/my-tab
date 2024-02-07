@@ -15,6 +15,7 @@ const isDragging = inject('isDragging') as Ref<boolean>
     :class="props.class"
     :draggable="true"
     style="will-change: transform;"
+    :style="props.style"
   >
     <div
       style="width: 100%; height: 100%;"
