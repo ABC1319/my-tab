@@ -5,9 +5,9 @@ import { editPinedWebsite } from '~/logic/websiteData'
 import type { WebsiteParams } from '~/typings/website'
 import { getColorFromPalettes } from '~/utils/random-color'
 
-// const props = defineProps<{
-//   currentSite?: WebsiteParams
-// }>()
+const props = defineProps<{
+  websites?: WebsiteParams[]
+}>()
 
 const emit = defineEmits(['handleOK'])
 
@@ -24,7 +24,7 @@ const currentSiteCfg = ref<WebsiteParams>({
   url: '',
   icon: '',
   type: 0,
-  index: -1,
+  index: 0,
   remark: {
     color: getColorFromPalettes(),
   },
@@ -127,11 +127,18 @@ function addWebsite() {
   // 2. 存储
   const { id, webName, url, remark, index, icon } = currentSiteCfg.value
 
+  let maxIndex = index
+  if (props.websites && props.websites.length > 0) {
+    maxIndex = props.websites.reduce(
+      (max, item) => Math.max(max, item.index),
+      0,
+    )
+  }
   editPinedWebsite({
     id,
     url,
     webName,
-    index,
+    index: maxIndex,
     icon,
     type: 0,
     remark: {

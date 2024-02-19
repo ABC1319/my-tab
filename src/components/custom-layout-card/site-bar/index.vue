@@ -1,9 +1,14 @@
 <script setup lang="ts">
-import { getPinedWebsite } from '~/logic/websiteData'
+import { broadcast } from '~/logic'
+import { editPinedWebsite, getPinedWebsite } from '~/logic/websiteData'
 import type { WebsiteParams } from '~/typings/website'
 
 const websites = ref<WebsiteParams[]>([
 ])
+
+onMounted(() => {
+  handleSynchronize()
+})
 
 await getList()
 async function getList() {
@@ -44,13 +49,52 @@ function renderBlobUrlIcon(file: Blob) {
     }
   })
 }
+
+const flatContents = ref(websites.value.map(item => `website-id-${item.id}`))
+
+watch(flatContents, (newVal) => {
+  const sorts = newVal.map((item) => {
+    return item.match(/website-id-(\d+)/)?.[1]
+  }).filter(item => item)
+
+  websites.value.forEach((item) => {
+    const index = sorts.indexOf(`${item.id}`)
+    item.index = index + 1
+  })
+  websites.value.forEach((item) => {
+    editPinedWebsite({
+      id: item.id,
+      url: item.url,
+      webName: item.webName,
+      index: item.index,
+      icon: item.icon,
+      type: item.type,
+      remark: {
+        defaultIcon: '',
+        color: item?.remark?.color,
+      },
+    })
+  })
+  // 2.说明拖拽结束，通知一下同步
+  noticeSynchronize()
+})
+
+function handleSynchronize() {
+  broadcast.syncWebsites.listen(async (event: MessageEvent<any>) => {
+    if (JSON.parse(event.data).cmd === 'SyncWebsites')
+      await getList()
+  })
+}
+function noticeSynchronize() {
+  broadcast.syncWebsites.call()
+}
 </script>
 
 <template>
   <ResizeCard :max-width="650" class="bg-transparent h-fit!">
     <ResizeCardContent>
       <FlatSortable>
-        <FlatSortableContent direction="row" :gap="10" class="flex-wrap">
+        <FlatSortableContent v-model="flatContents" direction="row" :gap="10" class="flex-wrap">
           <FlatSortableItem
             v-for="(item, index) in websites"
             :key="index"
@@ -75,7 +119,7 @@ function renderBlobUrlIcon(file: Blob) {
           </FlatSortableItem>
 
           <!-- 添加地址 -->
-          <AddOrEditSite @handle-o-k="getList()" />
+          <AddOrEditSite :websites="websites" @handle-o-k="getList()" />
         </FlatSortableContent>
       </FlatSortable>
     </ResizeCardContent>
