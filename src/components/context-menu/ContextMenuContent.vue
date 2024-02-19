@@ -22,9 +22,6 @@ const forwarded = useForwardPropsEmits(props, emits)
         rounded-10px shadow-md
         border border-solid border-[#41434f]
         py-6px px-4px
-        animate-in
-
-        data-[state=open]:animate-in data-[state=closed]:animate-out
 
         data-[side=left]:mr-10px
         data-[side=right]:ml-10px

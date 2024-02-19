@@ -248,7 +248,7 @@ onMounted(() => {
               </TooltipProvider>
             </ContextMenuTrigger>
 
-            <ContextMenuContent>
+            <ContextMenuContent class="data-[state=open]:animate-in data-[state=closed]:animate-out">
               <div class="px-2 text-12px h-20px ">
                 {{ currentWorkAreaCfg.layoutName }}
               </div>

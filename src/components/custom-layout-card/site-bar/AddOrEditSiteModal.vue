@@ -9,9 +9,9 @@ const props = defineProps<{
   websites?: WebsiteParams[]
 }>()
 
-const emit = defineEmits(['handleOK'])
+const emit = defineEmits(['handlehandleCompleted'])
 
-const DEFAULT_SITES: WebsiteParams = {
+const addItem: WebsiteParams = {
   id: 0,
   webName: 'default-add',
   url: 'https://mmeme.me/',
@@ -31,6 +31,21 @@ const currentSiteCfg = ref<WebsiteParams>({
 })
 
 const isOpen = ref(false)
+
+watch(isOpen, (newValue) => {
+  if (!newValue) {
+    currentSiteCfg.value = {
+      webName: '',
+      url: '',
+      icon: '',
+      type: 0,
+      index: 0,
+      remark: {
+        color: getColorFromPalettes(),
+      },
+    }
+  }
+})
 
 const isShowUrlDropdown = computed(() => {
   const isNeedComplete
@@ -146,7 +161,7 @@ function addWebsite() {
       color: remark?.color || getColorFromPalettes(),
     },
   }).then(async () => {
-    emit('handleOK')
+    emit('handlehandleCompleted')
     isOpen.value = false
 
     nextTick(() => {
@@ -158,12 +173,17 @@ function addWebsite() {
 function noticeSynchronize() {
   broadcast.syncWebsites.call()
 }
+
+defineExpose({
+  isOpen,
+  currentSiteCfg,
+})
 </script>
 
 <template>
   <Dialog :open="isOpen">
     <DialogTrigger as-child>
-      <SiteBarItem :icon="DEFAULT_SITES.icon" :web-name="DEFAULT_SITES.webName" @click="isOpen = true" />
+      <SiteBarItem :icon="addItem.icon" :web-name="addItem.webName" @click="isOpen = true" />
     </DialogTrigger>
     <DialogContent class="w-fit! max-w-unset!">
       <VisuallyHidden as-child>
@@ -180,7 +200,7 @@ function noticeSynchronize() {
         class="absolute top-3 right-3 p-0.5 transition-colors rounded-md cursor-pointer"
         @click="isOpen = false"
       >
-        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12" /></svg>
+        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="none" strhandleCompletede="currentColor" strhandleCompletede-linecap="round" strhandleCompletede-linejoin="round" strhandleCompletede-width="2" d="M18 6L6 18M6 6l12 12" /></svg>
         <span class="sr-only">Close</span>
       </div>
 
@@ -285,7 +305,7 @@ function noticeSynchronize() {
           <div class="flex flex-row gap-2 mt-32px">
             <button
               class="
-                ok-btn
+                handleCompleted-btn
                 w-108px h-32px text-14px
                 rounded-6px
                 bg-[#404459] text-[#fafafa]
@@ -324,7 +344,7 @@ function noticeSynchronize() {
   -webkit-transform-origin: bottom;
 }
 
-.ok-btn,
+.handleCompleted-btn,
 .cancel-btn {
   clip-path: path(
     M 0 16 C 0 0.358172 0.358172 0 16 0 L 92 0 C 107.642 0 108 0.358172 108 16 L
