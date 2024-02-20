@@ -13,7 +13,7 @@ const emit = defineEmits(['handlehandleCompleted'])
 
 const addItem: WebsiteParams = {
   id: 0,
-  webName: 'default-add',
+  webName: '添加网址',
   url: 'https://mmeme.me/',
   icon: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M11 13v3q0 .425.288.713T12 17q.425 0 .713-.288T13 16v-3h3q.425 0 .713-.288T17 12q0-.425-.288-.713T16 11h-3V8q0-.425-.288-.713T12 7q-.425 0-.713.288T11 8v3H8q-.425 0-.713.288T7 12q0 .425.288.713T8 13h3Zm1 9q-2.075 0-3.9-.788t-3.175-2.137q-1.35-1.35-2.137-3.175T2 12q0-2.075.788-3.9t2.137-3.175q1.35-1.35 3.175-2.137T12 2q2.075 0 3.9.788t3.175 2.137q1.35 1.35 2.138 3.175T22 12q0 2.075-.788 3.9t-2.137 3.175q-1.35 1.35-3.175 2.138T12 22Z"/></svg>',
   type: 0,
@@ -92,6 +92,20 @@ function handleUploadUrlIcon(e: any) {
 
 function clearUrlIcon() {
   currentSiteCfg.value.icon = ''
+}
+
+function getIconOnline() {
+  getWebSiteFavicon({ url: currentSiteCfg.value.url }).then((res) => {
+    currentSiteCfg.value.icon = res.src
+    currentSiteCfg.value!.remark!.renderIcon = `
+          <img
+            class="w-full h-full object-cover pointer-events-none select-none"
+            src="${res.src}"
+            alt="在线图标"
+          >
+        `
+    currentSiteCfg.value.webName = res.name
+  })
 }
 
 function renderBlobUrlIcon(file: Blob) {
@@ -212,37 +226,49 @@ defineExpose({
           >
             <div
               v-if="currentSiteCfg.icon && currentSiteCfg?.remark?.renderIcon"
-              class="w-10 h-10 grid place-items-center"
+              class="alpha-icon"
               v-html="currentSiteCfg.remark.renderIcon"
             />
             <div
               v-else
-              class="alpha-icon w-10 h-10 grid place-items-center text-18px"
+              class="alpha-icon"
               :style="{ background: currentSiteCfg.remark?.color || 'transparent' }"
             >
               {{ defaultIcon }}
             </div>
           </div>
 
-          <div
-            class="w-58px h-24px mt-14px bg-[#404459] rounded-md text-[#fafafa] ml-auto flex flex-row cursor-pointer overflow-hidden "
-          >
-            <div class="w-24px h-full grid place-items-center flex-1 hover:bg-[#2528366b]" @click="toggleUpload">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
-                <path
-                  fill="currentColor"
-                  d="M3 21h3.75L17.81 9.94l-3.75-3.75L3 17.25V21zm2-2.92l9.06-9.06l.92.92L5.92 19H5v-.92zM18.37 3.29a.996.996 0 0 0-1.41 0l-1.83 1.83l3.75 3.75l1.83-1.83a.996.996 0 0 0 0-1.41l-2.34-2.34z"
-                />
-              </svg>
+          <div class=" w-full flex flex-row justify-between items-center">
+            <div
+              class="w-fit h-24px pr-1 mt-14px bg-[#404459] hover:bg-[#363848] rounded-md text-[#fafafa] mr-auto flex flex-row justify-center items-center cursor-pointer overflow-hidden "
+              @click="getIconOnline"
+            >
+              <div class="w-24px h-full grid place-items-center flex-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9" /></svg>
+              </div>
+              <span>获取图标</span>
             </div>
-            <div class="h-full w-1px bg-[#00000036]" />
-            <div class="w-24px h-full grid place-items-center flex-1 hover:bg-[#2528366b]" @click="clearUrlIcon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
-                <path
-                  fill="currentColor"
-                  d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"
-                />
-              </svg>
+
+            <div
+              class="w-58px h-24px mt-14px bg-[#404459] rounded-md text-[#fafafa] flex flex-row cursor-pointer overflow-hidden "
+            >
+              <div class="w-24px h-full grid place-items-center flex-1 hover:bg-[#2528366b]" @click="toggleUpload">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                  <path
+                    fill="currentColor"
+                    d="M3 21h3.75L17.81 9.94l-3.75-3.75L3 17.25V21zm2-2.92l9.06-9.06l.92.92L5.92 19H5v-.92zM18.37 3.29a.996.996 0 0 0-1.41 0l-1.83 1.83l3.75 3.75l1.83-1.83a.996.996 0 0 0 0-1.41l-2.34-2.34z"
+                  />
+                </svg>
+              </div>
+              <div class="h-full w-1px bg-[#00000036]" />
+              <div class="w-24px h-full grid place-items-center flex-1 hover:bg-[#2528366b]" @click="clearUrlIcon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                  <path
+                    fill="currentColor"
+                    d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"
+                  />
+                </svg>
+              </div>
             </div>
           </div>
         </div>
@@ -360,17 +386,5 @@ defineExpose({
     width: 260px;
     margin-top: unset;
   }
-}
-
-.alpha-icon {
-  mask-size: contain;
-  mask-repeat: no-repeat;
-  mask-position: center;
-  mask-image: url("data:image/svg+xml,%3csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M100 0C20 0 0 20 0 100s20 100 100 100 100-20 100-100S180 0 100 0Z'/%3e%3c/svg%3e");
-
-  -webkit-mask-size: contain;
-  -webkit-mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  -webkit-mask-image: url("data:image/svg+xml,%3csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M100 0C20 0 0 20 0 100s20 100 100 100 100-20 100-100S180 0 100 0Z'/%3e%3c/svg%3e");
 }
 </style>
