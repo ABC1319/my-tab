@@ -404,24 +404,26 @@ async function handleGoToBrowserPage(page: 'history' | 'settings' | 'downloads' 
           v-for="item in bentoCells"
           :key="item.id"
           :style="{
-            position: 'absolute',
-            transform: item.isVerticalCenter
+            'position': 'absolute',
+            'transform': item.isVerticalCenter
               ? ` translate3d( -50%, ${item.y}px, 0) `
               : ` translate3d( ${item.x}px, ${item.y}px, 0) `,
-            left: item.isVerticalCenter
+            'left': item.isVerticalCenter
               ? ` 50% `
               : ` 0 `,
-            willChange: 'transform',
+            'willChange': 'transform',
+            'pointer-events': 'none',
           }"
           @contextmenu.stop
         >
           <div
             :id="`layout-component-${item.id}`"
-            class="w-fit h-fit"
+            class="w-fit h-fit "
             :style="{
-              transform: ` scale(${item.scale}) rotate(${item.rotate}deg) `,
-              willChange: 'transform',
-              transformOrigin: 'bottom center',
+              'transform': ` scale(${item.scale}) rotate(${item.rotate}deg) `,
+              'willChange': 'transform',
+              'transformOrigin': 'bottom center',
+              'pointer-events': appIsEditCleanHome ? 'auto' : 'none',
             }"
           >
             <component
@@ -463,6 +465,7 @@ async function handleGoToBrowserPage(page: 'history' | 'settings' | 'downloads' 
               rounded-10px
               bg-[#474d63]
               w-fit h-30px
+              pointer-events-auto
             "
           >
             <div

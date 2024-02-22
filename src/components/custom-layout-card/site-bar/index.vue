@@ -120,67 +120,66 @@ function handleSelectContextMenu(operation: 'delete' | 'edit', item: WebsitePara
 </script>
 
 <template>
-  <ResizeCard :max-width="650" class="bg-transparent h-fit!">
-    <ResizeCardContent>
-      <FlatSortable>
-        <FlatSortableContent v-model="flatContents" direction="row" :gap="30" class="flex-wrap">
-          <FlatSortableItem
-            v-for="(item, index) in websites"
-            :key="index"
-          >
-            <ContextMenu>
-              <ContextMenuTrigger>
+  <div class="max-w-1272px px-40px w-screen pointer-events-none">
+    <FlatSortable>
+      <FlatSortableContent v-model="flatContents" direction="row" :gap="30" class="flex-wrap">
+        <FlatSortableItem
+          v-for="(item, index) in websites"
+          :key="index"
+          class="pointer-events-auto"
+        >
+          <ContextMenu>
+            <ContextMenuTrigger>
+              <div
+                class=" text-white w-fit h-fit flex flex-col justify-center items-center flex-shrink-0 flex-grow-0 cursor-pointer overflow-hidden rounded-10px text-center "
+              >
                 <div
-                  class=" text-white w-fit h-fit flex flex-col justify-center items-center flex-shrink-0 flex-grow-0 cursor-pointer overflow-hidden rounded-10px text-center "
+                  v-if="item.icon && item?.remark?.renderIcon"
+                  class="alpha-icon"
+                  v-html="item.remark.renderIcon"
+                />
+                <div
+                  v-else
+                  class="alpha-icon"
+                  :style="{ background: item?.remark?.color || 'transparent' }"
                 >
-                  <div
-                    v-if="item.icon && item?.remark?.renderIcon"
-                    class="alpha-icon"
-                    v-html="item.remark.renderIcon"
-                  />
-                  <div
-                    v-else
-                    class="alpha-icon"
-                    :style="{ background: item?.remark?.color || 'transparent' }"
-                  >
-                    {{ item?.remark && item?.remark?.defaultIcon }}
-                  </div>
-
-                  <div class="w-full select-none">
-                    {{ item.webName }}
-                  </div>
+                  {{ item?.remark && item?.remark?.defaultIcon }}
                 </div>
-              </ContextMenuTrigger>
-              <ContextMenuContent>
-                <ContextMenuItem class="gap-10px" @click="handleSelectContextMenu('edit', item)">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2" /><path d="M7 7h.01M17 7h.01M7 17h.01M17 17h.01" /></g></svg>
-                  <span>
-                    编辑
-                  </span>
-                </ContextMenuItem>
 
-                <ContextMenuSeparator class="h-[1px] bg-[#bcbbc130] m-[5px]" />
+                <div class="w-full select-none">
+                  {{ item.webName }}
+                </div>
+              </div>
+            </ContextMenuTrigger>
+            <ContextMenuContent>
+              <ContextMenuItem class="gap-10px" @click="handleSelectContextMenu('edit', item)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2" /><path d="M7 7h.01M17 7h.01M7 17h.01M17 17h.01" /></g></svg>
+                <span>
+                  编辑
+                </span>
+              </ContextMenuItem>
 
-                <ContextMenuItem class="gap-10px hover:bg-#d45453!" @click="handleSelectContextMenu('delete', item)">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6" /></svg>
-                  <span>
-                    删除
-                  </span>
-                </ContextMenuItem>
-              </ContextMenuContent>
-            </ContextMenu>
-          </FlatSortableItem>
+              <ContextMenuSeparator class="h-[1px] bg-[#bcbbc130] m-[5px]" />
 
-          <!-- 添加地址 -->
-          <AddOrEditSiteModal
-            ref="addOrEditSiteModalRef"
-            :websites="websites"
-            @handlehandle-completed="getList()"
-          />
-        </FlatSortableContent>
-      </FlatSortable>
-    </ResizeCardContent>
-  </ResizeCard>
+              <ContextMenuItem class="gap-10px hover:bg-#d45453!" @click="handleSelectContextMenu('delete', item)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6" /></svg>
+                <span>
+                  删除
+                </span>
+              </ContextMenuItem>
+            </ContextMenuContent>
+          </ContextMenu>
+        </FlatSortableItem>
+
+        <!-- 添加地址 -->
+        <AddOrEditSiteModal
+          ref="addOrEditSiteModalRef"
+          :websites="websites"
+          @handlehandle-completed="getList()"
+        />
+      </FlatSortableContent>
+    </FlatSortable>
+  </div>
 </template>
 
 <style>
@@ -191,7 +190,7 @@ function handleSelectContextMenu(operation: 'delete' | 'edit', item: WebsitePara
     2px 2px 9px rgba(0, 0, 0, 0.16);
 }
 .alpha-icon {
-  @apply w-18 h-18 grid place-items-center text-18px;
+  @apply w-18 h-18 grid place-items-center text-18px mb-1;
 
   transition:
     box-shadow 0.25s cubic-bezier(0, 0, 0.5, 1),

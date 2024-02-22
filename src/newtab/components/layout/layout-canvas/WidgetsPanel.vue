@@ -134,10 +134,13 @@ watch(widgetsPopupWindowId, (val) => {
 function initComponentsSize() {
   allRef.value.forEach((el: HTMLElement) => {
     const firstChild = el.firstElementChild as HTMLDivElement
-    const scale = calculateMainScale(firstChild.clientWidth, firstChild.clientHeight)
-    firstChild.style.transform = `scale(${scale})`
-    firstChild.style.marginTop = `-${firstChild.clientHeight / 2}px`
-    firstChild.style.marginLeft = `-${firstChild.clientWidth / 2}px`
+
+    if (firstChild && firstChild?.clientWidth && firstChild?.clientHeight) {
+      const scale = calculateMainScale(firstChild.clientWidth, firstChild.clientHeight)
+      firstChild.style.transform = `scale(${scale})`
+      firstChild.style.marginTop = `-${firstChild.clientHeight / 2}px`
+      firstChild.style.marginLeft = `-${firstChild.clientWidth / 2}px`
+    }
   })
 }
 
@@ -193,7 +196,7 @@ function calculateMainScale(cw: number, ch: number) {
         我的组件
       </div>
 
-      <div class="flex flex-col flex-1 gap-10px p-10px ">
+      <div class="flex flex-col flex-1 gap-10px p-10px overflow-y-auto overflow-x-hidden">
         <div
           v-for="item in allComponents"
           :key="item.name"
