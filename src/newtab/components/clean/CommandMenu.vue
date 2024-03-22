@@ -20,20 +20,6 @@
         class="searchInput" placeholder="Search Store for Extensions" value=""
       >
 
-      <Select>
-        <SelectTrigger>
-          <SelectValue placeholder="Select a fruit" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            <SelectLabel>Fruits</SelectLabel>
-            <SelectItem value="apple">
-              Apple
-            </SelectItem>
-          </SelectGroup>
-        </SelectContent>
-      </Select>
-
       <div class="queryDropdown">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 16" style="height: 16px;">
           <path
