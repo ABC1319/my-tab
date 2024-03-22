@@ -1,5 +1,30 @@
 <script setup lang="ts">
+import { useMagicKeys } from '@vueuse/core'
+import { appSearchEngine } from '~/logic/storage'
+import { searchEngine } from '~/params/searchEngine'
+import type { ISearchEngine } from '~/typings/app'
 
+const searchText = ref('')
+
+const defaultSearchArr = ref<ISearchEngine[]>(searchEngine)
+
+function handleSelectEngine(item: ISearchEngine) {
+  appSearchEngine.value = item
+}
+
+function handleSearchInEngine() {
+  window.open(`${appSearchEngine.value.url}${searchText.value}`)
+}
+
+const keys = useMagicKeys()
+const AltQ = keys['Alt+Q']
+
+watch(AltQ, (v) => {
+  if (v) {
+    const index = defaultSearchArr.value.findIndex(item => item.webName === appSearchEngine.value.webName)
+    handleSelectEngine(defaultSearchArr.value[(index + 1) % defaultSearchArr.value.length])
+  }
+})
 </script>
 
 <template>
@@ -7,45 +32,39 @@
     <!-- <div class="glow" /> -->
     <div class="navigationBar">
       <a class="backButton">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 16" class="icon">
-          <path
-            stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-            d="M6.25 4.75 2.75 8m0 0 3.5 3.25M2.75 8h10.5"
-          />
-        </svg>
+        <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="11" cy="11" r="8" /><path d="m21 21l-4.3-4.3" /></g></svg>
       </a>
 
       <input
-        type="text" name="searchInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-        class="searchInput" placeholder="Search Store for Extensions" value=""
+        v-model="searchText"
+        type="text"
+        class="searchInput"
+        placeholder="按下回车检索, 按下Alt+Q切换搜索引擎"
+        autofocus
+        @keyup.enter="handleSearchInEngine"
       >
 
-      <div class="queryDropdown">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 16" style="height: 16px;">
-          <path
-            stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-            d="M9.093 2.094S10.531 4.083 10.531 8s-1.438 5.906-1.438 5.906M6.907 2.094S5.469 4.083 5.469 8s1.438 5.906 1.438 5.906M1.755 8h12.49m.005 0a6.25 6.25 0 1 1-12.5 0 6.25 6.25 0 0 1 12.5 0Z"
-          />
-        </svg><span>Public</span><svg
-          xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 16"
-          style="height: 11px;"
+      <select
+        v-model="appSearchEngine.webName"
+        class="queryDropdown outline-none! shadow-none!"
+      >
+        <!-- <div class="queryDropdownContent"> -->
+        <option
+          v-for="item in defaultSearchArr"
+          :key="item.webName"
+          class=" hover:bg-#27272a! cursor-pointer"
+          :value="item.webName"
+          @click="handleSelectEngine(item)"
         >
-          <path
-            stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-            d="M12.25 5.75 8 10.25l-4.25-4.5"
-          />
-        </svg>
-      </div>
+          <div>{{ item.webName }}</div>
+        </option>
+        <!-- </div> -->
+      </select>
     </div>
 
     <div class="content">
       <div class="section">
         <strong>Featured</strong>
-        <div class="items">
-          <a class="extension" href="https://www.raycast.com/HelloImSteven/sips">链接1</a>
-          <a class="extension" href="https://www.raycast.com/HelloImSteven/sips">链接2</a>
-          <a class="extension" href="https://www.raycast.com/HelloImSteven/sips">链接3</a>
-        </div>
       </div>
     </div>
 
@@ -58,15 +77,9 @@
           />
         </svg>
       </div>
-      <span class="actionLabel">Store</span>
+      <span class="actionLabel">TabTab</span>
 
       <div class="actions">
-        <span class="action mainAction">
-          Show Details
-          <div class="hotKeys">
-            <i class="hotKey">↵</i>
-          </div>
-        </span>
         <span class="action">
           Actions
           <div class="hotKeys">
@@ -79,13 +92,14 @@
   </div>
 </template>
 
-<style scoped>
+<style>
 .appFrame {
   position: relative;
   display: flex;
   flex-direction: column;
   width: 750px;
   height: 475px;
+  color: #fff;
   background: rgba(0, 0, 0, 0.6);
   -webkit-backdrop-filter: blur(72px);
   backdrop-filter: blur(72px);
@@ -124,7 +138,7 @@
   align-items: center;
   height: 56px;
   padding: 16px;
-  border-bottom: 0.5px solid hsla(0, 0%, 100%, 0.1);
+  border-bottom: 0.5px solid #ffffff1a;
 }
 
 .backButton {
@@ -134,7 +148,7 @@
   width: 24px;
   height: 24px;
   font-size: 12px;
-  background: hsla(0, 0%, 100%, 0.1);
+  background: #ffffff1a;
   border-radius: 8px;
   color: white;
   text-decoration: none;
@@ -158,26 +172,42 @@
   border: 0;
   outline: none;
   margin: 0;
+  color: white;
 }
 
 .queryDropdown {
-  color: #fff;
-  -webkit-font-smoothing: antialiased;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  width: 256px;
-  height: 32px;
-  padding: 0 10px;
-  font-size: 13px;
-  font-weight: 400;
-  line-height: 16px;
-  letter-spacing: 0.1px;
-  border: 1px solid hsla(0, 0%, 100%, 0.2);
-  border-radius: 8px;
+  background: #0f1016;
+  text-align: start !important;
+  color: #fff !important;
+  -webkit-font-smoothing: antialiased !important;
+  display: flex !important;
+  gap: 10px !important;
+  align-items: center !important;
+  width: 142px !important;
+  height: 32px !important;
+  padding: 0 10px !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  line-height: 16px !important;
+  letter-spacing: 0.1px !important;
+  border: 1px solid #ffffff33 !important;
+  border-radius: 8px !important;
+}
+.queryDropdownContent {
+  color: #fff !important;
+  padding: 0 10px !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  line-height: 16px !important;
+  letter-spacing: 0.1px !important;
+  border: 1px solid hsla(0, 0%, 100%, 0.2) !important;
+  border-radius: 8px !important;
 }
 .queryDropdown > span {
   flex-grow: 1;
+}
+.queryDropdown:focus {
+  box-shadow: none !important;
 }
 
 /* 中间的内容 */
@@ -198,31 +228,6 @@
 .section {
   display: flex;
   flex-direction: column;
-}
-.items {
-  padding: 0 5px;
-}
-.extension {
-  height: 58px;
-  background: transparent;
-  border-radius: 6px;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  padding: 10px;
-  text-decoration: none;
-  color: #fff;
-
-  font-size: 13px;
-  font-weight: 400;
-  line-height: 16px;
-  color: #fff;
-  text-overflow: ellipsis;
-  letter-spacing: 0.1px;
-  white-space: nowrap;
-}
-.extension:hover {
-  background: hsla(0, 0%, 100%, 0.1);
 }
 
 /* footer */
@@ -294,19 +299,5 @@
   text-transform: uppercase;
   background: hsla(0, 0%, 100%, 0.1);
   border-radius: 4px;
-}
-.hotKeys::after {
-  display: inline-block;
-  width: 2px;
-  height: 12px;
-  margin: 0 8px;
-  content: '';
-  box-sizing: border-box;
-  background: hsla(0, 0%, 100%, 0.1);
-  border-radius: 3px;
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 16px;
-  letter-spacing: 0.1px;
 }
 </style>

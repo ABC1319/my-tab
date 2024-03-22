@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import BackgroundBar from './BackgroundBar.vue'
-import CommandRoot from './CommandRoot.vue'
+import CommandRoot from '~/components/custom-command-modal/CommandRoot.vue'
 import { appWallPaper } from '~/logic'
 import AnimatedBackground from '~/components/AnimatedBackground.vue'
 import { defaultWallpapers } from '~/params/wallpaper'
@@ -53,10 +53,16 @@ async function getAllWallpaper() {
     custom: wallpapers_processing.filter(item => item?.image) as any,
   }
 }
+
+const commandRef = ref()
+function handleOpenCommandMenu(event: MouseEvent) {
+  if (event.button === 1)
+    commandRef.value.handleOpenChange()
+}
 </script>
 
 <template>
-  <div class="w-full h-full overflow-hidden">
+  <div class="w-full h-full overflow-hidden" @mousedown="handleOpenCommandMenu">
     <ContextMenu>
       <ContextMenuTrigger>
         <AnimatedBackground
@@ -67,7 +73,7 @@ async function getAllWallpaper() {
         <BackgroundBar v-model="currentWallpaper" />
       </ContextMenuContent>
     </ContextMenu>
-    <CommandRoot />
+    <CommandRoot ref="commandRef" />
   </div>
 </template>
 

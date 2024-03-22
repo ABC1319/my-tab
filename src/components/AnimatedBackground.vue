@@ -48,8 +48,10 @@ async function startAnimation() {
     )
     animation.onfinish = () => {
       animation.cancel()
-      fakeRef.value!.style.animation = 'none'
-      fakeRef.value!.style.opacity = '0'
+      if (fakeRef.value) {
+        fakeRef.value.style.animation = 'none'
+        fakeRef.value.style.opacity = '0'
+      }
     }
   }
 
@@ -65,8 +67,10 @@ async function startAnimation() {
     )
     animation.onfinish = () => {
       animation.cancel()
-      realRef.value!.style.animation = 'none'
-      realRef.value!.style.opacity = '1'
+      if (realRef.value) {
+        realRef.value.style.animation = 'none'
+        realRef.value.style.opacity = '1'
+      }
     }
   }
 }
@@ -90,6 +94,7 @@ async function startAnimation() {
 
 <style scoped>
 .animated-background-container {
+  user-select: none;
   position: relative;
   width: 100%;
   height: 100%;
